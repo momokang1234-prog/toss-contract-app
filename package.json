@@ -1,0 +1,32 @@
+{
+  "name": "toss-contract-app",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite dev",
+    "build": "vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@apps-in-toss/web-framework": "2.6.1",
+    "@supabase/supabase-js": "^2.107.0",
+    "@toss/tds-mobile": "2.4.0",
+    "@types/react-router-dom": "^5.3.3",
+    "react": "^18.3.0",
+    "react-dom": "^18.3.0",
+    "react-router-dom": "^7.17.0",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.0",
+    "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react": "^4.3.0",
+    "typescript": "^5.5.0",
+    "vite": "^6.0.0",
+    "vitest": "^4.1.8"
+  }
+}
