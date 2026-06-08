@@ -1,16 +1,17 @@
 import { useRef, useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useContracts, type Contract } from '../../hooks/useContracts';
-import { supabase } from '../../api/supabase';
 
 export default function ContractSignPage() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { getContract } = useContracts();
+  const { getContract, signContract } = useContracts();
   const [contract, setContract] = useState<Contract | null>(null);
   const [signing, setSigning] = useState(false);
+  const [signed, setSigned] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isDrawing, setIsDrawing] = useState(false);
+  const [hasDrawn, setHasDrawn] = useState(false);
 
   useEffect(() => {
     if (id) getContract(id).then(c => setContract(c));
@@ -53,6 +54,7 @@ export default function ContractSignPage() {
     const pos = getPos(e);
     ctx.lineTo(pos.x, pos.y);
     ctx.stroke();
+    setHasDrawn(true);
   };
 
   const endDraw = () => setIsDrawing(false);
@@ -61,18 +63,23 @@ export default function ContractSignPage() {
     const canvas = canvasRef.current!;
     const ctx = canvas.getContext('2d')!;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+    setHasDrawn(false);
   };
 
   const handleSign = async () => {
     if (!id || !canvasRef.current) return;
+    if (!hasDrawn) {
+      alert('서명을 그려주세요.');
+      return;
+    }
     setSigning(true);
     try {
       const signatureData = canvasRef.current.toDataURL('image/png');
-      const { error } = await supabase.functions.invoke('contracts-sign', {
-        body: { contractId: id, signatureData },
-      });
-      if (error) throw error;
-      navigate(`/worker/contracts/${id}`, { replace: true });
+      await signContract(id, signatureData);
+      setSigned(true);
+      setTimeout(() => {
+        navigate(`/worker/contracts/${id}`, { replace: true });
+      }, 1500);
     } catch (err) {
       console.error(err);
       alert('서명에 실패했습니다.');
@@ -81,14 +88,38 @@ export default function ContractSignPage() {
     }
   };
 
+  if (signed) {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', padding: 24 }}>
+        <div style={{ fontSize: 48, marginBottom: 16 }}>✅</div>
+        <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 8 }}>서명 완료!</h2>
+        <p style={{ fontSize: 14, color: '#6B7684' }}>근로계약서 서명이 완료되었습니다.</p>
+      </div>
+    );
+  }
+
   if (!contract) return <div style={{ padding: 24, textAlign: 'center', color: '#6B7684' }}>로딩 중...</div>;
+
+  if (contract.status === 'signed' || contract.status === 'completed') {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', padding: 24 }}>
+        <div style={{ fontSize: 48, marginBottom: 16 }}>📋</div>
+        <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 8 }}>이미 서명된 계약서입니다</h2>
+        <button onClick={() => navigate(`/worker/contracts/${id}`, { replace: true })} style={{
+          marginTop: 16, padding: '12px 24px', backgroundColor: '#3182F6', color: '#fff',
+          border: 'none', borderRadius: 10, fontSize: 14, cursor: 'pointer',
+        }}>계약서 보기</button>
+      </div>
+    );
+  }
 
   return (
     <div style={{ padding: 24, maxWidth: 480, margin: '0 auto' }}>
       <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 8 }}>전자서명</h2>
-      <p style={{ fontSize: 14, color: '#6B7684', marginBottom: 24 }}>아래 영역에 서명해주세요.</p>
+      <p style={{ fontSize: 14, color: '#6B7684', marginBottom: 4 }}>{contract.worker_name}님, 아래 영역에 서명해주세요.</p>
+      <p style={{ fontSize: 12, color: '#8B95A1', marginBottom: 24 }}>근무지: {contract.workplace} | 시급: {contract.base_wage.toLocaleString()}원</p>
 
-      <div style={{ border: '2px solid #E5E8EB', borderRadius: 12, overflow: 'hidden', marginBottom: 16 }}>
+      <div style={{ border: '2px solid #E5E8EB', borderRadius: 12, overflow: 'hidden', marginBottom: 16, backgroundColor: '#fff' }}>
         <canvas
           ref={canvasRef}
           width={400}
@@ -110,9 +141,9 @@ export default function ContractSignPage() {
         }}>다시 그리기</button>
       </div>
 
-      <button onClick={handleSign} disabled={signing} style={{
-        width: '100%', padding: '16px', backgroundColor: '#3182F6', color: '#fff', border: 'none',
-        borderRadius: 12, fontSize: 16, fontWeight: 600, cursor: signing ? 'not-allowed' : 'pointer', opacity: signing ? 0.6 : 1,
+      <button onClick={handleSign} disabled={signing || !hasDrawn} style={{
+        width: '100%', padding: '16px', backgroundColor: hasDrawn ? '#3182F6' : '#B0B8C1', color: '#fff', border: 'none',
+        borderRadius: 12, fontSize: 16, fontWeight: 600, cursor: signing || !hasDrawn ? 'not-allowed' : 'pointer', opacity: signing ? 0.6 : 1,
       }}>{signing ? '서명 중...' : '서명 완료'}</button>
     </div>
   );

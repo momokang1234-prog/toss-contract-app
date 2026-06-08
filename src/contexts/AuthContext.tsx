@@ -1,4 +1,5 @@
-import { createContext, useContext, useState, useCallback, type ReactNode } from 'react';
+import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from 'react';
+import { IS_MOCK } from '../api/supabase';
 
 export type UserRole = 'employer' | 'worker' | null;
 
@@ -16,12 +17,29 @@ interface AuthState {
   userName: string | null;
   ci: string | null;
   userProfile: UserProfile | null;
-  login: () => Promise<void>;
+  login: (role?: 'employer' | 'worker') => Promise<void>;
   logout: () => void;
   setRole: (role: 'employer' | 'worker') => Promise<void>;
 }
 
 const AuthContext = createContext<AuthState | null>(null);
+
+const MOCK_PROFILES: Record<string, UserProfile & { role: UserRole }> = {
+  employer: {
+    userKey: 'mock-employer-key',
+    name: '테스트 사장님',
+    phone: '01012345678',
+    ci: 'mock-ci-employer',
+    role: 'employer',
+  },
+  worker: {
+    userKey: 'mock-worker-key',
+    name: '김알바',
+    phone: '01098765432',
+    ci: 'mock-ci-worker',
+    role: 'worker',
+  },
+};
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -31,28 +49,48 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [ci, setCi] = useState<string | null>(null);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
 
-  const login = useCallback(async () => {
+  // Restore mock session from sessionStorage
+  useEffect(() => {
+    if (IS_MOCK) {
+      const savedRole = sessionStorage.getItem('mock_role') as 'employer' | 'worker' | null;
+      if (savedRole && MOCK_PROFILES[savedRole]) {
+        const p = MOCK_PROFILES[savedRole];
+        setIsAuthenticated(true);
+        setUserName(p.name);
+        setCi(p.ci);
+        setUserRole(p.role);
+        setUserProfile({ userKey: p.userKey, name: p.name, phone: p.phone, ci: p.ci });
+      }
+    }
+  }, []);
+
+  const login = useCallback(async (role?: 'employer' | 'worker') => {
     setIsLoading(true);
     try {
-      // TODO: Phase 2에서 실제 토스 인증 연동
-      // 임시 목업: 1초 대기 후 로그인 처리
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      if (IS_MOCK) {
+        await new Promise(r => setTimeout(r, 500));
+        const selectedRole = role ?? 'employer';
+        const p = MOCK_PROFILES[selectedRole];
+        if (!p) throw new Error('Invalid role');
+        sessionStorage.setItem('mock_role', selectedRole);
+        setIsAuthenticated(true);
+        setUserName(p.name);
+        setCi(p.ci);
+        setUserRole(p.role);
+        setUserProfile({ userKey: p.userKey, name: p.name, phone: p.phone, ci: p.ci });
+        return;
+      }
+      // TODO: Real Toss Login integration
+      await new Promise(r => setTimeout(r, 1000));
       setIsAuthenticated(true);
-      setUserName('테스트 사장님');
-      setCi('mock-ci-value');
-      setUserRole('employer');
-      setUserProfile({
-        userKey: 'mock-employer-key',
-        name: '테스트 사장님',
-        phone: '01012345678',
-        ci: 'mock-ci-value',
-      });
+      setUserName('사용자');
     } finally {
       setIsLoading(false);
     }
   }, []);
 
   const logout = useCallback(() => {
+    sessionStorage.removeItem('mock_role');
     setIsAuthenticated(false);
     setUserRole(null);
     setUserName(null);
@@ -62,6 +100,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const setRole = useCallback(async (role: 'employer' | 'worker') => {
     setUserRole(role);
+    if (IS_MOCK) {
+      sessionStorage.setItem('mock_role', role);
+    }
   }, []);
 
   return (

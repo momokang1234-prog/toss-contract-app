@@ -202,20 +202,72 @@ export function useContracts() {
     return data;
   };
 
-  const getHistory = async (contractId: string) => {
+  const sendContract = async (id: string) => {
     if (IS_MOCK) {
-      return [
-        { id: 'hist-1', contract_id: contractId, action: 'created', actor_role: 'employer', created_at: '2026-06-05T10:00:00+09:00' },
-      ];
+      return updateContract(id, { status: 'sent' });
     }
-
-    const { data } = await supabase
-      .from('contract_history')
-      .select('*')
-      .eq('contract_id', contractId)
-      .order('created_at', { ascending: false });
-    return data ?? [];
+    const { data, error } = await supabase.functions.invoke('contracts-send', {
+      body: { contractId: id },
+    });
+    if (error) throw error;
+    await fetchContracts();
+    return data;
   };
 
-  return { contracts, loading, getContract, createContract, updateContract, getHistory, refetch: fetchContracts };
+  const signContract = async (id: string, signatureData: string) => {
+    if (IS_MOCK) {
+      return updateContract(id, {
+        status: 'signed',
+        worker_signature_data: signatureData,
+        worker_signed_at: new Date().toISOString(),
+      });
+    }
+    const { data, error } = await supabase.functions.invoke('contracts-sign', {
+      body: { contractId: id, signatureData },
+    });
+    if (error) throw error;
+    await fetchContracts();
+    return data;
+  };
+
+  const completeContract = async (id: string) => {
+    if (IS_MOCK) {
+      return updateContract(id, { status: 'completed' });
+    }
+    const { data, error } = await supabase.functions.invoke('contracts-complete', {
+      body: { contractId: id },
+    });
+    if (error) throw error;
+    await fetchContracts();
+    return data;
+  };
+
+  return {
+    contracts,
+    loading,
+    getContract,
+    createContract,
+    updateContract,
+    sendContract,
+    signContract,
+    completeContract,
+    getHistory,
+    refetch: fetchContracts,
+  };
+}
+
+// getHistory is a standalone helper (not a hook)
+async function getHistory(contractId: string) {
+  if (IS_MOCK) {
+    return [
+      { id: 'hist-1', contract_id: contractId, action: 'created', actor_role: 'employer', created_at: '2026-06-05T10:00:00+09:00' },
+    ];
+  }
+
+  const { data } = await supabase
+    .from('contract_history')
+    .select('*')
+    .eq('contract_id', contractId)
+    .order('created_at', { ascending: false });
+  return data ?? [];
 }

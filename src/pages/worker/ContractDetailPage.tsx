@@ -3,20 +3,32 @@ import { useParams, Link } from 'react-router-dom';
 import { useContracts, type Contract } from '../../hooks/useContracts';
 import { ContractStatusBadge } from '../../components/contract/ContractStatusBadge';
 import { ContractPreview } from '../../components/contract/ContractPreview';
+import { IS_MOCK } from '../../api/supabase';
 import { supabase } from '../../api/supabase';
 
 export default function WorkerContractDetailPage() {
   const { id } = useParams();
-  const { getContract } = useContracts();
+  const { getContract, updateContract } = useContracts();
   const [contract, setContract] = useState<Contract | null>(null);
 
   useEffect(() => {
     if (id) {
-      // contracts-view Edge Function 호출 (viewed 상태 업데이트)
-      supabase.functions.invoke('contracts-view', {
-        body: {},
-        headers: { 'x-contract-id': id },
-      }).then(() => getContract(id)).then(c => setContract(c));
+      if (IS_MOCK) {
+        // In mock mode, just fetch and update to 'viewed' if still 'sent'
+        getContract(id).then(c => {
+          if (c && c.status === 'sent') {
+            updateContract(id, { status: 'viewed' }).then(updated => setContract(updated));
+          } else {
+            setContract(c);
+          }
+        });
+      } else {
+        // contracts-view Edge Function 호출 (viewed 상태 업데이트)
+        supabase.functions.invoke('contracts-view', {
+          body: {},
+          headers: { 'x-contract-id': id },
+        }).then(() => getContract(id)).then(c => setContract(c));
+      }
     }
   }, [id]);
 

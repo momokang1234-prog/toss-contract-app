@@ -16,6 +16,8 @@
     "@supabase/supabase-js": "^2.107.0",
     "@toss/tds-mobile": "2.4.0",
     "@types/react-router-dom": "^5.3.3",
+    "html2canvas-pro": "^2.0.4",
+    "jspdf": "^4.2.1",
     "react": "^18.3.0",
     "react-dom": "^18.3.0",
     "react-router-dom": "^7.17.0",
