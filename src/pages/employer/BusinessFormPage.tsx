@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useBusiness } from '../../hooks/useBusiness';
-import { TextField, Button, Spacing, Paragraph } from '@toss/tds-mobile';
+import { TextField, Button, Spacing, Paragraph, Top } from '@toss/tds-mobile';
 
 const formatNumber = (v: string) => {
   const digits = v.replace(/\D/g, '').slice(0, 10);
@@ -50,7 +50,7 @@ export default function BusinessFormPage() {
   };
 
   return (
-    <div style={{ padding: 24, maxWidth: 480, margin: '0 auto' }}>
+    <Top>
       <Paragraph typography="st3" fontWeight="bold">사업장 등록</Paragraph>
       <Spacing size={24} />
 
@@ -117,6 +117,6 @@ export default function BusinessFormPage() {
       >
         {submitting ? '등록 중...' : '사업장 등록'}
       </Button>
-    </div>
+    </Top>
   );
 }
