@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { Spacing, ListRow, List, Paragraph } from '@toss/tds-mobile';
 
 export default function RoleSelectPage() {
   const navigate = useNavigate();
@@ -13,24 +14,38 @@ export default function RoleSelectPage() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', padding: 24 }}>
-      <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 8 }}>시작 방법 선택</h2>
+      <Paragraph typography="st3" fontWeight="bold">시작 방법 선택</Paragraph>
+      <Spacing size={8} />
       <p style={{ color: '#6B7684', marginBottom: 32, textAlign: 'center' }}>어떻게 사용하시나요?</p>
 
-      <button
-        onClick={() => handleSelect('employer')}
-        style={{ width: '100%', maxWidth: 320, padding: '20px', marginBottom: 12, backgroundColor: '#fff', border: '2px solid #E5E8EB', borderRadius: 12, cursor: 'pointer', textAlign: 'left' }}
-      >
-        <div style={{ fontSize: 16, fontWeight: 600 }}>사장님</div>
-        <div style={{ fontSize: 14, color: '#6B7684', marginTop: 4 }}>근로계약서를 작성하고 관리해요</div>
-      </button>
-
-      <button
-        onClick={() => handleSelect('worker')}
-        style={{ width: '100%', maxWidth: 320, padding: '20px', backgroundColor: '#fff', border: '2px solid #E5E8EB', borderRadius: 12, cursor: 'pointer', textAlign: 'left' }}
-      >
-        <div style={{ fontSize: 16, fontWeight: 600 }}>근로자</div>
-        <div style={{ fontSize: 14, color: '#6B7684', marginTop: 4 }}>받은 계약서를 확인하고 서명해요</div>
-      </button>
+      <div style={{ width: '100%', maxWidth: 320 }}>
+        <List>
+          <ListRow onClick={() => handleSelect('employer')}>
+            <ListRow.Texts
+              top={{
+                label: '사장님',
+                typo: { fontWeight: 'bold' },
+              }}
+              bottom={{
+                label: '근로계약서를 작성하고 관리해요',
+                typo: { color: '#6B7684' },
+              }}
+            />
+          </ListRow>
+          <ListRow onClick={() => handleSelect('worker')}>
+            <ListRow.Texts
+              top={{
+                label: '근로자',
+                typo: { fontWeight: 'bold' },
+              }}
+              bottom={{
+                label: '받은 계약서를 확인하고 서명해요',
+                typo: { color: '#6B7684' },
+              }}
+            />
+          </ListRow>
+        </List>
+      </div>
     </div>
   );
 }

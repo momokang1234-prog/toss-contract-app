@@ -10,6 +10,7 @@ import EmployerContractList from './pages/employer/ContractListPage';
 import EmployerContractForm from './pages/employer/ContractFormPage';
 import EmployerDashboard from './pages/employer/DashboardPage';
 import EmployerContractDetail from './pages/employer/ContractDetailPage';
+import ContractHistoryPage from './pages/employer/ContractHistoryPage';
 import BusinessFormPage from './pages/employer/BusinessFormPage';
 import WorkerContractList from './pages/worker/ContractListPage';
 import WorkerContractDetail from './pages/worker/ContractDetailPage';
@@ -31,7 +32,7 @@ export default function App() {
             <Route path="contracts" element={<EmployerContractList />} />
             <Route path="contracts/new" element={<EmployerContractForm />} />
             <Route path="contracts/:id" element={<EmployerContractDetail />} />
-            <Route path="contracts/:id/history" element={<div>계약 이력 (준비 중)</div>} />
+            <Route path="contracts/:id/history" element={<ContractHistoryPage />} />
           </Route>
 
           {/* 근로자 */}

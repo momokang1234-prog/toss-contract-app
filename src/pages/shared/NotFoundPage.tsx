@@ -1,11 +1,15 @@
 import { Link } from 'react-router-dom';
+import { Paragraph, Button, Spacing } from '@toss/tds-mobile';
 
 export default function NotFoundPage() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '100vh' }}>
-      <h1 style={{ fontSize: 48, fontWeight: 700 }}>404</h1>
-      <p style={{ color: '#6B7684', marginBottom: 24 }}>페이지를 찾을 수 없어요.</p>
-      <Link to="/login" style={{ color: '#3182F6' }}>로그인으로 돌아가기</Link>
+      <Paragraph typography="st1" fontWeight="bold" style={{ fontSize: 48 }}>404</Paragraph>
+      <Paragraph typography="st4" color="grey600">페이지를 찾을 수 없어요.</Paragraph>
+      <Spacing size={16} />
+      <Link to="/login" style={{ textDecoration: 'none' }}>
+        <Button color="primary" variant="weak" size="large">로그인으로 돌아가기</Button>
+      </Link>
     </div>
   );
 }

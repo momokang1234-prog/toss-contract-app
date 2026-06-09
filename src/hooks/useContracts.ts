@@ -242,6 +242,38 @@ export function useContracts() {
     return data;
   };
 
+  const cancelContract = async (id: string) => {
+    if (IS_MOCK) {
+      return updateContract(id, { status: 'cancelled' });
+    }
+    const { data, error } = await supabase
+      .from('contracts')
+      .update({ status: 'cancelled' })
+      .eq('id', id)
+      .in('status', ['draft', 'signed'])
+      .select()
+      .single();
+    if (error) throw error;
+    await fetchContracts();
+    return data;
+  };
+
+  const expireContract = async (id: string) => {
+    if (IS_MOCK) {
+      return updateContract(id, { status: 'expired' });
+    }
+    const { data, error } = await supabase
+      .from('contracts')
+      .update({ status: 'expired' })
+      .eq('id', id)
+      .in('status', ['sent', 'viewed'])
+      .select()
+      .single();
+    if (error) throw error;
+    await fetchContracts();
+    return data;
+  };
+
   return {
     contracts,
     loading,
@@ -251,6 +283,8 @@ export function useContracts() {
     sendContract,
     signContract,
     completeContract,
+    cancelContract,
+    expireContract,
     getHistory,
     refetch: fetchContracts,
   };

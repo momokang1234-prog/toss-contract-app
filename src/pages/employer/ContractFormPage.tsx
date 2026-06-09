@@ -2,18 +2,26 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useContracts } from '../../hooks/useContracts';
 import { useBusiness } from '../../hooks/useBusiness';
+import { Spacing, TextField, SegmentedControl, FixedBottomCTA, Paragraph, Switch } from '@toss/tds-mobile';
+import { validateLaborContract, type ValidationWarning } from '../../domain/contract/validation';
 
 const DAYS = ['mon','tue','wed','thu','fri','sat','sun'] as const;
 const DAY_LABELS: Record<string, string> = { mon:'월', tue:'화', wed:'수', thu:'목', fri:'금', sat:'토', sun:'일' };
 
+/** camelCase.field.path → snake_case */
+function mapFieldPath(path: string): string {
+  const parts = path.split('.');
+  const last = parts[parts.length - 1];
+  return last.replace(/[A-Z]/g, m => '_' + m.toLowerCase());
+}
+
 export default function ContractFormPage() {
   const navigate = useNavigate();
-  // const { id } = useParams(); // TODO: 향후 수정 모드에서 사용
   const { createContract } = useContracts();
   const { businesses } = useBusiness();
   const [submitting, setSubmitting] = useState(false);
   const [form, setForm] = useState({
-    worker_name: '', worker_phone: '',
+    worker_name: '', worker_phone: '', worker_address: '',
     contract_type: 'partTime',
     workplace: '', job_description: '',
     start_date: '', end_date: '',
@@ -25,6 +33,7 @@ export default function ContractFormPage() {
     paid_leave_clause: true, social_insurance_clause: true, severance_clause: true,
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [warnings, setWarnings] = useState<ValidationWarning[]>([]);
 
   const handleChange = (field: string, value: any) => {
     setForm(prev => ({ ...prev, [field]: value }));
@@ -40,24 +49,77 @@ export default function ContractFormPage() {
     }));
   };
 
-  const validate = () => {
-    const e: Record<string, string> = {};
-    if (!form.worker_name.trim()) e.worker_name = '근로자 이름 필수';
-    if (!/^\d{10,11}$/.test(form.worker_phone)) e.worker_phone = '전화번호 10~11자리';
-    if (!form.workplace.trim()) e.workplace = '근무 장소 필수';
-    if (!form.job_description.trim()) e.job_description = '직무 내용 필수';
-    if (!form.start_date) e.start_date = '시작일 필수';
-    if (!form.base_wage || Number(form.base_wage) <= 0) e.base_wage = '급여 입력';
-    if (form.work_days.length === 0) e.work_days = '근무일 1일 이상';
-    if (!form.start_time || !form.end_time) e.time = '근무 시간 필수';
-    setErrors(e);
-    return Object.keys(e).length === 0;
+  const selectWeeklyHoliday = (day: string) => {
+    setForm(prev => ({
+      ...prev,
+      weekly_holiday: prev.weekly_holiday === day ? '' : day,
+    }));
   };
 
   const handleSubmit = async () => {
-    if (!validate()) return;
     if (businesses.length === 0) { alert('먼저 사업장을 등록해주세요.'); return; }
     setSubmitting(true);
+    setErrors({});
+    setWarnings([]);
+
+    const business = businesses[0];
+
+    // ── Build LaborContract from form state ──
+    const laborContract = {
+      worker: {
+        name: form.worker_name,
+        phone: form.worker_phone,
+        address: form.worker_address || undefined,
+      },
+      employer: {
+        businessNumber: business.business_number,
+        businessName: business.business_name,
+        representative: business.representative,
+        address: business.address,
+      },
+      contract: {
+        contractType: form.contract_type,
+        templateVersion: '1.0.0',
+        status: 'draft' as const,
+        startDate: form.start_date,
+        endDate: form.end_date || undefined,
+        workplace: form.workplace,
+        jobDescription: form.job_description,
+        wageType: form.wage_type,
+        baseWage: Number(form.base_wage) || 0,
+        wagePaymentDate: form.wage_payment_date,
+        wagePaymentMethod: form.wage_payment_method,
+        workDays: form.work_days,
+        startTime: form.start_time,
+        endTime: form.end_time,
+        breakMinutes: Number(form.break_minutes) || 0,
+        weeklyHoliday: form.weekly_holiday || undefined,
+        paidLeaveClause: form.paid_leave_clause,
+        socialInsuranceClause: form.social_insurance_clause,
+        severanceClause: form.severance_clause,
+      },
+    };
+
+    // ── Run validation engine ──
+    const result = validateLaborContract(laborContract);
+
+    if (!result.valid) {
+      const fieldErrors: Record<string, string> = {};
+      for (const err of result.errors) {
+        const field = mapFieldPath(err.field);
+        if (!fieldErrors[field]) fieldErrors[field] = err.message;
+      }
+      setErrors(fieldErrors);
+      setWarnings(result.warnings);
+      setSubmitting(false);
+      return;
+    }
+
+    // Show warnings but allow submission
+    if (result.warnings.length > 0) {
+      setWarnings(result.warnings);
+    }
+
     try {
       await createContract({
         business_id: businesses[0].id,
@@ -69,13 +131,13 @@ export default function ContractFormPage() {
         start_date: form.start_date,
         end_date: form.end_date || undefined,
         wage_type: form.wage_type,
-        base_wage: Number(form.base_wage),
+        base_wage: Number(form.base_wage) || 0,
         wage_payment_date: form.wage_payment_date,
         wage_payment_method: form.wage_payment_method,
         work_days: form.work_days,
         start_time: form.start_time,
         end_time: form.end_time,
-        break_minutes: Number(form.break_minutes),
+        break_minutes: Number(form.break_minutes) || 0,
         weekly_holiday: form.weekly_holiday || undefined,
         paid_leave_clause: form.paid_leave_clause,
         social_insurance_clause: form.social_insurance_clause,
@@ -90,99 +152,234 @@ export default function ContractFormPage() {
     }
   };
 
-  const inputStyle = (field: string) => ({
-    width: '100%', padding: '12px 16px', fontSize: 15,
-    border: `1px solid ${errors[field] ? '#FF5252' : '#E5E8EB'}`, borderRadius: 8,
+  const pillStyle = (active: boolean): React.CSSProperties => ({
+    width: 44, height: 44, borderRadius: 22, fontSize: 13, fontWeight: 600,
+    color: active ? '#fff' : '#333D4B',
+    backgroundColor: active ? '#3182F6' : '#F5F6F8',
+    border: 'none', cursor: 'pointer',
   });
 
   return (
     <div style={{ padding: 24, maxWidth: 480, margin: '0 auto', paddingBottom: 80 }}>
-      <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 24 }}>근로계약서 작성</h2>
+      <Paragraph typography="st3" fontWeight="bold">근로계약서 작성</Paragraph>
+      <Spacing size={24} />
 
-      <h3 style={{ fontSize: 16, fontWeight: 600, marginBottom: 12 }}>근로자 정보</h3>
-      <div style={{ marginBottom: 16 }}>
-        <label style={{ fontSize: 14, display: 'block', marginBottom: 6 }}>근로자 이름</label>
-        <input style={inputStyle('worker_name')} value={form.worker_name} onChange={e => handleChange('worker_name', e.target.value)} />
-        {errors.worker_name && <span style={{ color: '#FF5252', fontSize: 12 }}>{errors.worker_name}</span>}
-      </div>
-      <div style={{ marginBottom: 24 }}>
-        <label style={{ fontSize: 14, display: 'block', marginBottom: 6 }}>전화번호</label>
-        <input style={inputStyle('worker_phone')} placeholder="01012345678" value={form.worker_phone} onChange={e => handleChange('worker_phone', e.target.value.replace(/\D/g, '').slice(0, 11))} />
-        {errors.worker_phone && <span style={{ color: '#FF5252', fontSize: 12 }}>{errors.worker_phone}</span>}
-      </div>
+      {/* ── 근로자 정보 ── */}
+      <Paragraph typography="st3" fontWeight="bold" style={{ marginBottom: 12 }}>근로자 정보</Paragraph>
+      <TextField
+        variant="box"
+        label="근로자 이름"
+        value={form.worker_name}
+        onChange={e => handleChange('worker_name', e.target.value)}
+        hasError={!!errors.worker_name}
+        help={errors.worker_name}
+      />
+      <Spacing size={16} />
+      <TextField
+        variant="box"
+        label="전화번호"
+        placeholder="01012345678"
+        value={form.worker_phone}
+        onChange={e => handleChange('worker_phone', e.target.value.replace(/\D/g, '').slice(0, 11))}
+        hasError={!!errors.worker_phone}
+        help={errors.worker_phone}
+      />
+      <Spacing size={16} />
+      <TextField
+        variant="box"
+        label="근로자 주소 (선택)"
+        placeholder="서울특별시 강남구..."
+        value={form.worker_address}
+        onChange={e => handleChange('worker_address', e.target.value)}
+        hasError={!!errors.worker_address}
+        help={errors.worker_address}
+      />
+      <Spacing size={24} />
 
-      <h3 style={{ fontSize: 16, fontWeight: 600, marginBottom: 12 }}>계약 조건</h3>
-      <div style={{ marginBottom: 16 }}>
-        <label style={{ fontSize: 14, display: 'block', marginBottom: 6 }}>근무 장소</label>
-        <input style={inputStyle('workplace')} value={form.workplace} onChange={e => handleChange('workplace', e.target.value)} />
-        {errors.workplace && <span style={{ color: '#FF5252', fontSize: 12 }}>{errors.workplace}</span>}
-      </div>
-      <div style={{ marginBottom: 16 }}>
-        <label style={{ fontSize: 14, display: 'block', marginBottom: 6 }}>직무 내용</label>
-        <input style={inputStyle('job_description')} value={form.job_description} onChange={e => handleChange('job_description', e.target.value)} />
-        {errors.job_description && <span style={{ color: '#FF5252', fontSize: 12 }}>{errors.job_description}</span>}
-      </div>
-      <div style={{ display: 'flex', gap: 12, marginBottom: 16 }}>
+      {/* ── 계약 조건 ── */}
+      <Paragraph typography="st3" fontWeight="bold" style={{ marginBottom: 12 }}>계약 조건</Paragraph>
+      <TextField
+        variant="box"
+        label="근무 장소"
+        value={form.workplace}
+        onChange={e => handleChange('workplace', e.target.value)}
+        hasError={!!errors.workplace}
+        help={errors.workplace}
+      />
+      <Spacing size={16} />
+      <TextField
+        variant="box"
+        label="직무 내용"
+        value={form.job_description}
+        onChange={e => handleChange('job_description', e.target.value)}
+        hasError={!!errors.job_description}
+        help={errors.job_description}
+      />
+      <Spacing size={16} />
+      <div style={{ display: 'flex', gap: 12 }}>
         <div style={{ flex: 1 }}>
-          <label style={{ fontSize: 14, display: 'block', marginBottom: 6 }}>시작일</label>
-          <input type="date" style={inputStyle('start_date')} value={form.start_date} onChange={e => handleChange('start_date', e.target.value)} />
-          {errors.start_date && <span style={{ color: '#FF5252', fontSize: 12 }}>{errors.start_date}</span>}
+          <TextField
+            variant="box"
+            label="시작일"
+            type="date"
+            value={form.start_date}
+            onChange={e => handleChange('start_date', e.target.value)}
+            hasError={!!errors.start_date}
+            help={errors.start_date}
+          />
         </div>
         <div style={{ flex: 1 }}>
-          <label style={{ fontSize: 14, display: 'block', marginBottom: 6 }}>종료일 (선택)</label>
-          <input type="date" style={inputStyle('end_date')} value={form.end_date} onChange={e => handleChange('end_date', e.target.value)} />
+          <TextField
+            variant="box"
+            label="종료일 (선택)"
+            type="date"
+            value={form.end_date}
+            onChange={e => handleChange('end_date', e.target.value)}
+            hasError={!!errors.end_date}
+            help={errors.end_date}
+          />
         </div>
       </div>
+      <Spacing size={24} />
 
-      <h3 style={{ fontSize: 16, fontWeight: 600, marginBottom: 12 }}>임금</h3>
-      <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
-        {[{ v: 'hourly', l: '시급' }, { v: 'daily', l: '일급' }, { v: 'weekly', l: '주급' }, { v: 'monthly', l: '월급' }].map(opt => (
-          <button key={opt.v} onClick={() => handleChange('wage_type', opt.v)} style={{
-            flex: 1, padding: '10px 0', fontSize: 14, fontWeight: form.wage_type === opt.v ? 600 : 400,
-            color: form.wage_type === opt.v ? '#fff' : '#333D4B',
-            backgroundColor: form.wage_type === opt.v ? '#3182F6' : '#F5F6F8',
-            border: form.wage_type === opt.v ? 'none' : '1px solid #E5E8EB', borderRadius: 10, cursor: 'pointer',
-          }}>{opt.l}</button>
-        ))}
-      </div>
-      <div style={{ marginBottom: 16 }}>
-        <label style={{ fontSize: 14, display: 'block', marginBottom: 6 }}>금액 (원)</label>
-        <input type="number" style={inputStyle('base_wage')} value={form.base_wage} onChange={e => handleChange('base_wage', e.target.value)} />
-        {errors.base_wage && <span style={{ color: '#FF5252', fontSize: 12 }}>{errors.base_wage}</span>}
-      </div>
+      {/* ── 임금 ── */}
+      <Paragraph typography="st3" fontWeight="bold" style={{ marginBottom: 12 }}>임금</Paragraph>
+      <SegmentedControl
+        value={form.wage_type}
+        onChange={(value) => handleChange('wage_type', value)}
+      >
+        <SegmentedControl.Item value="hourly">시급</SegmentedControl.Item>
+        <SegmentedControl.Item value="daily">일급</SegmentedControl.Item>
+        <SegmentedControl.Item value="weekly">주급</SegmentedControl.Item>
+        <SegmentedControl.Item value="monthly">월급</SegmentedControl.Item>
+      </SegmentedControl>
+      <Spacing size={12} />
+      <TextField
+        variant="box"
+        label="금액 (원)"
+        type="number"
+        value={form.base_wage}
+        onChange={e => handleChange('base_wage', e.target.value)}
+        hasError={!!errors.base_wage}
+        help={errors.base_wage}
+      />
+      <Spacing size={16} />
+      <div style={{ fontSize: 13, fontWeight: 600, color: '#4E5968', marginBottom: 8 }}>임금 지급 방법</div>
+      <SegmentedControl
+        value={form.wage_payment_method}
+        onChange={(value) => handleChange('wage_payment_method', value)}
+      >
+        <SegmentedControl.Item value="bankTransfer">계좌이체</SegmentedControl.Item>
+        <SegmentedControl.Item value="cash">현금</SegmentedControl.Item>
+        <SegmentedControl.Item value="mixed">혼합</SegmentedControl.Item>
+      </SegmentedControl>
+      <Spacing size={24} />
 
-      <h3 style={{ fontSize: 16, fontWeight: 600, marginBottom: 12 }}>근무 시간</h3>
+      {/* ── 근무 시간 ── */}
+      <Paragraph typography="st3" fontWeight="bold" style={{ marginBottom: 12 }}>근무 시간</Paragraph>
       <div style={{ display: 'flex', gap: 8, marginBottom: 12, flexWrap: 'wrap' }}>
         {DAYS.map(day => (
-          <button key={day} onClick={() => toggleDay(day)} style={{
-            width: 44, height: 44, borderRadius: 22, fontSize: 13, fontWeight: 600,
-            color: form.work_days.includes(day) ? '#fff' : '#333D4B',
-            backgroundColor: form.work_days.includes(day) ? '#3182F6' : '#F5F6F8',
-            border: 'none', cursor: 'pointer',
-          }}>{DAY_LABELS[day]}</button>
+          <button key={day} onClick={() => toggleDay(day)} style={pillStyle(form.work_days.includes(day))}>
+            {DAY_LABELS[day]}
+          </button>
         ))}
         {errors.work_days && <span style={{ color: '#FF5252', fontSize: 12, width: '100%' }}>{errors.work_days}</span>}
       </div>
-      <div style={{ display: 'flex', gap: 12, marginBottom: 16 }}>
-        <div style={{ flex: 1 }}>
-          <label style={{ fontSize: 14, display: 'block', marginBottom: 6 }}>시작</label>
-          <input type="time" style={inputStyle('start_time')} value={form.start_time} onChange={e => handleChange('start_time', e.target.value)} />
-        </div>
-        <div style={{ flex: 1 }}>
-          <label style={{ fontSize: 14, display: 'block', marginBottom: 6 }}>종료</label>
-          <input type="time" style={inputStyle('end_time')} value={form.end_time} onChange={e => handleChange('end_time', e.target.value)} />
-        </div>
-        <div style={{ flex: 1 }}>
-          <label style={{ fontSize: 14, display: 'block', marginBottom: 6 }}>휴게(분)</label>
-          <input type="number" style={inputStyle('break_minutes')} value={form.break_minutes} onChange={e => handleChange('break_minutes', e.target.value)} />
-        </div>
+
+      {/* 주휴일 */}
+      <div style={{ fontSize: 13, fontWeight: 600, color: '#4E5968', marginBottom: 8 }}>주휴일</div>
+      <div style={{ display: 'flex', gap: 8, marginBottom: 12, flexWrap: 'wrap', alignItems: 'center' }}>
+        {DAYS.map(day => (
+          <button key={day} onClick={() => selectWeeklyHoliday(day)} style={pillStyle(form.weekly_holiday === day)}>
+            {DAY_LABELS[day]}
+          </button>
+        ))}
+        {!form.weekly_holiday && (
+          <span style={{ fontSize: 13, color: '#8B95A1', marginLeft: 4 }}>선택 안 함</span>
+        )}
+        {errors.weekly_holiday && <span style={{ color: '#FF5252', fontSize: 12, width: '100%' }}>{errors.weekly_holiday}</span>}
       </div>
 
-      <button onClick={handleSubmit} disabled={submitting} style={{
-        position: 'fixed', bottom: 0, left: 0, right: 0, padding: '16px',
-        backgroundColor: '#3182F6', color: '#fff', border: 'none', fontSize: 16, fontWeight: 600,
-        cursor: submitting ? 'not-allowed' : 'pointer', opacity: submitting ? 0.6 : 1,
-      }}>{submitting ? '저장 중...' : '계약서 저장'}</button>
+      <div style={{ display: 'flex', gap: 12 }}>
+        <div style={{ flex: 1 }}>
+          <TextField
+            variant="box"
+            label="시작"
+            type="time"
+            value={form.start_time}
+            onChange={e => handleChange('start_time', e.target.value)}
+            hasError={!!errors.start_time}
+            help={errors.start_time}
+          />
+        </div>
+        <div style={{ flex: 1 }}>
+          <TextField
+            variant="box"
+            label="종료"
+            type="time"
+            value={form.end_time}
+            onChange={e => handleChange('end_time', e.target.value)}
+            hasError={!!errors.end_time}
+            help={errors.end_time}
+          />
+        </div>
+        <div style={{ flex: 1 }}>
+          <TextField
+            variant="box"
+            label="휴게(분)"
+            type="number"
+            value={form.break_minutes}
+            onChange={e => handleChange('break_minutes', e.target.value)}
+            hasError={!!errors.break_minutes}
+            help={errors.break_minutes}
+          />
+        </div>
+      </div>
+      <Spacing size={24} />
+
+      {/* ── 근로조건 ── */}
+      <Paragraph typography="st3" fontWeight="bold" style={{ marginBottom: 12 }}>근로조건</Paragraph>
+
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+        <Paragraph as="span" typography="st5" color="grey600">연차 유급휴가</Paragraph>
+        <Switch checked={form.paid_leave_clause} onChange={(e) => handleChange('paid_leave_clause', (e.target as HTMLInputElement).checked)} />
+      </div>
+
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+        <Paragraph as="span" typography="st5" color="grey600">4대 보험</Paragraph>
+        <Switch checked={form.social_insurance_clause} onChange={(e) => handleChange('social_insurance_clause', (e.target as HTMLInputElement).checked)} />
+      </div>
+
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+        <Paragraph as="span" typography="st5" color="grey600">퇴직금</Paragraph>
+        <Switch checked={form.severance_clause} onChange={(e) => handleChange('severance_clause', (e.target as HTMLInputElement).checked)} />
+      </div>
+
+      {/* ── 경고 요약 ── */}
+      {warnings.length > 0 && Object.keys(errors).length === 0 && (
+        <div style={{
+          backgroundColor: '#FFF9DB', borderRadius: 8, padding: 16, marginBottom: 16,
+          border: '1px solid #F2E49B',
+        }}>
+          <div style={{ fontSize: 13, fontWeight: 600, color: '#8B6F00', marginBottom: 8 }}>⚠ 검토 필요</div>
+          {warnings.map((w, i) => (
+            <div key={i} style={{ fontSize: 12, color: '#8B6F00', marginBottom: 4, lineHeight: 1.5 }}>
+              • {w.message}
+            </div>
+          ))}
+        </div>
+      )}
+
+      <Spacing size={100} />
+
+      <FixedBottomCTA>
+        <FixedBottomCTA.Button
+          loading={submitting}
+          onClick={handleSubmit}
+        >
+          {submitting ? '저장 중...' : '계약서 저장'}
+        </FixedBottomCTA.Button>
+      </FixedBottomCTA>
     </div>
   );
 }

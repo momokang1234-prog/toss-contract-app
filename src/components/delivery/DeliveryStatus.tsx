@@ -1,3 +1,5 @@
+import { Paragraph } from "@toss/tds-mobile";
+
 interface DeliveryStatusProps {
   status: string;
   sentAt?: string;
@@ -22,7 +24,7 @@ export function DeliveryStatus({ status }: DeliveryStatusProps) {
             backgroundColor: step.done ? '#3182F6' : '#E5E8EB',
             marginBottom: 6,
           }} />
-          <span style={{ fontSize: 11, color: step.done ? '#3182F6' : '#6B7684' }}>{step.label}</span>
+          <Paragraph typography="st6" color={step.done ? "primary500" : "grey600"}>{step.label}</Paragraph>
         </div>
       ))}
     </div>

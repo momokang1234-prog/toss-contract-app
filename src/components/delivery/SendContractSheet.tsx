@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useDelivery } from '../../hooks/useDelivery';
+import { Button, Paragraph, SegmentedControl, Spacing } from '@toss/tds-mobile';
 
 interface SendContractSheetProps {
   contractId: string;
@@ -26,26 +27,35 @@ export function SendContractSheet({ contractId, workerName, onClose, onSent }: S
       maxWidth: 480, margin: '0 auto',
     }}>
       <div style={{ width: 40, height: 4, backgroundColor: '#E5E8EB', borderRadius: 2, margin: '0 auto 16px' }} />
-      <h3 style={{ fontSize: 18, fontWeight: 700, marginBottom: 8 }}>{workerName}에게 전송</h3>
-      <p style={{ fontSize: 14, color: '#6B7684', marginBottom: 20 }}>전송 방식을 선택해주세요.</p>
+      <Paragraph typography="st2" fontWeight="bold">{workerName}에게 전송</Paragraph>
+      <Spacing size={8} />
+      <Paragraph typography="st4" color="grey600">전송 방식을 선택해주세요.</Paragraph>
+      <Spacing size={16} />
 
-      <div style={{ display: 'flex', gap: 8, marginBottom: 24 }}>
-        {[{ v: 'sms', l: 'SMS' }, { v: 'push', l: 'Push 알림' }, { v: 'share', l: '직접 공유' }].map(opt => (
-          <button key={opt.v} onClick={() => setMethod(opt.v as any)} style={{
-            flex: 1, padding: '12px 0', fontSize: 14, fontWeight: method === opt.v ? 600 : 400,
-            color: method === opt.v ? '#fff' : '#333D4B',
-            backgroundColor: method === opt.v ? '#3182F6' : '#F5F6F8',
-            border: 'none', borderRadius: 10, cursor: 'pointer',
-          }}>{opt.l}</button>
-        ))}
-      </div>
+      <SegmentedControl
+        value={method}
+        onChange={(value) => setMethod(value as 'sms' | 'push' | 'share')}
+      >
+        <SegmentedControl.Item value="sms">SMS</SegmentedControl.Item>
+        <SegmentedControl.Item value="push">Push 알림</SegmentedControl.Item>
+        <SegmentedControl.Item value="share">직접 공유</SegmentedControl.Item>
+      </SegmentedControl>
+      <Spacing size={24} />
 
       <div style={{ display: 'flex', gap: 8 }}>
-        <button onClick={onClose} style={{ flex: 1, padding: '14px', backgroundColor: '#F5F6F8', border: 'none', borderRadius: 10, fontSize: 15, cursor: 'pointer' }}>취소</button>
-        <button onClick={handleSend} disabled={sending} style={{
-          flex: 2, padding: '14px', backgroundColor: '#3182F6', color: '#fff', border: 'none', borderRadius: 10, fontSize: 15, fontWeight: 600,
-          cursor: sending ? 'not-allowed' : 'pointer', opacity: sending ? 0.6 : 1,
-        }}>{sending ? '전송 중...' : '전송하기'}</button>
+        <Button color="light" variant="weak" size="large" style={{ flex: 1 }} onClick={onClose}>
+          취소
+        </Button>
+        <Button
+          color="primary"
+          variant="fill"
+          size="large"
+          style={{ flex: 2 }}
+          onClick={handleSend}
+          disabled={sending}
+        >
+          {sending ? '전송 중...' : '전송하기'}
+        </Button>
       </div>
     </div>
   );

@@ -1,0 +1,1374 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Toss 근로계약서 — 개발자 워크스페이스</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<style>
+  :root {
+    --bg: #F8F9FA;
+    --card: #FFFFFF;
+    --text: #191F28;
+    --text2: #4E5968;
+    --border: #E5E8EB;
+    --accent: #3182F6;
+    --accent2: #00826D;
+    --danger: #C62828;
+    --warning: #F9A825;
+    --sidebar-w: 380px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Pretendard Variable', Pretendard, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    overflow: hidden;
+    height: 100vh;
+    display: flex;
+  }
+
+  /* === SIDEBAR === */
+  .sidebar {
+    width: var(--sidebar-w);
+    min-width: var(--sidebar-w);
+    height: 100vh;
+    background: var(--card);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    z-index: 10;
+  }
+  .sidebar-header {
+    padding: 20px 20px 12px;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  .sidebar-header h1 {
+    font-size: 18px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .sidebar-header .subtitle {
+    font-size: 12px;
+    color: var(--text2);
+    margin-top: 4px;
+  }
+  .sidebar-search {
+    padding: 12px 20px;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  .sidebar-search input {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 13px;
+    font-family: inherit;
+    outline: none;
+    transition: border-color .15s;
+  }
+  .sidebar-search input:focus { border-color: var(--accent); }
+  .sidebar-scroll {
+    flex: 1;
+    overflow-y: auto;
+    padding: 12px 20px 20px;
+  }
+  .sidebar-scroll::-webkit-scrollbar { width: 4px; }
+  .sidebar-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  .page-group { margin-bottom: 20px; }
+  .page-group-title {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text2);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+    padding: 4px 0;
+  }
+  .page-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin-bottom: 6px;
+    cursor: pointer;
+    transition: all .15s;
+    position: relative;
+  }
+  .page-card:hover { background: #F5F8FF; border-color: var(--accent); }
+  .page-card.active { background: #E3F2FD; border-color: var(--accent); box-shadow: 0 0 0 2px rgba(49,130,246,0.15); }
+  .page-card .emoji { font-size: 20px; flex-shrink: 0; width: 24px; text-align: center; }
+  .page-card .info { flex: 1; min-width: 0; }
+  .page-card .route {
+    font-family: 'SF Mono', 'Menlo', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    margin-bottom: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .page-card .title { font-weight: 700; font-size: 13px; }
+  .page-card .src {
+    font-size: 10px;
+    color: var(--text2);
+    margin-top: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .update-dot {
+    position: absolute;
+    top: 6px;
+    right: 8px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--accent2);
+    box-shadow: 0 0 6px rgba(0,130,109,0.3);
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(1.5); }
+  }
+
+  /* === MAIN === */
+  .main {
+    flex: 1;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .main-header {
+    padding: 14px 24px;
+    border-bottom: 1px solid var(--border);
+    background: var(--card);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+  }
+  .main-header h2 { font-size: 16px; font-weight: 700; }
+  .tab-bar {
+    display: flex;
+    gap: 4px;
+  }
+  .tab-btn {
+    padding: 6px 14px;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    background: var(--card);
+    font-size: 13px;
+    font-family: inherit;
+    font-weight: 500;
+    cursor: pointer;
+    color: var(--text2);
+    transition: all .15s;
+  }
+  .tab-btn:hover { background: #F5F8FF; }
+  .tab-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .main-scroll {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px;
+  }
+  .main-scroll::-webkit-scrollbar { width: 6px; }
+  .main-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  .flowchart-section {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 24px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  }
+  .flowchart-section h3 {
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  /* === ZOOMABLE FLOWCHART WRAPPER === */
+  .zoom-container {
+    overflow: auto;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: #FAFBFC;
+    position: relative;
+    cursor: default;
+    min-height: 300px;
+    padding: 16px;
+  }
+  .zoom-inner {
+    transform-origin: 0 0;
+    transition: none;
+    display: inline-block;
+  }
+  .zoom-inner svg {
+    display: block;
+    max-width: none;
+    shape-rendering: auto;
+    text-rendering: auto;
+  }
+
+  /* Zoom controls bar */
+  .zoom-controls {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-shrink: 0;
+  }
+  .zoom-btn {
+    width: 28px;
+    height: 28px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--card);
+    font-size: 16px;
+    font-family: inherit;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text2);
+    transition: all .12s;
+    line-height: 1;
+  }
+  .zoom-btn:hover { background: #F0F4FF; border-color: var(--accent); color: var(--accent); }
+  .zoom-btn:active { background: #E3F2FD; }
+  .zoom-level {
+    font-size: 11px;
+    color: var(--text2);
+    min-width: 40px;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* === LEGEND === */
+  .legend-bar {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 8px 16px;
+    background: #F9FAFB;
+    border-radius: 8px;
+    font-size: 12px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .legend-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .legend-dot.updated { background: var(--accent2); box-shadow: 0 0 4px rgba(0,130,109,0.3); }
+  .legend-dot.normal { background: var(--accent); }
+
+  /* === TOOLTIP === */
+  .node-tooltip {
+    position: fixed;
+    background: #191F28;
+    color: #fff;
+    padding: 10px 14px;
+    border-radius: 10px;
+    font-size: 13px;
+    pointer-events: none;
+    z-index: 100;
+    opacity: 0;
+    transition: opacity .15s;
+    max-width: 260px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+  }
+  .node-tooltip.visible { opacity: 1; }
+  .node-tooltip .tt-route { font-family: monospace; font-size: 11px; color: #64B5F6; margin-bottom: 2px; }
+  .node-tooltip .tt-title { font-weight: 700; margin-bottom: 2px; }
+  .node-tooltip .tt-src { font-size: 11px; color: #B0B8C1; }
+
+  /* === CLICKABLE NODE STYLE === */
+  .mermaid-wrapper svg .clickable-node { cursor: pointer; }
+  .mermaid-wrapper svg .clickable-node:hover { filter: brightness(0.9); }
+
+  /* === DETAIL PANEL (bottom of sidebar) === */
+  .detail-panel {
+    border-top: 1px solid var(--border);
+    padding: 14px 20px;
+    background: #FAFBFC;
+    flex-shrink: 0;
+    max-height: 180px;
+    overflow-y: auto;
+    font-size: 12px;
+    display: none;
+  }
+  .detail-panel.visible { display: block; }
+  .detail-panel .dp-route { font-family: monospace; font-size: 11px; color: var(--accent); }
+  .detail-panel .dp-title { font-weight: 700; font-size: 14px; margin: 4px 0; }
+  .detail-panel .dp-file { font-size: 11px; color: var(--text2); word-break: break-all; }
+  .detail-panel .dp-status { margin-top: 6px; display: flex; gap: 6px; align-items: center; }
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 10px;
+    font-weight: 600;
+  }
+  .badge-updated { background: #E8F5E9; color: #2E7D32; }
+
+  /* === PREVIEW PANEL === */
+  .preview-panel {
+    border-top: 1px solid var(--border);
+    background: var(--card);
+    flex-shrink: 0;
+    display: none;
+    flex-direction: column;
+  }
+  .preview-panel.open { display: flex; height: 55%; }
+  .preview-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 20px;
+    border-bottom: 1px solid var(--border);
+    background: #FAFBFC;
+    flex-shrink: 0;
+  }
+  .preview-header span { font-size: 13px; font-weight: 600; }
+  .preview-frame-wrap {
+    flex: 1; overflow: auto; position: relative;
+    display: flex; align-items: flex-start; justify-content: center;
+    padding: 20px; background: #E8ECF0;
+  }
+  .phone-frame {
+    width: 390px; min-width: 390px; height: 844px;
+    border-radius: 36px;
+    border: 3px solid #333;
+    background: #fff;
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+    position: relative;
+  }
+  .phone-frame iframe {
+    width: 390px; height: 844px;
+    border: none;
+    display: block;
+  }
+
+  /* Mobile responsive */
+  @media (max-width: 768px) {
+    body { flex-direction: column; }
+    .sidebar { width: 100%; min-width: unset; height: 45vh; border-right: none; border-bottom: 1px solid var(--border); }
+    .main { height: 55vh; }
+    .tab-bar { flex-wrap: wrap; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ============== SIDEBAR ============== -->
+<aside class="sidebar">
+  <div class="sidebar-header">
+    <h1>📋 개발자 워크스페이스</h1>
+    <div class="subtitle">toss-contract-app · 14개 라우트 · 2026-06-09 KST</div>
+  </div>
+  <div class="sidebar-search">
+    <input type="text" id="searchInput" placeholder="페이지 검색 (경로·제목·파일명)" oninput="filterPages()">
+  </div>
+  <div class="sidebar-scroll" id="pageOverview">
+  </div>
+  <div class="detail-panel" id="detailPanel">
+    <div class="dp-route" id="dpRoute"></div>
+    <div class="dp-title" id="dpTitle"></div>
+    <div class="dp-file" id="dpFile"></div>
+    <div class="dp-status" id="dpStatus"></div>
+  </div>
+</aside>
+
+<!-- ============== MAIN ============== -->
+<main class="main">
+  <div class="main-header">
+    <h2>🔄 플로우차트</h2>
+    <div class="tab-bar">
+      <button class="tab-btn active" onclick="switchTab('auth')">🔐 인증·온보딩</button>
+      <button class="tab-btn" onclick="switchTab('employer')">🏢 사장님</button>
+      <button class="tab-btn" onclick="switchTab('worker')">👤 근로자</button>
+      <button class="tab-btn" onclick="switchTab('state')">🔄 상태 머신</button>
+      <button class="tab-btn" onclick="switchTab('sequence')">↔️ 상호작용</button>
+    </div>
+  </div>
+  <div class="legend-bar">
+    <div class="legend-item"><div class="legend-dot updated"></div> 최근 수정됨 (2026-06-09)</div>
+    <div class="legend-item"><div class="legend-dot normal"></div> 노드 클릭 → 페이지 상세</div>
+    <span style="color:var(--text2);font-size:11px;">클릭 가능한 노드는 마우스 오버 시 하이라이트됩니다</span>
+  </div>
+  <div class="main-scroll" id="flowchartContainer">
+  </div>
+  <div class="preview-panel" id="previewPanel">
+    <div class="preview-header">
+      <span id="previewTitle">페이지 미리보기</span>
+      <div style="display:flex;gap:6px;align-items:center;">
+        <span id="previewUrl" style="font-size:11px;color:var(--text2);font-family:monospace;"></span>
+        <button class="zoom-btn" onclick="closePreview()" title="닫기" style="font-size:18px;">×</button>
+      </div>
+    </div>
+    <div class="preview-frame-wrap">
+      <div class="phone-frame">
+        <iframe id="previewFrame" src="about:blank" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- ============== TOOLTIP ============== -->
+<div class="node-tooltip" id="tooltip"></div>
+
+<script>
+// ============ DATA: PAGE INVENTORY ============
+const BASE_URL = 'http://toss-contract-app.private-apps.tossmini.com:5173';
+const MOCK_IDS = { ':id': 'mock-contract-001' }; // :id 파라미터 대체값
+
+const pages = [
+  // Common (no auth)
+  { id: 'login', route: '/login', title: '🔐 로그인 화면', src: 'src/pages/auth/LoginPage.tsx', group: 'common', groupLabel: '공통 (인증 불필요)', updated: true },
+  { id: 'role-select', route: '/role-select', title: '👥 역할 선택', src: 'src/pages/auth/RoleSelectPage.tsx', group: 'common', groupLabel: '공통 (인증 불필요)', updated: false },
+  { id: 'deeplink', route: '/contract/:id', title: '🔗 딥링크 핸들러', src: 'src/pages/shared/DeeplinkHandler.tsx', group: 'common', groupLabel: '공통 (인증 불필요)', updated: true },
+  { id: 'root', route: '/', title: '↩️ 진입 리다이렉트', src: 'src/App.tsx', group: 'common', groupLabel: '공통 (인증 불필요)', updated: false },
+  { id: '404', route: '*', title: '🚫 404 페이지', src: 'src/pages/shared/NotFoundPage.tsx', group: 'common', groupLabel: '공통 (인증 불필요)', updated: false },
+
+  // Employer
+  { id: 'dashboard', route: '/employer/dashboard', title: '📊 대시보드', src: 'src/pages/employer/DashboardPage.tsx', group: 'employer', groupLabel: '사장님 (RoleGuard: employer)', updated: false },
+  { id: 'business-new', route: '/employer/business/new', title: '🏪 사업장 등록', src: 'src/pages/employer/BusinessFormPage.tsx', group: 'employer', groupLabel: '사장님 (RoleGuard: employer)', updated: false },
+  { id: 'contracts-list', route: '/employer/contracts', title: '📋 계약 목록', src: 'src/pages/employer/ContractListPage.tsx', group: 'employer', groupLabel: '사장님 (RoleGuard: employer)', updated: false },
+  { id: 'contracts-new', route: '/employer/contracts/new', title: '📝 새 계약 작성', src: 'src/pages/employer/ContractFormPage.tsx', group: 'employer', groupLabel: '사장님 (RoleGuard: employer)', updated: false },
+  { id: 'contract-detail', route: '/employer/contracts/:id', title: '🔍 계약서 상세', src: 'src/pages/employer/ContractDetailPage.tsx', group: 'employer', groupLabel: '사장님 (RoleGuard: employer)', updated: true },
+  { id: 'contract-history', route: '/employer/contracts/:id/history', title: '📜 계약 이력', src: 'src/pages/employer/ContractHistoryPage.tsx', group: 'employer', groupLabel: '사장님 (RoleGuard: employer)', updated: false },
+
+  // Worker
+  { id: 'worker-list', route: '/worker/contracts', title: '📋 내 계약 목록', src: 'src/pages/worker/ContractListPage.tsx', group: 'worker', groupLabel: '근로자 (RoleGuard: worker)', updated: false },
+  { id: 'worker-detail', route: '/worker/contracts/:id', title: '📄 계약서 상세', src: 'src/pages/worker/ContractDetailPage.tsx', group: 'worker', groupLabel: '근로자 (RoleGuard: worker)', updated: true },
+  { id: 'worker-sign', route: '/worker/contracts/:id/sign', title: '✍️ 전자서명', src: 'src/pages/worker/ContractSignPage.tsx', group: 'worker', groupLabel: '근로자 (RoleGuard: worker)', updated: true },
+];
+
+// ============ NODE -> PAGE MAPPINGS ============
+// Maps Mermaid node IDs to page IDs. Also maps text patterns for fallback.
+const nodeMappings = {
+  // Auth flow nodes
+  'LOGIN_PAGE': 'login',
+  'ROLE_PAGE': 'role-select',
+  'DEEPLINK': 'deeplink',
+  'ROUTE': 'deeplink',
+  'LOGIN_REDIRECT': 'login',
+  'REDIRECT_ROLE_SELECT': 'role-select',
+
+  // Employer flow nodes
+  'DASHBOARD': 'dashboard',
+  'REGISTER': 'business-new',
+  'REGISTER_PROMPT': 'business-new',
+  'NEW_CONTRACT': 'contracts-new',
+  'FORM': 'contracts-new',
+  'CONTRACT_LIST': 'contracts-list',
+  'LIST_ITEMS': 'contracts-list',
+  'CONTRACT_DETAIL': 'contract-detail',
+  'HISTORY': 'contract-history',
+  'SEND_SHEET': 'contract-detail',
+  'SIGNED_STATE': 'contract-detail',
+  'DRAFT_STATE': 'contract-detail',
+
+  // Worker flow nodes
+  'VIEW_CONTRACT': 'worker-detail',
+  'SIGN_PAGE': 'worker-sign',
+  'GO_SIGN': 'worker-sign',
+  'LIST_ENTRY': 'worker-list',
+  'HAS_ITEMS': 'worker-list',
+  'BACK_DETAIL': 'worker-detail',
+  'START': 'deeplink',
+  'DEEP_LOAD': 'deeplink',
+
+  // Navigation-only nodes (no dedicated page)
+  'REDIRECT_BY_ROLE': 'dashboard',
+  'REDIRECT_EMP': 'dashboard',
+  'REDIRECT_WORK': 'worker-list',
+  'CLICK_CARD': 'worker-detail',
+  'HIST_ENTRY': 'contract-history',
+  'TIMELINE': 'contract-history',
+  'PDF': 'contract-detail',
+  'COMPLETED': 'worker-detail',
+  'COMPLETED_VIEW': 'worker-detail',
+  'SIGN_SUCCESS': 'worker-sign',
+  'SHOW_SIGNED': 'worker-detail',
+};
+
+// Fallback: text pattern → page ID
+const textPatterns = [
+{ pattern: /로그인/, pageId: 'login' },
+{ pattern: /역할\s*선택/, pageId: 'role-select' },
+{ pattern: /딥링크/, pageId: 'deeplink' },
+{ pattern: /대시보드/, pageId: 'dashboard' },
+{ pattern: /사업장\s*등록/, pageId: 'business-new' },
+{ pattern: /새\s*계약\s*작성/, pageId: 'contracts-new' },
+{ pattern: /계약서\s*양식/, pageId: 'contracts-new' },
+{ pattern: /계약\s*목록/, pageId: 'contracts-list' },
+{ pattern: /계약서\s*상세/, pageId: 'contract-detail' },
+{ pattern: /계약\s*이력/, pageId: 'contract-history' },
+{ pattern: /전자서명/, pageId: 'worker-sign' },
+{ pattern: /서명하기/, pageId: 'worker-sign' },
+{ pattern: /서명\s*화면/, pageId: 'worker-sign' },
+{ pattern: /내\s*계약\s*목록/, pageId: 'worker-list' },
+{ pattern: /계약\s*링크\s*수신/, pageId: 'deeplink' },
+{ pattern: /전송\s*바텀시트/, pageId: 'contract-detail' },
+{ pattern: /계약서\s*열람/, pageId: 'worker-detail' },
+{ pattern: /사장님\s*선택/, pageId: 'dashboard' },
+{ pattern: /근로자\s*선택/, pageId: 'worker-list' },
+{ pattern: /탭\s*→/, pageId: 'worker-detail' },
+];
+
+function findPageId(nodeId, nodeText) {
+  // Direct mapping
+  if (nodeMappings[nodeId]) return nodeMappings[nodeId];
+  // Text pattern matching
+  for (const { pattern, pageId } of textPatterns) {
+    if (pattern.test(nodeText)) return pageId;
+  }
+  return null;
+}
+
+// ============ RENDER PAGE OVERVIEW ============
+function renderPageOverview(filter = '') {
+  const container = document.getElementById('pageOverview');
+  const groups = {};
+  for (const p of pages) {
+    if (filter) {
+      const q = filter.toLowerCase();
+      if (!p.route.toLowerCase().includes(q) &&
+          !p.title.toLowerCase().includes(q) &&
+          !p.src.toLowerCase().includes(q)) continue;
+    }
+    if (!groups[p.group]) groups[p.group] = [];
+    groups[p.group].push(p);
+  }
+
+  let html = '';
+  for (const [group, items] of Object.entries(groups)) {
+    const label = items[0].groupLabel;
+    html += `<div class="page-group"><div class="page-group-title">${label}</div>`;
+    for (const p of items) {
+      const updatedDot = p.updated ? '<div class="update-dot" title="최근 수정됨 (2026-06-09)"></div>' : '';
+      const safeId = p.id.replace(/[^a-z0-9-]/g, '-');
+      html += `
+        <div class="page-card" id="card-${safeId}" data-page-id="${p.id}" onclick="selectPage('${p.id}')">
+          ${updatedDot}
+          <div class="emoji">${p.title.slice(0,2)}</div>
+          <div class="info">
+            <div class="route">${p.route}</div>
+            <div class="title">${p.title}</div>
+            <div class="src">${p.src}</div>
+          </div>
+        </div>`;
+    }
+    html += '</div>';
+  }
+  container.innerHTML = html || '<div style="padding:20px;color:var(--text2);text-align:center;">일치하는 페이지 없음</div>';
+}
+
+function filterPages() {
+  const q = document.getElementById('searchInput').value;
+  renderPageOverview(q);
+}
+
+function selectPage(pageId) {
+  // Highlight card
+  document.querySelectorAll('.page-card').forEach(c => c.classList.remove('active'));
+  const card = document.querySelector(`[data-page-id="${pageId}"]`);
+  if (card) {
+    card.classList.add('active');
+    card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+  // Show detail panel
+  showDetail(pageId);
+  // Open page preview
+  openPreview(pageId);
+}
+
+function openPreview(pageId) {
+  const p = pages.find(x => x.id === pageId);
+  if (!p) return;
+  // :id 파라미터 치환
+  let url = p.route;
+  for (const [param, val] of Object.entries(MOCK_IDS)) {
+    url = url.replace(param, val);
+  }
+  const fullUrl = BASE_URL + url;
+  const panel = document.getElementById('previewPanel');
+  document.getElementById('previewTitle').textContent = p.title;
+  document.getElementById('previewUrl').textContent = url;
+  document.getElementById('previewFrame').src = fullUrl;
+  panel.classList.add('open');
+}
+
+function closePreview() {
+  const panel = document.getElementById('previewPanel');
+  panel.classList.remove('open');
+  document.getElementById('previewFrame').src = 'about:blank';
+}
+
+function showDetail(pageId) {
+  const p = pages.find(x => x.id === pageId);
+  if (!p) return;
+  const panel = document.getElementById('detailPanel');
+  document.getElementById('dpRoute').textContent = p.route;
+  document.getElementById('dpTitle').textContent = p.title;
+  document.getElementById('dpFile').textContent = p.src;
+  const statusHtml = p.updated
+    ? '<span class="badge badge-updated">● 최근 수정됨 (2026-06-09)</span>'
+    : '<span style="color:var(--text2);font-size:11px;">변경 없음</span>';
+  document.getElementById('dpStatus').innerHTML = statusHtml;
+  panel.classList.add('visible');
+}
+
+// ============ MERMAID FLOWCHART DEFINITIONS ============
+const flowchartDefs = {
+  auth: `flowchart TD
+    ENTRY(["🚀 앱 최초 진입 / 루트 접근"])
+    LOGIN_PAGE["🔐 로그인 화면<br/>'근로계약서' 타이틀<br/>'토스에서 간편하게' 문구"]
+    MODE_CHECK{"IS_MOCK<br/>(환경변수)"}
+    MOCK_MODE["🧪 Mock 모드<br/>━━━━━━━━━━━<br/>[사장님으로 로그인] 버튼<br/>[근로자로 로그인] 버튼"]
+    PROD_MODE["🏦 Production 모드<br/>━━━━━━━━━━━<br/>[토스로 시작하기] 버튼"]
+    TOSS_AUTH["🔐 토스 본인인증<br/>AuthScreen 컴포넌트<br/>원터치 인증 / CI 수집"]
+    AUTH_POLLING["⏳ 인증 대기<br/>토스 앱에서 확인<br/>최대 5분 (60회 폴링)"]
+    AUTH_COMPLETE{"인증 결과"}
+    AUTH_SUCCESS["✅ 인증 성공<br/>userKey·CI·이름 수신"]
+    AUTH_FAIL["❌ 인증 실패<br/>만료 / 시간초과 / 거절"]
+    MOCK_LOGIN["✅ Mock 로그인<br/>선택 역할로 즉시 인증<br/>sessionStorage 저장"]
+    ALREADY_AUTH{"이미 로그인?"}
+    ROLE_EXISTS{"역할 선택됨?"}
+    REDIRECT_BY_ROLE["↩️ 역할별 자동 이동<br/>employer → /employer/dashboard<br/>worker → /worker/contracts"]
+    REDIRECT_ROLE_SELECT["↩️ /role-select"]
+
+    ENTRY --> LOGIN_PAGE
+    LOGIN_PAGE --> ALREADY_AUTH
+    ALREADY_AUTH -->|Yes| ROLE_EXISTS
+    ALREADY_AUTH -->|No| MODE_CHECK
+    ROLE_EXISTS -->|Yes| REDIRECT_BY_ROLE
+    ROLE_EXISTS -->|No| REDIRECT_ROLE_SELECT
+    MODE_CHECK -->|Mock| MOCK_MODE
+    MODE_CHECK -->|Production| PROD_MODE
+    MOCK_MODE --> MOCK_LOGIN
+    MOCK_LOGIN --> REDIRECT_BY_ROLE
+    PROD_MODE --> TOSS_AUTH
+    TOSS_AUTH --> AUTH_POLLING
+    AUTH_POLLING --> AUTH_COMPLETE
+    AUTH_COMPLETE -->|성공| AUTH_SUCCESS
+    AUTH_COMPLETE -->|실패| AUTH_FAIL
+    AUTH_FAIL --> LOGIN_PAGE
+    AUTH_SUCCESS --> ROLE_EXISTS
+
+    click LOGIN_PAGE callback
+    click ROLE_PAGE callback
+    click DEEPLINK callback
+    click LOGIN_REDIRECT callback
+    click REDIRECT_ROLE_SELECT callback
+    click REDIRECT_BY_ROLE callback
+    click ENTRY callback
+    click MOCK_LOGIN callback
+    click AUTH_SUCCESS callback
+    click AUTH_FAIL callback
+
+    style ENTRY fill:#E3F2FD,stroke:#1976D2
+    style AUTH_SUCCESS fill:#E8F5E9,stroke:#2E7D32
+    style AUTH_FAIL fill:#FFEBEE,stroke:#C62828
+    style MOCK_LOGIN fill:#FFF9C4,stroke:#F9A825
+    style LOGIN_PAGE fill:#F5F5F5,stroke:#9E9E9E`,
+
+  employer: `flowchart TD
+    START(["🏢 로그인<br/>login → role-select → 사장님"])
+    DASHBOARD["📊 대시보드<br/>employer/dashboard<br/>전체·작성중·전송됨·서명완료 통계"]
+    FIRST_TIME{"사업장 등록됨?"}
+    REGISTER_PROMPT["⚠️ 사업장 등록 안내<br/>'사업장을 먼저 등록해주세요'<br/>[사업장 등록하기] 링크"]
+    REGISTER["🏪 사업장 등록<br/>employer/business/new<br/>사업자등록번호·상호·대표자·소재지"]
+    REG_VALIDATE{"유효성 검증"}
+    REG_ERROR["⚠️ 필드 오류<br/>형식·필수값"]
+    REG_SUCCESS["✅ 등록 완료 → 대시보드"]
+    ACTION{"액션"}
+    NEW_CONTRACT["📝 새 계약 작성<br/>employer/contracts/new"]
+    FORM["📋 계약서 양식<br/>━━━━━━━━━━━━━<br/>근로자: 이름·전화번호·주소<br/>계약: 근무장소·직무·시작일·종료일<br/>임금: 시급·일급·주급·월급·금액<br/>근무: 요일·시작·종료·휴게시간<br/>주휴일·유급휴가·4대보험·퇴직금"]
+    VALIDATE{"유효성 검증<br/>validateLaborContract()"}
+    VALID_ERROR["⚠️ 오류 필드 표시<br/>필수 누락·전화번호 형식·근무일"]
+    VALID_WARN["⚠️ 근로기준법 경고<br/>'검토 필요' 요약 표시<br/>(제출은 가능)"]
+    SAVE["💾 계약서 저장<br/>status: draft"]
+    CONTRACT_LIST["📋 계약 목록<br/>employer/contracts"]
+    LIST_LOADING["⏳ 로딩 (Skeleton)"]
+    LIST_EMPTY["📭 빈 목록<br/>'아직 계약서가 없어요'<br/>[첫 계약서 작성하기]"]
+    LIST_ITEMS["📑 ContractCard 리스트"]
+    CONTRACT_DETAIL["🔍 계약서 상세<br/>employer/contracts/:id<br/>미리보기·서명 확인"]
+    STATUS_CHECK{"현재 상태?"}
+    DRAFT_STATE["📝 draft<br/>[근로자에게 전송] 버튼<br/>[취소] 버튼"]
+    SEND_SHEET["📤 전송 바텀시트<br/>SendContractSheet<br/>━━━━━━━━━━━<br/>SMS / Push 알림 / 직접 공유<br/>[전송하기] [취소]"]
+    SENT_OK["📨 status → sent<br/>근로자에게 발송"]
+    WAIT_VIEW["⏳ 근로자 열람 대기<br/>(sent → viewed 자동)"]
+    WAIT_SIGN["⏳ 근로자 서명 대기<br/>(viewed → signed)"]
+    SIGNED_STATE["✍️ signed<br/>서명 이미지 표시<br/>서명일자 표시<br/>[계약 확정] [취소] 버튼"]
+    CONFIRM_PROMPT{"'계약을 확정하시겠습니까?'"}
+    COMPLETE["🎉 status → completed<br/>✅ 계약 완료 배지"]
+    CANCEL_PROMPT{"'계약을 취소하시겠습니까?<br/>되돌릴 수 없습니다.'"}
+    CANCEL["❌ status → cancelled<br/>🚫 취소된 계약"]
+    TERMINAL_CANCEL["🚫 취소 안내<br/>'이 계약은 취소되어<br/>더 이상 진행할 수 없습니다'"]
+    TERMINAL_EXPIRED["⏰ 만료 안내<br/>'유효 기간이 만료되었습니다'"]
+    HISTORY["📜 계약 이력 보기<br/>employer/contracts/:id/history<br/>타임라인 뷰"]
+    PDF["📥 PDF 다운로드<br/>(completed 상태)"]
+
+    START --> DASHBOARD
+    DASHBOARD --> FIRST_TIME
+    FIRST_TIME -->|No| REGISTER_PROMPT
+    FIRST_TIME -->|Yes| ACTION
+    REGISTER_PROMPT --> REGISTER
+    REGISTER --> REG_VALIDATE
+    REG_VALIDATE -->|실패| REG_ERROR
+    REG_ERROR --> REGISTER
+    REG_VALIDATE -->|통과| REG_SUCCESS
+    REG_SUCCESS --> DASHBOARD
+    ACTION -->|새 계약| NEW_CONTRACT
+    ACTION -->|전체 목록| CONTRACT_LIST
+    NEW_CONTRACT --> FORM
+    FORM --> VALIDATE
+    VALIDATE -->|오류| VALID_ERROR
+    VALID_ERROR --> FORM
+    VALIDATE -->|경고만| VALID_WARN
+    VALID_WARN --> SAVE
+    VALIDATE -->|통과| SAVE
+    SAVE --> CONTRACT_LIST
+    CONTRACT_LIST --> LIST_LOADING
+    LIST_LOADING -->|0건| LIST_EMPTY
+    LIST_LOADING -->|1건+| LIST_ITEMS
+    LIST_ITEMS --> CONTRACT_DETAIL
+    CONTRACT_DETAIL --> STATUS_CHECK
+    STATUS_CHECK -->|draft| DRAFT_STATE
+    STATUS_CHECK -->|sent| WAIT_VIEW
+    STATUS_CHECK -->|viewed| WAIT_SIGN
+    STATUS_CHECK -->|signed| SIGNED_STATE
+    STATUS_CHECK -->|completed| PDF
+    STATUS_CHECK -->|cancelled| TERMINAL_CANCEL
+    STATUS_CHECK -->|expired| TERMINAL_EXPIRED
+    DRAFT_STATE -->|전송| SEND_SHEET
+    DRAFT_STATE -->|취소| CANCEL_PROMPT
+    SEND_SHEET --> SENT_OK
+    SENT_OK --> WAIT_VIEW
+    WAIT_VIEW --> WAIT_SIGN
+    WAIT_SIGN --> SIGNED_STATE
+    SIGNED_STATE -->|확정| CONFIRM_PROMPT
+    SIGNED_STATE -->|취소| CANCEL_PROMPT
+    CONFIRM_PROMPT -->|확인| COMPLETE
+    CONFIRM_PROMPT -->|취소| SIGNED_STATE
+    CANCEL_PROMPT -->|확인| CANCEL
+    CANCEL_PROMPT -->|취소| STATUS_CHECK
+    COMPLETE --> PDF
+    CONTRACT_DETAIL --> HISTORY
+
+    click DASHBOARD callback
+    click REGISTER callback
+    click REGISTER_PROMPT callback
+    click NEW_CONTRACT callback
+    click FORM callback
+    click CONTRACT_LIST callback
+    click LIST_ITEMS callback
+    click CONTRACT_DETAIL callback
+    click HISTORY callback
+    click SEND_SHEET callback
+    click SIGNED_STATE callback
+    click DRAFT_STATE callback
+    click START callback
+    click PDF callback
+
+    style START fill:#E3F2FD,stroke:#1976D2
+    style COMPLETE fill:#C8E6C9,stroke:#1B5E20,stroke-width:3px
+    style SAVE fill:#E8F5E9,stroke:#2E7D32
+    style SENT_OK fill:#BBDEFB,stroke:#1565C0
+    style VALIDATE fill:#FFF3E0,stroke:#E65100
+    style STATUS_CHECK fill:#FFF3E0,stroke:#E65100
+    style CONFIRM_PROMPT fill:#FFF3E0,stroke:#E65100
+    style CANCEL_PROMPT fill:#FFEBEE,stroke:#C62828
+    style CANCEL fill:#FFCDD2,stroke:#C62828
+    style DASHBOARD fill:#F3E5F5,stroke:#7B1FA2
+    style PDF fill:#E8EAF6,stroke:#283593
+    style SEND_SHEET fill:#E1F5FE,stroke:#0288D1
+    style REGISTER_PROMPT fill:#FFF8E1,stroke:#F9A825
+    style LIST_EMPTY fill:#F5F5F5,stroke:#9E9E9E
+    style TERMINAL_CANCEL fill:#FFEBEE,stroke:#C62828
+    style TERMINAL_EXPIRED fill:#ECEFF1,stroke:#607D8B
+    style VALID_WARN fill:#FFF9C4,stroke:#F9A825`,
+
+  worker: `flowchart TD
+    START(["📱 계약 링크 수신<br/>SMS / Push / 공유링크"])
+    DEEPLINK["🔗 딥링크 진입<br/>contract/:id<br/>DeeplinkHandler"]
+    DEEP_LOAD["⏳ 계약서 로딩 중..."]
+    AUTH_CHECK{"이미 로그인?"}
+    LOGIN_REDIRECT["🔐 로그인 필요<br/>→ /login?redirect=/contract/:id"]
+    ROLE_SELECT{"역할 선택됨?"}
+    ROLE_PICK["👤 역할 선택<br/>role-select → 근로자"]
+    ROUTE["DeeplinkHandler 라우팅<br/>→ worker/contracts/:id"]
+    VIEW_CONTRACT["📄 계약서 상세 보기<br/>WorkerContractDetailPage"]
+    AUTO_VIEWED{"status == sent?"}
+    MARK_VIEWED["👁️ 자동 상태 변경<br/>sent → viewed<br/>(Edge Function 호출)"]
+    REVIEW["🔍 계약 내용 검토<br/>근무장소 · 직무 · 임금<br/>근무시간 · 휴게시간 · 주휴일<br/>유급휴가 · 사회보험 · 퇴직금"]
+    DECISION{"근로자 결정<br/>(sent/viewed 상태)"}
+    REJECT["❌ 거절 / 미응답<br/>(MVP: 별도 버튼 없음<br/>미응답 상태로 남음)"]
+    GO_SIGN["✍️ 서명하기 클릭<br/>worker/contracts/:id/sign"]
+    SIGN_PAGE["🖊️ 전자서명 화면<br/>ContractSignPage"]
+    ALREADY_SIGNED{"이미 서명됨?<br/>(signed/completed)"}
+    SHOW_SIGNED["📋 이미 서명된 계약<br/>'이미 서명된 계약서입니다'<br/>[계약서 보기] 버튼"]
+    CANVAS["🖌️ Canvas 서명 영역<br/>터치/마우스 드로잉<br/>[다시 그리기] 버튼"]
+    DRAW_SIGN{"서명 입력?"}
+    EMPTY_ALERT["⚠️ '서명을 그려주세요'"]
+    SUBMIT["📤 서명 완료 제출<br/>서명 이미지 base64 전송<br/>signContract()"]
+    SIGNING["⏳ 서명 중..."]
+    SIGN_SUCCESS["✅ 서명 완료<br/>status → signed<br/>worker_signature_data 저장<br/>worker_signed_at 기록"]
+    CONFIRM_SCREEN["🎉 서명 완료 확인<br/>✅ 아이콘 + 메시지<br/>1.5초 후 자동 이동"]
+    BACK_DETAIL["📋 계약서 상세 복귀<br/>✅ 서명 완료 배지"]
+    WAIT_COMPLETE["⏳ 사장님 확정 대기"]
+    COMPLETED["🏁 status → completed<br/>계약 완료"]
+    COMPLETED_VIEW["✅ 계약 완료 상태<br/>서명 완료 배지 유지"]
+
+    START --> DEEPLINK
+    DEEPLINK --> DEEP_LOAD
+    DEEP_LOAD --> AUTH_CHECK
+    AUTH_CHECK -->|No| LOGIN_REDIRECT
+    LOGIN_REDIRECT -->|로그인 후 redirect 복귀| ROUTE
+    AUTH_CHECK -->|Yes| ROLE_SELECT
+    ROLE_SELECT -->|미선택| ROLE_PICK
+    ROLE_SELECT -->|선택됨| ROUTE
+    ROLE_PICK --> ROUTE
+    ROUTE --> VIEW_CONTRACT
+    VIEW_CONTRACT --> AUTO_VIEWED
+    AUTO_VIEWED -->|Yes| MARK_VIEWED
+    AUTO_VIEWED -->|No| REVIEW
+    MARK_VIEWED --> REVIEW
+    REVIEW --> DECISION
+    DECISION -->|거절/미응답| REJECT
+    DECISION -->|수락| GO_SIGN
+    GO_SIGN --> SIGN_PAGE
+    SIGN_PAGE --> ALREADY_SIGNED
+    ALREADY_SIGNED -->|Yes| SHOW_SIGNED
+    ALREADY_SIGNED -->|No| CANVAS
+    SHOW_SIGNED --> BACK_DETAIL
+    CANVAS --> DRAW_SIGN
+    DRAW_SIGN -->|미입력| EMPTY_ALERT
+    EMPTY_ALERT --> CANVAS
+    DRAW_SIGN -->|입력됨| SUBMIT
+    SUBMIT --> SIGNING
+    SIGNING --> SIGN_SUCCESS
+    SIGN_SUCCESS --> CONFIRM_SCREEN
+    CONFIRM_SCREEN --> BACK_DETAIL
+    BACK_DETAIL --> WAIT_COMPLETE
+    WAIT_COMPLETE --> COMPLETED
+    COMPLETED --> COMPLETED_VIEW
+
+    click START callback
+    click DEEPLINK callback
+    click LOGIN_REDIRECT callback
+    click ROUTE callback
+    click VIEW_CONTRACT callback
+    click GO_SIGN callback
+    click SIGN_PAGE callback
+    click BACK_DETAIL callback
+    click DEEP_LOAD callback
+    click SHOW_SIGNED callback
+    click SIGN_SUCCESS callback
+    click COMPLETED callback
+
+    style START fill:#E3F2FD,stroke:#1976D2
+    style REJECT fill:#FFEBEE,stroke:#C62828
+    style SIGN_SUCCESS fill:#E8F5E9,stroke:#2E7D32
+    style COMPLETED fill:#C8E6C9,stroke:#1B5E20,stroke-width:3px
+    style CONFIRM_SCREEN fill:#FFF9C4,stroke:#F9A825
+    style DECISION fill:#FFF3E0,stroke:#E65100
+    style AUTO_VIEWED fill:#FFF3E0,stroke:#E65100
+    style LOGIN_REDIRECT fill:#FFEBEE,stroke:#C62828
+    style SHOW_SIGNED fill:#E3F2FD,stroke:#1976D2
+    style DEEP_LOAD fill:#F5F5F5,stroke:#9E9E9E`,
+
+  state: `stateDiagram-v2
+    [*] --> draft: 사장님이 계약서 작성
+    draft --> sent: 사장님이 근로자에게 전송 (바텀시트)
+    draft --> cancelled: 사장님이 취소 (confirm)
+    sent --> viewed: 근로자가 계약서 열람 (Edge Function)
+    sent --> expired: 유효기간 만료
+    viewed --> signed: 근로자가 전자서명 완료
+    viewed --> expired: 유효기간 만료
+    signed --> completed: 사장님이 계약 확정 (confirm)
+    signed --> cancelled: 사장님이 취소 (confirm)
+    completed --> [*]
+    cancelled --> [*]
+    expired --> [*]`,
+
+  sequence: `sequenceDiagram
+    actor E as 🏢 사장님
+    participant App as Toss 미니앱
+    participant BE as Supabase + Edge Functions
+    actor W as 👤 근로자
+
+    Note over E,W: 1. 계약 작성
+    E->>App: 계약서 양식 작성
+    App->>BE: createContract()
+    BE-->>App: status: draft
+    App-->>E: 저장 완료
+
+    Note over E,W: 2. 계약 전송
+    E->>App: 전송 방식 선택
+    App->>BE: sendContract() → status: sent
+    BE-->>W: 📨 계약서 도착 알림
+
+    Note over E,W: 3. 근로자 검토
+    W->>App: 딥링크로 계약서 열람
+    App->>BE: contracts-view → status: viewed
+    BE-->>E: 상태 업데이트
+    W->>App: 계약 내용 검토
+
+    Note over E,W: 4. 서명
+    W->>App: 서명하기 → Canvas 서명
+    App->>BE: signContract() → status: signed
+    BE-->>E: 서명 완료 알림
+
+    Note over E,W: 5. 확정
+    E->>App: 서명 확인
+    E->>BE: completeContract() → completed
+    BE-->>W: 계약 확정 알림
+    App-->>E: PDF 다운로드`
+};
+
+// ============ RECENTLY UPDATED PAGE IDS ============
+const recentlyUpdatedPages = new Set(['login', 'deeplink', 'contract-detail', 'worker-detail', 'worker-sign']);
+
+// ============ MERMAID CONFIG ============
+mermaid.initialize({
+  startOnLoad: false,
+  theme: 'default',
+  securityLevel: 'loose',
+  flowchart: { useMaxWidth: true, htmlLabels: true, curve: 'basis' },
+  sequence: { useMaxWidth: true, showSequenceNumbers: false },
+});
+
+// ============ CURRENT TAB & CACHE ============
+let currentTab = 'auth';
+const renderedCache = {}; // { tabId: { html, diagrams: [{id, svgHTML}] } }
+const initialZoomSet = new Set(); // track which diagrams have had initial zoom computed on first render
+
+// ============ RENDER FLOWCHART ============
+async function renderFlowchart(tabId) {
+  currentTab = tabId;
+  const container = document.getElementById('flowchartContainer');
+  const def = flowchartDefs[tabId];
+  if (!def) return;
+
+  // Check cache — skip expensive Mermaid rendering if already rendered
+  if (renderedCache[tabId]) {
+    container.innerHTML = renderedCache[tabId].html;
+    attachNodeHandlers(container);
+    // Restore zoom state
+    const zoomContainers = container.querySelectorAll('.zoom-container');
+    zoomContainers.forEach(zc => {
+      const zTabId = zc.id.replace('zoomContainer-', '');
+      applyZoomTransform(zTabId);
+    });
+    return;
+  }
+
+  const titles = {
+    auth: '🔐 인증·온보딩 UX',
+    employer: '🏢 사장님 (Employer) 흐름',
+    worker: '👤 근로자 (Worker) 흐름',
+    state: '🔄 계약 상태 머신',
+    sequence: '↔️ 교차 역할 상호작용',
+  };
+
+  let html = `<div class="flowchart-section">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+      <h3 style="margin:0;">${titles[tabId]}</h3>
+      <div class="zoom-controls" data-zoom-target="${tabId}">
+        <button class="zoom-btn" title="축소" onclick="zoomFlowchart('${tabId}', -0.2)">−</button>
+        <span class="zoom-level" id="zoomLevel-${tabId}">100%</span>
+        <button class="zoom-btn" title="확대" onclick="zoomFlowchart('${tabId}', +0.2)">+</button>
+        <button class="zoom-btn" title="초기화" onclick="resetZoom('${tabId}')">↺</button>
+      </div>
+    </div>
+    <div class="zoom-container" id="zoomContainer-${tabId}">
+      <div class="zoom-inner" id="zoomInner-${tabId}">
+        <div class="mermaid" id="mermaid-${tabId}">${def}</div>
+      </div>
+    </div>
+  </div>`;
+
+  // Add role-select mini diagram on auth tab
+  if (tabId === 'auth') {
+    html += `<div class="flowchart-section">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+        <h3 style="margin:0;">👥 역할 선택 (/role-select)</h3>
+        <div class="zoom-controls" data-zoom-target="role">
+          <button class="zoom-btn" title="축소" onclick="zoomFlowchart('role', -0.2)">−</button>
+          <span class="zoom-level" id="zoomLevel-role">100%</span>
+          <button class="zoom-btn" title="확대" onclick="zoomFlowchart('role', +0.2)">+</button>
+          <button class="zoom-btn" title="초기화" onclick="resetZoom('role')">↺</button>
+        </div>
+      </div>
+      <div class="zoom-container" id="zoomContainer-role">
+        <div class="zoom-inner" id="zoomInner-role">
+          <div class="mermaid" id="mermaid-role">
+flowchart TD
+    ROLE_NO["🔄 역할 미선택 상태<br/>userRole == null"]
+    ROLE_PAGE["👥 역할 선택 화면<br/>'시작 방법 선택'<br/>'어떻게 사용하시나요?'"]
+    PICK_EMP["🏢 사장님 선택<br/>'근로계약서를 작성하고 관리해요'"]
+    PICK_WORK["👤 근로자 선택<br/>'받은 계약서를 확인하고 서명해요'"]
+    SET_ROLE["💾 setRole() 호출<br/>sessionStorage 저장"]
+    REDIRECT_EMP["↩️ /employer/dashboard"]
+    REDIRECT_WORK["↩️ /worker/contracts"]
+
+    ROLE_NO --> ROLE_PAGE
+    ROLE_PAGE --> PICK_EMP
+    ROLE_PAGE --> PICK_WORK
+    PICK_EMP --> SET_ROLE
+    PICK_WORK --> SET_ROLE
+    SET_ROLE --> REDIRECT_EMP
+    SET_ROLE --> REDIRECT_WORK
+
+    click ROLE_PAGE callback
+    click REDIRECT_EMP callback
+    click REDIRECT_WORK callback
+
+    style ROLE_PAGE fill:#F3E5F5,stroke:#7B1FA2
+    style PICK_EMP fill:#E3F2FD,stroke:#1976D2
+    style PICK_WORK fill:#E8F5E9,stroke:#2E7D32
+      </div></div></div></div>`;
+  }
+
+  // Add worker list mini diagram on worker tab
+  if (tabId === 'worker') {
+    html += `<div class="flowchart-section">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+        <h3 style="margin:0;">📋 근로자 계약 목록 (/worker/contracts)</h3>
+        <div class="zoom-controls" data-zoom-target="worker-list">
+          <button class="zoom-btn" title="축소" onclick="zoomFlowchart('worker-list', -0.2)">−</button>
+          <span class="zoom-level" id="zoomLevel-worker-list">100%</span>
+          <button class="zoom-btn" title="확대" onclick="zoomFlowchart('worker-list', +0.2)">+</button>
+          <button class="zoom-btn" title="초기화" onclick="resetZoom('worker-list')">↺</button>
+        </div>
+      </div>
+      <div class="zoom-container" id="zoomContainer-worker-list">
+        <div class="zoom-inner" id="zoomInner-worker-list">
+          <div class="mermaid" id="mermaid-worker-list">
+flowchart LR
+    LIST_ENTRY(["📋 내 계약 목록 진입"])
+    LOADING["⏳ 로딩<br/>Skeleton 3개"]
+    LOADED{"데이터 로드"}
+    EMPTY["📭 빈 목록<br/>'아직 받은 계약서가 없어요'<br/>'사장님이 전송하면 표시돼요'"]
+    HAS_ITEMS["📑 계약 카드 리스트<br/>ContractCard x N<br/>이름·유형·금액·날짜·상태배지"]
+    CLICK_CARD["탭 → /worker/contracts/:id"]
+
+    LIST_ENTRY --> LOADING
+    LOADING --> LOADED
+    LOADED -->|0건| EMPTY
+    LOADED -->|1건+| HAS_ITEMS
+    HAS_ITEMS --> CLICK_CARD
+
+    click LIST_ENTRY callback
+    click HAS_ITEMS callback
+    click CLICK_CARD callback
+
+    style EMPTY fill:#F5F5F5,stroke:#9E9E9E
+    style LOADING fill:#FFF3E0,stroke:#E65100
+    style HAS_ITEMS fill:#E8F5E9,stroke:#2E7D32
+      </div></div></div></div>`;
+  }
+
+  // Add history timeline on employer tab
+  if (tabId === 'employer') {
+    html += `<div class="flowchart-section">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+        <h3 style="margin:0;">📜 계약 이력 타임라인 (/employer/contracts/:id/history)</h3>
+        <div class="zoom-controls" data-zoom-target="history">
+          <button class="zoom-btn" title="축소" onclick="zoomFlowchart('history', -0.2)">−</button>
+          <span class="zoom-level" id="zoomLevel-history">100%</span>
+          <button class="zoom-btn" title="확대" onclick="zoomFlowchart('history', +0.2)">+</button>
+          <button class="zoom-btn" title="초기화" onclick="resetZoom('history')">↺</button>
+        </div>
+      </div>
+      <div class="zoom-container" id="zoomContainer-history">
+        <div class="zoom-inner" id="zoomInner-history">
+          <div class="mermaid" id="mermaid-history">
+flowchart LR
+    HIST_ENTRY(["📜 계약 이력 진입"])
+    HIST_LOAD["⏳ 로딩"]
+    HIST_EMPTY["📭 '아직 이력이 없습니다'"]
+    TIMELINE["🕐 타임라인 뷰<br/>━━━━━━━━━━━<br/>● 계약서 작성 (사장님)<br/>● 근로자에게 전송 (사장님)<br/>○ 근로자가 확인 (근로자)<br/>○ 근로자 서명 완료 (근로자)<br/>○ 계약 확정 (사장님)<br/>세로선 + 도트 + 역할·시간"]
+
+    HIST_ENTRY --> HIST_LOAD
+    HIST_LOAD -->|0건| HIST_EMPTY
+    HIST_LOAD -->|1건+| TIMELINE
+
+    click HIST_ENTRY callback
+    click TIMELINE callback
+
+    style HIST_EMPTY fill:#F5F5F5,stroke:#9E9E9E
+    style TIMELINE fill:#E3F2FD,stroke:#1976D2
+      </div></div></div></div>`;
+  }
+
+  container.innerHTML = html;
+
+  // Render all mermaid diagrams in this tab
+  const mermaidDivs = container.querySelectorAll('.mermaid');
+  for (const div of mermaidDivs) {
+    try {
+      const id = div.id || 'mermaid-' + Math.random().toString(36).slice(2);
+      div.removeAttribute('data-processed');
+      const { svg } = await mermaid.render(id + '-svg', div.textContent);
+      div.innerHTML = svg;
+      div.setAttribute('data-processed', 'true');
+    } catch (e) {
+      console.error('Mermaid render error:', e);
+      div.innerHTML = `<div style="color:red;padding:20px;">렌더링 오류: ${e.message}</div>`;
+    }
+  }
+
+  // Attach click handlers to SVG nodes
+  attachNodeHandlers(container);
+
+  // Compute and apply per-diagram initial zoom based on actual SVG size
+  computeInitialZoomForAll(container);
+
+  // Cache the rendered HTML
+  renderedCache[tabId] = { html: container.innerHTML };
+}
+
+// ============ APPLY ZOOM TRANSFORM (buttons only) ============
+function applyZoomTransform(tabId) {
+  const inner = document.getElementById('zoomInner-' + tabId);
+  const levelEl = document.getElementById('zoomLevel-' + tabId);
+  if (!zoomState[tabId]) zoomState[tabId] = { scale: 1, tx: 0, ty: 0 };
+  const s = zoomState[tabId];
+  if (inner) {
+    inner.style.transform = `translate(${s.tx}px, ${s.ty}px) scale(${s.scale})`;
+    // transform만으로는 스크롤 영역이 늘어나지 않으므로,
+    // scale된 실제 크기만큼 inner의 min-width/min-height 강제
+    const svg = inner.querySelector('svg');
+    if (svg) {
+      const vb = svg.getAttribute('viewBox');
+      if (vb) {
+        const parts = vb.split(/\s+/);
+        const vbW = parseFloat(parts[2]) || 800;
+        const vbH = parseFloat(parts[3]) || 600;
+        inner.style.minWidth  = (vbW * s.scale) + 'px';
+        inner.style.minHeight = (vbH * s.scale) + 'px';
+      }
+    }
+  }
+  if (levelEl) levelEl.textContent = Math.round(s.scale * 100) + '%';
+}
+
+// ============ COMPUTE INITIAL ZOOM — default 100% ============
+function computeInitialZoomForAll(container) {
+  const zoomContainers = container.querySelectorAll('.zoom-container');
+  zoomContainers.forEach(zc => {
+    const tabId = zc.id.replace('zoomContainer-', '');
+    if (initialZoomSet.has(tabId)) return;
+    if (!zoomState[tabId]) zoomState[tabId] = { scale: 1, tx: 0, ty: 0 };
+    zoomState[tabId].scale = 1;
+    zoomState[tabId]._initialScale = 1;
+    initialZoomSet.add(tabId);
+    applyZoomTransform(tabId);
+  });
+}
+function attachNodeHandlers(container) {
+  const svgs = container.querySelectorAll('svg');
+  svgs.forEach(svg => {
+    // Find all nodes (g elements with class 'node' that are not clusters)
+    const nodes = svg.querySelectorAll('.node:not(.cluster)');
+    nodes.forEach(node => {
+      // Try to get node ID from class or data-id
+      const nodeId = (node.getAttribute('id') || '').replace(/^flowchart-/, '').replace(/-\d+$/, '');
+      // Extract node text content
+      const textEls = node.querySelectorAll('text, span, foreignObject div');
+      let nodeText = '';
+      textEls.forEach(el => {
+        nodeText += ' ' + (el.textContent || '').replace(/<br\s*\/?>/gi, ' ');
+      });
+      nodeText = nodeText.replace(/\s+/g, ' ').trim();
+
+      // Find matching page
+      const pageId = findPageId(nodeId, nodeText);
+
+      // Mark node as clickable
+      node.style.cursor = 'pointer';
+      node.classList.add('clickable-node');
+
+      // Add update indicator badge for recently updated pages
+      if (pageId && recentlyUpdatedPages.has(pageId)) {
+        // Add green border to the background shape
+        const bgShape = node.querySelector('rect, path, polygon, ellipse, circle');
+        if (bgShape) {
+          bgShape.setAttribute('stroke', '#00826D');
+          bgShape.setAttribute('stroke-width', '2.5');
+          bgShape.setAttribute('stroke-dasharray', '');
+          bgShape.style.filter = 'drop-shadow(0 0 3px rgba(0,130,109,0.4))';
+        }
+
+        // Add a small green dot indicator
+        const nodeBBox = node.getBBox ? node.getBBox() : null;
+        if (nodeBBox && nodeBBox.width > 0) {
+          const dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+          dot.setAttribute('cx', nodeBBox.x + nodeBBox.width - 6);
+          dot.setAttribute('cy', nodeBBox.y + 6);
+          dot.setAttribute('r', '4');
+          dot.setAttribute('fill', '#00826D');
+          dot.setAttribute('stroke', '#fff');
+          dot.setAttribute('stroke-width', '1');
+          dot.classList.add('update-indicator');
+          node.insertBefore(dot, node.firstChild);
+        }
+      }
+
+      // Add event listeners
+      node.addEventListener('click', (e) => handleNodeClick(nodeId, nodeText, node, e));
+      node.addEventListener('mouseenter', (e) => handleNodeHover(nodeId, nodeText, node, e));
+      node.addEventListener('mouseleave', () => hideTooltip());
+    });
+
+    // Also handle edge labels (text on edges) - make them non-interactive
+    const edgeLabels = svg.querySelectorAll('.edgeLabel');
+    edgeLabels.forEach(label => {
+      label.style.cursor = 'default';
+      label.style.pointerEvents = 'none';
+    });
+  });
+}
+
+// ============ NODE CLICK HANDLER ============
+function handleNodeClick(nodeId, nodeText, nodeElement, event) {
+  event.stopPropagation();
+  const pageId = findPageId(nodeId, nodeText);
+
+  if (pageId) {
+    selectPage(pageId);
+    // Flash the node
+    nodeElement.style.transition = 'all 0.1s';
+    nodeElement.style.filter = 'brightness(1.3)';
+    setTimeout(() => {
+      nodeElement.style.filter = '';
+    }, 200);
+  } else {
+    // Just show tooltip with what we have
+    showTooltip(event, nodeText, null);
+  }
+}
+
+// ============ HOVER HANDLER ============
+function handleNodeHover(nodeId, nodeText, nodeElement, event) {
+  const pageId = findPageId(nodeId, nodeText);
+  if (pageId) {
+    const page = pages.find(p => p.id === pageId);
+    showTooltip(event, nodeText, page);
+  }
+}
+
+// ============ TOOLTIP ============
+function showTooltip(event, nodeText, page) {
+  const tooltip = document.getElementById('tooltip');
+  let html = '';
+  if (page) {
+    html = `<div class="tt-route">${page.route}</div>
+            <div class="tt-title">${page.title}</div>
+            <div class="tt-src">${page.src}</div>`;
+    if (recentlyUpdatedPages.has(page.id)) {
+      html += '<div style="margin-top:4px;color:#4CAF50;font-size:11px;">● 최근 수정됨</div>';
+    }
+  } else {
+    // Extract first line as title
+    const firstLine = nodeText.split('\n')[0].slice(0, 60);
+    html = `<div class="tt-title">${firstLine || '연결된 페이지 없음'}</div>
+            <div class="tt-src">클릭 가능한 페이지 매핑이 없습니다</div>`;
+  }
+  tooltip.innerHTML = html;
+  tooltip.classList.add('visible');
+  // Position tooltip
+  const x = event.clientX + 12;
+  const y = event.clientY - 10;
+  tooltip.style.left = Math.min(x, window.innerWidth - 280) + 'px';
+  tooltip.style.top = Math.min(y, window.innerHeight - 100) + 'px';
+}
+
+function hideTooltip() {
+  document.getElementById('tooltip').classList.remove('visible');
+}
+
+// ============ TAB SWITCHING ============
+function switchTab(tabId) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelector(`.tab-btn[onclick="switchTab('${tabId}')"]`)?.classList.add('active');
+  renderFlowchart(tabId);
+}
+
+// ============ ZOOM (buttons only) ============
+const zoomState = {};
+
+function zoomFlowchart(tabId, delta) {
+  if (!zoomState[tabId]) zoomState[tabId] = { scale: 1, tx: 0, ty: 0 };
+  const s = zoomState[tabId];
+  const newScale = Math.max(0.2, Math.min(5, s.scale + delta));
+  s.scale = newScale;
+  applyZoomTransform(tabId);
+}
+
+function resetZoom(tabId) {
+  const s = zoomState[tabId] || { _initialScale: 1 };
+  const initial = s._initialScale || 1;
+  zoomState[tabId] = { scale: initial, tx: 0, ty: 0, _initialScale: initial };
+  applyZoomTransform(tabId);
+}
+
+// ============ INIT ============
+function init() {
+  renderPageOverview();
+  renderFlowchart('auth');
+
+  // Global click to catch mermaid callback
+  // Mermaid's `click NODE_ID callback` calls a global function named `callback`
+  window.callback = function(nodeId) {
+    // nodeId is the Mermaid node ID
+    // Find the SVG element and trigger our click handler
+    const svgNode = document.querySelector(`[id="${nodeId}"]`) || document.querySelector(`.node[id="${nodeId}"]`);
+    if (svgNode) {
+      const textEl = svgNode.querySelector('text') || svgNode.querySelector('span');
+      const nodeText = textEl ? textEl.textContent.replace(/<br\s*\/?>/gi, ' ').replace(/\s+/g, ' ').trim() : '';
+      const pageId = findPageId(nodeId, nodeText);
+      if (pageId) {
+        selectPage(pageId);
+      }
+    } else {
+      // Fallback: try direct mapping
+      const pageId = findPageId(nodeId, '');
+      if (pageId) selectPage(pageId);
+    }
+  };
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>

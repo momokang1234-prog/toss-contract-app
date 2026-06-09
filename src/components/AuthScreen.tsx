@@ -1,4 +1,5 @@
 import { useState, useCallback } from "react";
+import { Button, Paragraph, Spacing } from "@toss/tds-mobile";
 
 interface AuthScreenProps {
   onAuthComplete: (ci: string, userName: string) => void;
@@ -85,12 +86,10 @@ export function AuthScreen({ onAuthComplete }: AuthScreenProps) {
 
   return (
     <div style={{ textAlign: "center", paddingTop: 80 }}>
-      <h1 style={{ fontSize: 24, fontWeight: 700, marginBottom: 8 }}>
-        근로계약
-      </h1>
-      <p style={{ color: "#6B7684", marginBottom: 40 }}>
-        토스 인증으로 간편하게 본인 확인 후 계약을 진행합니다
-      </p>
+      <Paragraph typography="st1" fontWeight="bold">근로계약</Paragraph>
+      <Spacing size={8} />
+      <Paragraph typography="st4" color="grey600">토스 인증으로 간편하게 본인 확인 후 계약을 진행합니다</Paragraph>
+      <Spacing size={40} />
 
       {DEV_MODE && (
         <div
@@ -99,11 +98,9 @@ export function AuthScreen({ onAuthComplete }: AuthScreenProps) {
             marginBottom: 16,
             backgroundColor: "#FFF8E1",
             borderRadius: 10,
-            color: "#F57F17",
-            fontSize: 13,
           }}
         >
-          개발 모드 — mock 인증으로 테스트 중
+          <Paragraph typography="st6" color="yellow700">개발 모드 — mock 인증으로 테스트 중</Paragraph>
         </div>
       )}
 
@@ -114,11 +111,9 @@ export function AuthScreen({ onAuthComplete }: AuthScreenProps) {
             marginBottom: 16,
             backgroundColor: "#FFF3F0",
             borderRadius: 10,
-            color: "#FF4500",
-            fontSize: 14,
           }}
         >
-          {error}
+          <Paragraph typography="st5" color="danger500">{error}</Paragraph>
         </div>
       )}
 
@@ -129,31 +124,22 @@ export function AuthScreen({ onAuthComplete }: AuthScreenProps) {
             marginBottom: 16,
             backgroundColor: "#F0F5FF",
             borderRadius: 10,
-            color: "#3182F6",
-            fontSize: 14,
           }}
         >
-          {status}
+          <Paragraph typography="st5" color="primary500">{status}</Paragraph>
         </div>
       )}
 
-      <button
+      <Button
+        color="primary"
+        variant="fill"
+        display="block"
+        size="large"
         onClick={handleOneTouchAuth}
         disabled={loading}
-        style={{
-          width: "100%",
-          padding: "16px",
-          fontSize: 16,
-          fontWeight: 600,
-          color: "#fff",
-          backgroundColor: loading ? "#9098A4" : "#3182F6",
-          border: "none",
-          borderRadius: 12,
-          cursor: loading ? "not-allowed" : "pointer",
-        }}
       >
         {loading ? "인증 중..." : "토스로 본인 인증하기"}
-      </button>
+      </Button>
     </div>
   );
 }

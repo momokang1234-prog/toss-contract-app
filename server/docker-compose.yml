@@ -1,0 +1,33 @@
+version: "3.8"
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: toss
+      POSTGRES_PASSWORD: toss_dev_password
+      POSTGRES_DB: toss_payment
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./src/db/migrations:/docker-entrypoint-initdb.d
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: postgresql://toss:***@db:5432/toss_payment
+      JWT_SECRET: dev-secret-key-change-in-production-abc123xyz
+      PORT: "3000"
+      NODE_ENV: production
+    depends_on:
+      - db
+
+volumes:
+  pgdata:

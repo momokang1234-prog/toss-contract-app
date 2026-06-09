@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useBusiness } from '../../hooks/useBusiness';
 import { useContracts } from '../../hooks/useContracts';
+import { Button, Spacing, Paragraph } from '@toss/tds-mobile';
 
 export default function DashboardPage() {
   const { businesses, loading: bizLoading } = useBusiness();
@@ -15,7 +16,8 @@ export default function DashboardPage() {
 
   return (
     <div style={{ padding: 24, maxWidth: 480, margin: '0 auto' }}>
-      <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 24 }}>사장님 대시보드</h2>
+      <Paragraph typography="st3" fontWeight="bold">내 사업장</Paragraph>
+      <Spacing size={24} />
 
       {businesses.length === 0 && !bizLoading && (
         <div style={{ padding: 20, backgroundColor: '#FFF8E1', borderRadius: 12, marginBottom: 24, textAlign: 'center' }}>
@@ -34,8 +36,12 @@ export default function DashboardPage() {
       </div>
 
       <div style={{ display: 'flex', gap: 8 }}>
-        <Link to="/employer/contracts/new" style={{ flex: 1, padding: '14px', textAlign: 'center', backgroundColor: '#3182F6', color: '#fff', borderRadius: 10, fontSize: 15, fontWeight: 600, textDecoration: 'none' }}>+ 새 계약</Link>
-        <Link to="/employer/contracts" style={{ flex: 1, padding: '14px', textAlign: 'center', backgroundColor: '#F5F6F8', color: '#333D4B', border: '1px solid #E5E8EB', borderRadius: 10, fontSize: 15, fontWeight: 600, textDecoration: 'none' }}>전체 목록</Link>
+        <Link to="/employer/contracts/new" style={{ flex: 1, textDecoration: 'none' }}>
+          <Button color="primary" variant="fill" display="block" size="large">+ 새 계약</Button>
+        </Link>
+        <Link to="/employer/contracts" style={{ flex: 1, textDecoration: 'none' }}>
+          <Button color="light" variant="fill" display="block" size="large">전체 목록</Button>
+        </Link>
       </div>
     </div>
   );

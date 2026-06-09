@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useBusiness } from '../../hooks/useBusiness';
+import { TextField, Button, Spacing, Paragraph } from '@toss/tds-mobile';
 
 const formatNumber = (v: string) => {
   const digits = v.replace(/\D/g, '').slice(0, 10);
@@ -48,44 +49,74 @@ export default function BusinessFormPage() {
     }
   };
 
-  const inputStyle = (field: string) => ({
-    width: '100%', padding: '12px 16px', fontSize: 15, border: `1px solid ${errors[field] ? '#FF5252' : '#E5E8EB'}`, borderRadius: 8,
-  });
-
   return (
     <div style={{ padding: 24, maxWidth: 480, margin: '0 auto' }}>
-      <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 24 }}>사업장 등록</h2>
-      <div style={{ marginBottom: 16 }}>
-        <label style={{ fontSize: 14, fontWeight: 500, marginBottom: 6, display: 'block' }}>사업자등록번호</label>
-        <input style={inputStyle('business_number')} placeholder="000-00-00000" value={form.business_number} onChange={e => handleChange('business_number', e.target.value)} />
-        {errors.business_number && <span style={{ color: '#FF5252', fontSize: 12 }}>{errors.business_number}</span>}
-      </div>
-      <div style={{ marginBottom: 16 }}>
-        <label style={{ fontSize: 14, fontWeight: 500, marginBottom: 6, display: 'block' }}>상호</label>
-        <input style={inputStyle('business_name')} placeholder="사업장 이름" value={form.business_name} onChange={e => handleChange('business_name', e.target.value)} />
-        {errors.business_name && <span style={{ color: '#FF5252', fontSize: 12 }}>{errors.business_name}</span>}
-      </div>
-      <div style={{ marginBottom: 16 }}>
-        <label style={{ fontSize: 14, fontWeight: 500, marginBottom: 6, display: 'block' }}>대표자</label>
-        <input style={inputStyle('representative')} placeholder="대표자 이름" value={form.representative} onChange={e => handleChange('representative', e.target.value)} />
-        {errors.representative && <span style={{ color: '#FF5252', fontSize: 12 }}>{errors.representative}</span>}
-      </div>
-      <div style={{ marginBottom: 16 }}>
-        <label style={{ fontSize: 14, fontWeight: 500, marginBottom: 6, display: 'block' }}>사업장 소재지</label>
-        <input style={inputStyle('address')} placeholder="주소" value={form.address} onChange={e => handleChange('address', e.target.value)} />
-        {errors.address && <span style={{ color: '#FF5252', fontSize: 12 }}>{errors.address}</span>}
-      </div>
-      <div style={{ marginBottom: 24 }}>
-        <label style={{ fontSize: 14, fontWeight: 500, marginBottom: 6, display: 'block' }}>전화 (선택)</label>
-        <input style={inputStyle('phone')} placeholder="02-1234-5678" value={form.phone} onChange={e => handleChange('phone', e.target.value)} />
-      </div>
-      <button
+      <Paragraph typography="st3" fontWeight="bold">사업장 등록</Paragraph>
+      <Spacing size={24} />
+
+      <TextField
+        variant="box"
+        label="사업자등록번호"
+        placeholder="000-00-00000"
+        value={form.business_number}
+        onChange={e => handleChange('business_number', e.target.value)}
+        hasError={!!errors.business_number}
+        help={errors.business_number}
+      />
+      <Spacing size={16} />
+
+      <TextField
+        variant="box"
+        label="상호"
+        placeholder="사업장 이름"
+        value={form.business_name}
+        onChange={e => handleChange('business_name', e.target.value)}
+        hasError={!!errors.business_name}
+        help={errors.business_name}
+      />
+      <Spacing size={16} />
+
+      <TextField
+        variant="box"
+        label="대표자"
+        placeholder="대표자 이름"
+        value={form.representative}
+        onChange={e => handleChange('representative', e.target.value)}
+        hasError={!!errors.representative}
+        help={errors.representative}
+      />
+      <Spacing size={16} />
+
+      <TextField
+        variant="box"
+        label="사업장 소재지"
+        placeholder="주소"
+        value={form.address}
+        onChange={e => handleChange('address', e.target.value)}
+        hasError={!!errors.address}
+        help={errors.address}
+      />
+      <Spacing size={16} />
+
+      <TextField
+        variant="box"
+        label="전화 (선택)"
+        placeholder="02-1234-5678"
+        value={form.phone}
+        onChange={e => handleChange('phone', e.target.value)}
+      />
+      <Spacing size={24} />
+
+      <Button
+        color="primary"
+        variant="fill"
+        display="block"
+        size="large"
         onClick={handleSubmit}
         disabled={submitting}
-        style={{ width: '100%', padding: '16px', backgroundColor: '#3182F6', color: '#fff', border: 'none', borderRadius: 12, fontSize: 16, fontWeight: 600, cursor: submitting ? 'not-allowed' : 'pointer', opacity: submitting ? 0.6 : 1 }}
       >
         {submitting ? '등록 중...' : '사업장 등록'}
-      </button>
+      </Button>
     </div>
   );
 }

@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from "react";
+import { TextField, Button, Paragraph, Spacing, List, ListRow } from "@toss/tds-mobile";
 
 interface BusinessVerifyProps {
   onComplete: (businessInfo: BusinessInfo) => void;
@@ -11,23 +12,6 @@ interface BusinessInfo {
   address: string;
   verified: boolean;
 }
-
-const inputStyle: React.CSSProperties = {
-  width: "100%",
-  padding: "14px 16px",
-  fontSize: 15,
-  border: "1px solid #E5E8EB",
-  borderRadius: 10,
-  outline: "none",
-  marginBottom: 12,
-};
-
-const labelStyle: React.CSSProperties = {
-  fontSize: 13,
-  color: "#6B7684",
-  display: "block",
-  marginBottom: 4,
-};
 
 export function BusinessVerify({ onComplete }: BusinessVerifyProps) {
   const [businessNumber, setBusinessNumber] = useState("");
@@ -54,8 +38,6 @@ export function BusinessVerify({ onComplete }: BusinessVerifyProps) {
     setError(null);
 
     try {
-      // TODO: 국세청 사업자등록정보 진위확인 API 연동
-      // 현재는 mock 응답
       await new Promise((r) => setTimeout(r, 1500));
 
       const mockResult: BusinessInfo = {
@@ -77,12 +59,10 @@ export function BusinessVerify({ onComplete }: BusinessVerifyProps) {
   if (result) {
     return (
       <div>
-        <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 4 }}>
-          사업자 확인 완료
-        </h2>
-        <p style={{ color: "#6B7684", marginBottom: 24, fontSize: 14 }}>
-          사업자 정보가 확인되었습니다
-        </p>
+        <Paragraph typography="st1" fontWeight="bold">사업자 확인 완료</Paragraph>
+        <Spacing size={4} />
+        <Paragraph typography="st4" color="grey600">사업자 정보가 확인되었습니다</Paragraph>
+        <Spacing size={24} />
 
         <div
           style={{
@@ -92,70 +72,65 @@ export function BusinessVerify({ onComplete }: BusinessVerifyProps) {
             marginBottom: 24,
           }}
         >
-          {[
-            ["사업자등록번호", result.businessNumber],
-            ["상호(법인명)", result.businessName],
-            ["대표자", result.representative],
-            ["사업장 소재지", result.address],
-          ].map(([k, v]) => (
-            <div
-              key={k}
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                padding: "8px 0",
-                borderBottom: "1px solid #E5E8EB",
-                fontSize: 14,
-              }}
-            >
-              <span style={{ color: "#6B7684" }}>{k}</span>
-              <span style={{ fontWeight: 500 }}>{v}</span>
-            </div>
-          ))}
+          <List>
+            <ListRow>
+              <ListRow.Texts
+                top={{ label: "사업자등록번호", typo: { color: "#6B7684" } }}
+                bottom={{ label: result.businessNumber, typo: { fontWeight: "bold" } }}
+              />
+            </ListRow>
+            <ListRow>
+              <ListRow.Texts
+                top={{ label: "상호(법인명)", typo: { color: "#6B7684" } }}
+                bottom={{ label: result.businessName, typo: { fontWeight: "bold" } }}
+              />
+            </ListRow>
+            <ListRow>
+              <ListRow.Texts
+                top={{ label: "대표자", typo: { color: "#6B7684" } }}
+                bottom={{ label: result.representative, typo: { fontWeight: "bold" } }}
+              />
+            </ListRow>
+            <ListRow>
+              <ListRow.Texts
+                top={{ label: "사업장 소재지", typo: { color: "#6B7684" } }}
+                bottom={{ label: result.address, typo: { fontWeight: "bold" } }}
+              />
+            </ListRow>
+          </List>
 
+          <Spacing size={12} />
           <div
             style={{
-              marginTop: 12,
               padding: "8px 12px",
               backgroundColor: "#E8F5E9",
               borderRadius: 8,
-              fontSize: 13,
-              color: "#2E7D32",
               textAlign: "center",
             }}
           >
-            ✓ 사업자 확인 완료
+            <Paragraph typography="st6" color="teal700">✓ 사업자 확인 완료</Paragraph>
           </div>
         </div>
 
-        <button
+        <Button
+          color="primary"
+          variant="fill"
+          display="block"
+          size="large"
           onClick={() => onComplete(result)}
-          style={{
-            width: "100%",
-            padding: "16px",
-            fontSize: 16,
-            fontWeight: 600,
-            color: "#fff",
-            backgroundColor: "#3182F6",
-            border: "none",
-            borderRadius: 12,
-            cursor: "pointer",
-          }}
         >
           다음 단계로
-        </button>
+        </Button>
       </div>
     );
   }
 
   return (
     <form onSubmit={handleVerify}>
-      <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 4 }}>
-        사업자 확인
-      </h2>
-      <p style={{ color: "#6B7684", marginBottom: 24, fontSize: 14 }}>
-        사업자등록번호를 입력하여 사업자를 확인합니다
-      </p>
+      <Paragraph typography="st1" fontWeight="bold">사업자 확인</Paragraph>
+      <Spacing size={4} />
+      <Paragraph typography="st4" color="grey600">사업자등록번호를 입력하여 사업자를 확인합니다</Paragraph>
+      <Spacing size={24} />
 
       {error && (
         <div
@@ -164,17 +139,15 @@ export function BusinessVerify({ onComplete }: BusinessVerifyProps) {
             marginBottom: 16,
             backgroundColor: "#FFF3F0",
             borderRadius: 10,
-            color: "#FF4500",
-            fontSize: 14,
           }}
         >
-          {error}
+          <Paragraph typography="st5" color="danger500">{error}</Paragraph>
         </div>
       )}
 
-      <label style={labelStyle}>사업자등록번호</label>
-      <input
-        style={inputStyle}
+      <TextField
+        variant="box"
+        label="사업자등록번호"
         value={businessNumber}
         onChange={(e) => {
           setBusinessNumber(formatNumber(e.target.value));
@@ -183,25 +156,18 @@ export function BusinessVerify({ onComplete }: BusinessVerifyProps) {
         placeholder="000-00-00000"
         inputMode="numeric"
       />
+      <Spacing size={16} />
 
-      <button
+      <Button
+        color="primary"
+        variant="fill"
+        display="block"
+        size="large"
         type="submit"
         disabled={loading}
-        style={{
-          width: "100%",
-          padding: "16px",
-          fontSize: 16,
-          fontWeight: 600,
-          color: "#fff",
-          backgroundColor: loading ? "#9098A4" : "#3182F6",
-          border: "none",
-          borderRadius: 12,
-          cursor: loading ? "not-allowed" : "pointer",
-          marginTop: 8,
-        }}
       >
         {loading ? "확인 중..." : "사업자 확인"}
-      </button>
+      </Button>
     </form>
   );
 }

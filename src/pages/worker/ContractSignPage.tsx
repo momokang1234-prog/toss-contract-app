@@ -1,6 +1,7 @@
 import { useRef, useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useContracts, type Contract } from '../../hooks/useContracts';
+import { Button, Paragraph, Spacing } from '@toss/tds-mobile';
 
 export default function ContractSignPage() {
   const { id } = useParams();
@@ -91,33 +92,47 @@ export default function ContractSignPage() {
   if (signed) {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', padding: 24 }}>
-        <div style={{ fontSize: 48, marginBottom: 16 }}>✅</div>
-        <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 8 }}>서명 완료!</h2>
-        <p style={{ fontSize: 14, color: '#6B7684' }}>근로계약서 서명이 완료되었습니다.</p>
+        <Paragraph typography="st1" style={{ fontSize: 48 }}>✅</Paragraph>
+        <Spacing size={16} />
+        <Paragraph typography="st3" fontWeight="bold">서명 완료!</Paragraph>
+        <Paragraph typography="st4" color="grey600">근로계약서 서명이 완료되었습니다.</Paragraph>
       </div>
     );
   }
 
-  if (!contract) return <div style={{ padding: 24, textAlign: 'center', color: '#6B7684' }}>로딩 중...</div>;
+  if (!contract) return (
+    <div style={{ padding: 24, textAlign: 'center' }}>
+      <Paragraph typography="st4" color="grey600">로딩 중...</Paragraph>
+    </div>
+  );
 
   if (contract.status === 'signed' || contract.status === 'completed') {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', padding: 24 }}>
-        <div style={{ fontSize: 48, marginBottom: 16 }}>📋</div>
-        <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 8 }}>이미 서명된 계약서입니다</h2>
-        <button onClick={() => navigate(`/worker/contracts/${id}`, { replace: true })} style={{
-          marginTop: 16, padding: '12px 24px', backgroundColor: '#3182F6', color: '#fff',
-          border: 'none', borderRadius: 10, fontSize: 14, cursor: 'pointer',
-        }}>계약서 보기</button>
+        <Paragraph typography="st1" style={{ fontSize: 48 }}>📋</Paragraph>
+        <Spacing size={16} />
+        <Paragraph typography="st3" fontWeight="bold">이미 서명된 계약서입니다</Paragraph>
+        <Spacing size={16} />
+        <Button
+          color="primary"
+          variant="fill"
+          size="large"
+          onClick={() => navigate(`/worker/contracts/${id}`, { replace: true })}
+        >
+          계약서 보기
+        </Button>
       </div>
     );
   }
 
   return (
     <div style={{ padding: 24, maxWidth: 480, margin: '0 auto' }}>
-      <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 8 }}>전자서명</h2>
-      <p style={{ fontSize: 14, color: '#6B7684', marginBottom: 4 }}>{contract.worker_name}님, 아래 영역에 서명해주세요.</p>
-      <p style={{ fontSize: 12, color: '#8B95A1', marginBottom: 24 }}>근무지: {contract.workplace} | 시급: {contract.base_wage.toLocaleString()}원</p>
+      <Paragraph typography="st3" fontWeight="bold">전자서명</Paragraph>
+      <Spacing size={8} />
+      <Paragraph typography="st4" color="grey600">{contract.worker_name}님, 아래 영역에 서명해주세요.</Paragraph>
+      <Spacing size={4} />
+      <Paragraph typography="st6" color="grey500">근무지: {contract.workplace} | 시급: {contract.base_wage.toLocaleString()}원</Paragraph>
+      <Spacing size={16} />
 
       <div style={{ border: '2px solid #E5E8EB', borderRadius: 12, overflow: 'hidden', marginBottom: 16, backgroundColor: '#fff' }}>
         <canvas
@@ -136,15 +151,28 @@ export default function ContractSignPage() {
       </div>
 
       <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
-        <button onClick={clearCanvas} style={{
-          flex: 1, padding: '12px', backgroundColor: '#F5F6F8', border: 'none', borderRadius: 10, fontSize: 14, cursor: 'pointer',
-        }}>다시 그리기</button>
+        <Button
+          color="light"
+          variant="weak"
+          display="block"
+          size="large"
+          style={{ flex: 1 }}
+          onClick={clearCanvas}
+        >
+          다시 그리기
+        </Button>
       </div>
 
-      <button onClick={handleSign} disabled={signing || !hasDrawn} style={{
-        width: '100%', padding: '16px', backgroundColor: hasDrawn ? '#3182F6' : '#B0B8C1', color: '#fff', border: 'none',
-        borderRadius: 12, fontSize: 16, fontWeight: 600, cursor: signing || !hasDrawn ? 'not-allowed' : 'pointer', opacity: signing ? 0.6 : 1,
-      }}>{signing ? '서명 중...' : '서명 완료'}</button>
+      <Button
+        color="primary"
+        variant="fill"
+        display="block"
+        size="large"
+        onClick={handleSign}
+        disabled={signing || !hasDrawn}
+      >
+        {signing ? '서명 중...' : '서명 완료'}
+      </Button>
     </div>
   );
 }

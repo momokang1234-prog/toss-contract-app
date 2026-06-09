@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { Paragraph } from '@toss/tds-mobile';
 
 export function DeeplinkHandler() {
   const { id } = useParams<{ id: string }>();
@@ -16,10 +17,13 @@ export function DeeplinkHandler() {
     } else if (userRole === 'employer') {
       navigate(`/employer/contracts/${id}`, { replace: true });
     } else {
-      // No role selected yet - default to worker view for contract deeplinks
       navigate(`/worker/contracts/${id}`, { replace: true });
     }
   }, [id, isAuthenticated, userRole, navigate]);
 
-  return <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>계약서 로딩 중...</div>;
+  return (
+    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
+      <Paragraph typography="st4" color="grey600">계약서 로딩 중...</Paragraph>
+    </div>
+  );
 }
