@@ -9,7 +9,6 @@ const DAYS = ['mon','tue','wed','thu','fri','sat','sun'] as const;
 const DAY_LABELS: Record<string, string> = { mon:'월', tue:'화', wed:'수', thu:'목', fri:'금', sat:'토', sun:'일' };
 
 const STEPS = ['근로자 정보', '계약 조건', '임금', '근무 시간', '근로조건', '법정 검증', '최종 확인'];
-const STEP_ICONS = ['🧑', '📋', '💰', '⏰', '🛡️', '🔍', '✅'];
 const TOTAL_STEPS = STEPS.length;
 
 function computeBreakMinutes(start: string, end: string): number {
@@ -237,13 +236,17 @@ export default function ContractFormPage() {
 
   return (
     <div style={{ padding: 24, maxWidth: 480, margin: '0 auto', paddingBottom: 120 }}>
-      <Paragraph typography="st3" fontWeight="bold">
-        <span className="tossface">📄</span> 근로계약서 작성
-      </Paragraph>
+      <div style={{ position: 'relative', marginBottom: 8 }}>
+        <img src="https://static.toss.im/lotties/point-blue2.png" alt=""
+          style={{ position: 'absolute', top: -30, right: -10, width: 160, height: 160, opacity: 0.3, pointerEvents: 'none' }}
+        />
+        <img src="https://static.toss.im/lotties/point-green2.png" alt=""
+          style={{ position: 'absolute', top: -10, right: 20, width: 120, height: 120, opacity: 0.25, pointerEvents: 'none' }}
+        />
+        <Paragraph typography="st3" fontWeight="bold">근로계약서 작성</Paragraph>
+      </div>
       <Spacing size={8} />
-      <Paragraph typography="st7" color="grey-500">
-        <span className="tossface">{STEP_ICONS[step]}</span> {STEPS[step]} ({step + 1}/{TOTAL_STEPS})
-      </Paragraph>
+      <Paragraph typography="st7" color="grey-500">{STEPS[step]} ({step + 1}/{TOTAL_STEPS})</Paragraph>
       <Spacing size={12} />
       <div style={{ height: 4, borderRadius: 2, backgroundColor: '#E5E8EB', overflow: 'hidden', marginBottom: 24 }}>
         <div style={{ height: '100%', width: `${progressPct}%`, borderRadius: 2, backgroundColor: '#3182F6', transition: 'width 0.3s ease' }} />

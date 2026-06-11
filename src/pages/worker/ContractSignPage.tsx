@@ -1,178 +1,127 @@
-import { useRef, useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useEffect, useRef, useState } from 'react';
+import { useParams, useNavigate, Navigate } from 'react-router-dom';
 import { useContracts, type Contract } from '../../hooks/useContracts';
-import { Button, Paragraph, Spacing } from '@toss/tds-mobile';
+import { Top, Paragraph, Spacing, Button } from '@toss/tds-mobile';
+import styles from './ContractSignPage.module.css';
 
 export default function ContractSignPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { getContract, signContract } = useContracts();
   const [contract, setContract] = useState<Contract | null>(null);
+  const [drawing, setDrawing] = useState(false);
+  const [hasSignature, setHasSignature] = useState(false);
   const [signing, setSigning] = useState(false);
-  const [signed, setSigned] = useState(false);
+  const [done, setDone] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [isDrawing, setIsDrawing] = useState(false);
-  const [hasDrawn, setHasDrawn] = useState(false);
 
   useEffect(() => {
-    if (id) getContract(id).then(c => setContract(c));
+    if (!id) return;
+    getContract(id).then(setContract);
   }, [id]);
 
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-    ctx.strokeStyle = '#191F28';
-    ctx.lineWidth = 2;
-    ctx.lineCap = 'round';
-  }, []);
-
-  const getPos = (e: React.TouchEvent | React.MouseEvent) => {
-    const canvas = canvasRef.current!;
-    const rect = canvas.getBoundingClientRect();
-    if ('touches' in e) {
-      return { x: e.touches[0].clientX - rect.left, y: e.touches[0].clientY - rect.top };
-    }
-    return { x: (e as React.MouseEvent).clientX - rect.left, y: (e as React.MouseEvent).clientY - rect.top };
-  };
-
-  const startDraw = (e: React.TouchEvent | React.MouseEvent) => {
-    e.preventDefault();
-    setIsDrawing(true);
-    const canvas = canvasRef.current!;
-    const ctx = canvas.getContext('2d')!;
-    const pos = getPos(e);
-    ctx.beginPath();
-    ctx.moveTo(pos.x, pos.y);
-  };
-
-  const draw = (e: React.TouchEvent | React.MouseEvent) => {
-    e.preventDefault();
-    if (!isDrawing) return;
-    const canvas = canvasRef.current!;
-    const ctx = canvas.getContext('2d')!;
-    const pos = getPos(e);
-    ctx.lineTo(pos.x, pos.y);
-    ctx.stroke();
-    setHasDrawn(true);
-  };
-
-  const endDraw = () => setIsDrawing(false);
-
   const clearCanvas = () => {
-    const canvas = canvasRef.current!;
-    const ctx = canvas.getContext('2d')!;
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    setHasDrawn(false);
+    const c = canvasRef.current;
+    if (!c) return;
+    const ctx = c.getContext('2d');
+    if (ctx) { ctx.clearRect(0,0,c.width,c.height); setHasSignature(false); }
   };
+
+  const startDraw = (e: React.MouseEvent|React.TouchEvent) => {
+    setDrawing(true);
+    const c = canvasRef.current;
+    if (!c) return;
+    const ctx = c.getContext('2d');
+    if (!ctx) return;
+    const rect = c.getBoundingClientRect();
+    const x = 'touches' in e ? e.touches[0].clientX - rect.left : e.clientX - rect.left;
+    const y = 'touches' in e ? e.touches[0].clientY - rect.top : e.clientY - rect.top;
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.strokeStyle = '#191f28';
+    ctx.lineWidth = 3;
+    ctx.lineCap = 'round';
+  };
+
+  const draw = (e: React.MouseEvent|React.TouchEvent) => {
+    if (!drawing) return;
+    const c = canvasRef.current;
+    if (!c) return;
+    const ctx = c.getContext('2d');
+    if (!ctx) return;
+    const rect = c.getBoundingClientRect();
+    const x = 'touches' in e ? e.touches[0].clientX - rect.left : e.clientX - rect.left;
+    const y = 'touches' in e ? e.touches[0].clientY - rect.top : e.clientY - rect.top;
+    ctx.lineTo(x, y);
+    ctx.stroke();
+    setHasSignature(true);
+  };
+
+  const stopDraw = () => setDrawing(false);
 
   const handleSign = async () => {
     if (!id || !canvasRef.current) return;
-    if (!hasDrawn) {
-      alert('서명을 그려주세요.');
-      return;
-    }
     setSigning(true);
     try {
-      const signatureData = canvasRef.current.toDataURL('image/png');
-      await signContract(id, signatureData);
-      setSigned(true);
-      setTimeout(() => {
-        navigate(`/worker/contracts/${id}`, { replace: true });
-      }, 1500);
-    } catch (err) {
-      console.error(err);
-      alert('서명에 실패했습니다.');
-    } finally {
-      setSigning(false);
-    }
+      const dataUrl = canvasRef.current.toDataURL('image/png');
+      const updated = await signContract(id, dataUrl);
+      setContract(updated);
+      setDone(true);
+    } catch { alert('서명에 실패했어요'); }
+    finally { setSigning(false); }
   };
 
-  if (signed) {
+  if (!id) return <Navigate to="/worker/contracts" replace />;
+  if (!contract) return <div className={styles.page}><Top title="서명하기" /><div className={styles.center}><Spacing size={24} /><Paragraph typography="st5" color="grey-500">불러오는 중...</Paragraph></div></div>;
+  if (done) {
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', padding: 24 }}>
-        <Paragraph typography="st1" style={{ fontSize: 48 }}>✅</Paragraph>
-        <Spacing size={16} />
-        <Paragraph typography="st3" fontWeight="bold">서명 완료!</Paragraph>
-        <Paragraph typography="st4" color="grey600">근로계약서 서명이 완료되었습니다.</Paragraph>
-      </div>
-    );
-  }
-
-  if (!contract) return (
-    <div style={{ padding: 24, textAlign: 'center' }}>
-      <Paragraph typography="st4" color="grey600">로딩 중...</Paragraph>
-    </div>
-  );
-
-  if (contract.status === 'signed' || contract.status === 'completed') {
-    return (
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', padding: 24 }}>
-        <Paragraph typography="st1" style={{ fontSize: 48 }}>📋</Paragraph>
-        <Spacing size={16} />
-        <Paragraph typography="st3" fontWeight="bold">이미 서명된 계약서입니다</Paragraph>
-        <Spacing size={16} />
-        <Button
-          color="primary"
-          variant="fill"
-          size="large"
-          onClick={() => navigate(`/worker/contracts/${id}`, { replace: true })}
-        >
-          계약서 보기
-        </Button>
+      <div className={styles.page}>
+        <Top title="서명 완료" />
+        <div className={styles.center}>
+          <Spacing size={60} />
+          <div style={{ textAlign: 'center' }}>
+            <img src="https://static.toss.im/3d-common/check-success.png" alt=""
+              style={{ width: 80, height: 80, marginBottom: 12 }}
+            />
+          </div>
+          <Spacing size={16} />
+          <Paragraph typography="st2" fontWeight="bold">서명이 완료되었어요</Paragraph>
+          <Spacing size={8} />
+          <Paragraph typography="st5" color="grey-500">사장님이 확인 후 계약이 확정돼요</Paragraph>
+          <Spacing size={32} />
+          <Button color="primary" variant="weak" size="large"
+            onClick={() => navigate(`/worker/contracts/${id}`)}>계약서 보기</Button>
+        </div>
       </div>
     );
   }
 
   return (
-    <div style={{ padding: 24, maxWidth: 480, margin: '0 auto' }}>
-      <Paragraph typography="st3" fontWeight="bold">전자서명</Paragraph>
-      <Spacing size={8} />
-      <Paragraph typography="st4" color="grey600">{contract.worker_name}님, 아래 영역에 서명해주세요.</Paragraph>
-      <Spacing size={4} />
-      <Paragraph typography="st6" color="grey500">근무지: {contract.workplace} | 시급: {contract.base_wage.toLocaleString()}원</Paragraph>
-      <Spacing size={16} />
+    <div className={styles.page}>
+      <Top title="서명하기" />
+      <div className={styles.content}>
+        <Spacing size={24} />
+        <Paragraph typography="st2" fontWeight="bold">전자서명</Paragraph>
+        <Spacing size={8} />
+        <Paragraph typography="st5" color="grey-500">화면에 서명을 그려주세요</Paragraph>
+        <Spacing size={24} />
 
-      <div style={{ border: '2px solid #E5E8EB', borderRadius: 12, overflow: 'hidden', marginBottom: 16, backgroundColor: '#fff' }}>
-        <canvas
-          ref={canvasRef}
-          width={400}
-          height={200}
-          style={{ width: '100%', height: 200, touchAction: 'none' }}
-          onMouseDown={startDraw}
-          onMouseMove={draw}
-          onMouseUp={endDraw}
-          onMouseLeave={endDraw}
-          onTouchStart={startDraw}
-          onTouchMove={draw}
-          onTouchEnd={endDraw}
-        />
-      </div>
+        <div className={styles.canvasWrap}>
+          <canvas ref={canvasRef} className={styles.canvas}
+            width={400} height={200}
+            onMouseDown={startDraw} onMouseMove={draw} onMouseUp={stopDraw} onMouseLeave={stopDraw}
+            onTouchStart={startDraw} onTouchMove={draw} onTouchEnd={stopDraw}
+          />
+        </div>
+        <Spacing size={12} />
+        <Button color="primary" variant="outline" size="small" onClick={clearCanvas}>지우기</Button>
 
-      <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
-        <Button
-          color="light"
-          variant="weak"
-          display="block"
-          size="large"
-          style={{ flex: 1 }}
-          onClick={clearCanvas}
-        >
-          다시 그리기
+        <Spacing size={32} />
+        <Button color="primary" variant="fill" display="block" size="xlarge"
+          onClick={handleSign} disabled={!hasSignature || signing}>
+          {signing ? '서명 중...' : '서명 완료'}
         </Button>
       </div>
-
-      <Button
-        color="primary"
-        variant="fill"
-        display="block"
-        size="large"
-        onClick={handleSign}
-        disabled={signing || !hasDrawn}
-      >
-        {signing ? '서명 중...' : '서명 완료'}
-      </Button>
     </div>
   );
 }
