@@ -78,7 +78,7 @@ export default function SendContractSheet({ contractTitle, deepLink, onSend, onC
         {copied ? '✅ 복사 완료' : '🔗 링크 복사'}
       </Button>
 
-      <Button color="grey" variant="weak" display="block" size="large" onClick={onCancel}>
+      <Button color="light" variant="weak" display="block" size="large" onClick={onCancel}>
         취소
       </Button>
 

@@ -10,7 +10,7 @@ export default function ContractDetailPage() {
   const navigate = useNavigate();
   const { getContract, sendContract, completeContract, cancelContract } = useContracts();
   const [contract, setContract] = useState<Contract | null>(null);
-  const [sending, setSending] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [completing, setCompleting] = useState(false);
   const [showSheet, setShowSheet] = useState(false);
 
@@ -139,8 +139,7 @@ export default function ContractDetailPage() {
         {canSend && (
           <>
             <Button color="primary" variant="fill" display="block" size="large"
-              onClick={() => setShowSheet(true)}
-              disabled={sending}>{sending ? '전송 중...' : '근로자에게 전송'}</Button>
+              onClick={() => setShowSheet(true)}>{'근로자에게 전송'}</Button>
             <Spacing size={12} />
             <Button color="light" variant="weak" display="block" size="large"
               onClick={async () => {

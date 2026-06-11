@@ -1,15 +1,24 @@
-import { Link } from 'react-router-dom';
-import { Paragraph, Button, Spacing } from '@toss/tds-mobile';
+import { useNavigate } from 'react-router-dom';
+import { Top, Paragraph, Spacing, Button } from '@toss/tds-mobile';
+import styles from './NotFoundPage.module.css';
 
 export default function NotFoundPage() {
+  const navigate = useNavigate();
+
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '100vh' }}>
-      <Paragraph typography="st1" fontWeight="bold" style={{ fontSize: 48 }}>404</Paragraph>
-      <Paragraph typography="st4" color="grey600">페이지를 찾을 수 없어요.</Paragraph>
-      <Spacing size={16} />
-      <Link to="/login" style={{ textDecoration: 'none' }}>
-        <Button color="primary" variant="weak" size="large">로그인으로 돌아가기</Button>
-      </Link>
+    <div className={styles.page}>
+      <Top title="" />
+      <div className={styles.center}>
+        <Spacing size={80} />
+        <Paragraph typography="st1">🔍</Paragraph>
+        <Spacing size={16} />
+        <Paragraph typography="st2" fontWeight="bold">페이지를 찾을 수 없어요</Paragraph>
+        <Spacing size={12} />
+        <Paragraph typography="st5" color="grey-500">주소가 잘못되었거나 삭제된 페이지예요</Paragraph>
+        <Spacing size={32} />
+        <Button color="primary" variant="weak" size="large"
+          onClick={() => navigate('/login')}>처음으로</Button>
+      </div>
     </div>
   );
 }

@@ -1,0 +1,57 @@
+.page {
+  max-width: 480px;
+  margin: 0 auto;
+  min-height: 100vh;
+  background: #fff;
+}
+
+.content {
+  padding: 0 20px;
+}
+
+.findLink {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.keypad {
+  width: 100%;
+}
+
+.keypadRow {
+  display: flex;
+  gap: 0;
+}
+
+.keypadBtn {
+  flex: 1;
+  height: 56px;
+  border: none;
+  background: #f5f6f8;
+  font-size: 24px;
+  font-weight: 500;
+  color: #191f28;
+  cursor: pointer;
+  border-radius: 8px;
+  margin: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.keypadBtn:active {
+  background: #e5e8eb;
+}
+
+.keypadEmpty {
+  background: transparent;
+  cursor: default;
+}
+
+.keypadEmpty:active {
+  background: transparent;
+}

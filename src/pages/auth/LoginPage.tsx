@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import { IS_MOCK } from "../../api/supabase";
 import { Paragraph, Spacing, Button, ListRow, List } from "@toss/tds-mobile";
+import styles from "./LoginPage.module.css";
 
 const benefits = [
   { icon: "📝", text: "근로기준법에 맞춘 계약서 자동 완성" },
@@ -14,125 +15,84 @@ export default function LoginPage() {
   const navigate = useNavigate();
   const { login, isAuthenticated, userRole, isLoading } = useAuth();
 
-  useEffect(() => {
-    if (isAuthenticated && !isLoading) {
-      if (userRole === "employer")
-        navigate("/employer/dashboard", { replace: true });
-      else if (userRole === "worker")
-        navigate("/worker/contracts", { replace: true });
-      else navigate("/role-select", { replace: true });
-    }
-  }, [isAuthenticated, isLoading, userRole, navigate]);
-
-  const handleLogin = async (role?: "employer" | "worker") => {
-    try {
+  // 디자인 프리뷰: 자동 리디렉트 비활성화
+  const handleLogin = async (role?: 'employer' | 'worker') => {
+    if (role) {
       await login(role);
-    } catch (err) {
-      console.error("로그인 실패:", err);
-      alert("로그인에 실패했습니다.");
+      navigate(role === 'employer' ? '/employer/dashboard' : '/worker/contracts', { replace: true });
+    } else {
+      await login();
     }
   };
 
   return (
-    <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
-      <div
-        style={{
-          flex: 1,
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          padding: "32px 24px",
-        }}
-      >
-        {/* 일러스트 영역 */}
-        <div
-          style={{
-            width: 120,
-            height: 120,
-            borderRadius: 32,
-            background: "linear-gradient(135deg, #E3F2FD 0%, #BBDEFB 100%)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            fontSize: 52,
-            marginBottom: 24,
-          }}
-        >
-          📄
-        </div>
-
-        {/* 헤드라인 */}
-        <Paragraph typography="st2" fontWeight="bold" style={{ textAlign: "center" }}>
+    <div className={styles.page}>
+      {/* Hero area */}
+      <div className={styles.hero}>
+        <Paragraph typography="st1">📄</Paragraph>
+        <Spacing size={24} />
+        <Paragraph typography="st2" fontWeight="bold">
           근로계약서,
         </Paragraph>
-        <Paragraph typography="st2" fontWeight="bold" style={{ textAlign: "center" }}>
+        <Paragraph typography="st2" fontWeight="bold">
           5분이면 충분해요
         </Paragraph>
         <Spacing size={8} />
-        <Paragraph typography="st5" color="grey500" style={{ textAlign: "center" }}>
+        <Paragraph typography="st5" color="grey-500">
           종이 계약서 대신 토스에서 간편하게
         </Paragraph>
-
         <Spacing size={32} />
-
-        {/* 혜택 리스트 */}
         <List>
           {benefits.map((b, i) => (
-            <ListRow key={i}>
-              <ListRow.Texts
-                top={{
-                  label: `${b.icon}  ${b.text}`,
-                  typo: { fontSize: 15 },
-                }}
-              />
-            </ListRow>
+            <ListRow
+              key={i}
+              left={
+                <Paragraph typography="st4">{`${b.icon}  ${b.text}`}</Paragraph>
+              }
+            />
           ))}
         </List>
       </div>
-
-      {/* 하단 CTA */}
-      <div style={{ padding: "0 24px 32px" }}>
+      <div className={styles.bottomCta}>
+        <Paragraph typography="st7" color="grey-500" textAlign="center">
+          로그인하면 근로기준법 기반 계약서를 바로 작성할 수 있어요
+        </Paragraph>
+        <Spacing size={12} />
         {IS_MOCK ? (
-          <>
+          <div className={styles.buttonGroup}>
             <Button
               color="primary"
               variant="fill"
               display="block"
               size="xlarge"
-              loading={isLoading}
               onClick={() => handleLogin("employer")}
+              disabled={isLoading}
             >
               사장님으로 시작하기
             </Button>
-            <Spacing size={12} />
             <Button
               color="light"
               variant="fill"
               display="block"
               size="xlarge"
-              loading={isLoading}
               onClick={() => handleLogin("worker")}
+              disabled={isLoading}
             >
               근로자로 시작하기
             </Button>
-          </>
+          </div>
         ) : (
           <Button
             color="primary"
             variant="fill"
             display="block"
             size="xlarge"
-            loading={isLoading}
             onClick={() => handleLogin()}
+            disabled={isLoading}
           >
             토스로 시작하기
           </Button>
         )}
-        <Spacing size={16} />
-        <Paragraph typography="st7" color="grey400" style={{ textAlign: "center" }}>
-          로그인하면 근로기준법 기반 계약서를 바로 작성할 수 있어요
-        </Paragraph>
       </div>
     </div>
   );

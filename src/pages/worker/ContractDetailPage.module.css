@@ -1,0 +1,5 @@
+.page { max-width:480px; margin:0 auto; min-height:100vh; background:#fff; }
+.content { padding:0 20px; }
+.center { text-align:center; padding:0 20px; }
+.card { background:#fff; }
+.row { padding:8px 0; border-bottom:1px solid #f2f4f6; display:flex; justify-content:space-between; align-items:center; }

@@ -5,7 +5,7 @@ export default defineConfig({
   brand: {
     displayName: "근로계약",
     primaryColor: "#3182F6",
-    icon: "",
+    icon: "/icon.png",
   },
   web: {
     host: "localhost",
@@ -15,6 +15,9 @@ export default defineConfig({
       build: "vite build",
     },
   },
-  permissions: [],
+  permissions: [
+    { name: "push", reason: "계약서 전송 알림" },
+    { name: "Smart Messenger", reason: "근로자에게 계약서 링크 전송" },
+  ],
   outdir: "dist",
 });

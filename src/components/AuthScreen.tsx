@@ -1,5 +1,8 @@
+const MOCK_AUTH_DELAY_MS = 500;
+const AUTH_TIMEOUT_S = 60;
+
 import { useState, useCallback } from "react";
-import { Button, Paragraph, Spacing } from "@toss/tds-mobile";
+import { Button, Paragraph, Spacing, Top } from "@toss/tds-mobile";
 
 interface AuthScreenProps {
   onAuthComplete: (ci: string, userName: string) => void;
@@ -25,7 +28,7 @@ export function AuthScreen({ onAuthComplete }: AuthScreenProps) {
       setStatus("개발 모드: 인증 시뮬레이션 중...");
       await new Promise((r) => setTimeout(r, 1500));
       setStatus("인증 완료! (mock)");
-      await new Promise((r) => setTimeout(r, 500));
+      await new Promise((r) => setTimeout(r, MOCK_AUTH_DELAY_MS));
       onAuthComplete("mock-ci-123456789", "김토스");
       setLoading(false);
       return;
@@ -53,7 +56,7 @@ export function AuthScreen({ onAuthComplete }: AuthScreenProps) {
       const txId = authData.success.txId;
       setStatus("토스 앱에서 인증을 확인해주세요...");
 
-      for (let i = 0; i < 60; i++) {
+      for (let i = 0; i < AUTH_TIMEOUT_S; i++) {
         await new Promise((r) => setTimeout(r, 5000));
         const statusRes = await fetch(
           `/api/auth/status/${txId}?accessToken=${access_token}&sessionKey=${sessionKey}`
@@ -73,7 +76,7 @@ export function AuthScreen({ onAuthComplete }: AuthScreenProps) {
         if (statusData.success?.status === "EXPIRED") {
           throw new Error("인증 시간이 만료되었습니다.");
         }
-        setStatus(`인증 대기 중... (${i + 1}/60)`);
+        setStatus(`인증 대기 중... (${i + 1}/${AUTH_TIMEOUT_S})`);
       }
       throw new Error("인증 시간 초과");
     } catch (err) {
@@ -85,61 +88,55 @@ export function AuthScreen({ onAuthComplete }: AuthScreenProps) {
   }, [onAuthComplete]);
 
   return (
-    <div style={{ textAlign: "center", paddingTop: 80 }}>
-      <Paragraph typography="st1" fontWeight="bold">근로계약</Paragraph>
-      <Spacing size={8} />
-      <Paragraph typography="st4" color="grey600">토스 인증으로 간편하게 본인 확인 후 계약을 진행합니다</Paragraph>
-      <Spacing size={40} />
-
-      {DEV_MODE && (
-        <div
-          style={{
-            padding: "10px 14px",
-            marginBottom: 16,
-            backgroundColor: "#FFF8E1",
-            borderRadius: 10,
-          }}
+    <Top
+      title={
+        <Paragraph typography="st1" fontWeight="bold">근로계약</Paragraph>
+      }
+      subtitleTop={
+        <Paragraph typography="st4" color="grey-600">
+          토스 인증으로 간편하게 본인 확인 후 계약을 진행합니다
+        </Paragraph>
+      }
+      subtitleBottom={
+        <>
+          {DEV_MODE && (
+            <>
+              <Spacing size={40} />
+              <Paragraph typography="st6" color="yellow700">
+                개발 모드 — mock 인증으로 테스트 중
+              </Paragraph>
+            </>
+          )}
+          {error && (
+            <>
+              <Spacing size={40} />
+              <Paragraph typography="st5" color="danger500">
+                {error}
+              </Paragraph>
+            </>
+          )}
+          {status && !error && (
+            <>
+              <Spacing size={40} />
+              <Paragraph typography="st5" color="primary500">
+                {status}
+              </Paragraph>
+            </>
+          )}
+        </>
+      }
+      lower={
+        <Button
+          color="primary"
+          variant="fill"
+          display="block"
+          size="large"
+          onClick={handleOneTouchAuth}
+          disabled={loading}
         >
-          <Paragraph typography="st6" color="yellow700">개발 모드 — mock 인증으로 테스트 중</Paragraph>
-        </div>
-      )}
-
-      {error && (
-        <div
-          style={{
-            padding: "12px 16px",
-            marginBottom: 16,
-            backgroundColor: "#FFF3F0",
-            borderRadius: 10,
-          }}
-        >
-          <Paragraph typography="st5" color="danger500">{error}</Paragraph>
-        </div>
-      )}
-
-      {status && !error && (
-        <div
-          style={{
-            padding: "12px 16px",
-            marginBottom: 16,
-            backgroundColor: "#F0F5FF",
-            borderRadius: 10,
-          }}
-        >
-          <Paragraph typography="st5" color="primary500">{status}</Paragraph>
-        </div>
-      )}
-
-      <Button
-        color="primary"
-        variant="fill"
-        display="block"
-        size="large"
-        onClick={handleOneTouchAuth}
-        disabled={loading}
-      >
-        {loading ? "인증 중..." : "토스로 본인 인증하기"}
-      </Button>
-    </div>
+          {loading ? "인증 중..." : "토스로 본인 인증하기"}
+        </Button>
+      }
+    />
   );
 }

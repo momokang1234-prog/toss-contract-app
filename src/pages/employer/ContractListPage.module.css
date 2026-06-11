@@ -1,0 +1,20 @@
+.page {
+  max-width: 480px;
+  margin: 0 auto;
+  min-height: 100vh;
+  background: #fff;
+}
+
+.content {
+  padding: 0 20px;
+}
+
+.contractRow {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.empty {
+  text-align: center;
+}

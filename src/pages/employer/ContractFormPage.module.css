@@ -1,0 +1,118 @@
+.page {
+  max-width: 480px;
+  margin: 0 auto;
+  min-height: 100vh;
+  background: #fff;
+  padding-bottom: 100px;
+}
+
+.content {
+  padding: 0 20px;
+}
+
+.progress {
+  height: 3px;
+  background: #f2f4f6;
+}
+
+.progressBar {
+  height: 100%;
+  background: #3182f6;
+  transition: width 0.3s ease;
+}
+
+.label {
+  margin-bottom: 8px;
+}
+
+.dayGrid {
+  display: flex;
+  gap: 6px;
+}
+
+.dayBtn {
+  flex: 1;
+  padding: 10px 0;
+  border: 1px solid #e5e8eb;
+  border-radius: 8px;
+  background: #fff;
+  font-size: 13px;
+  color: #6b7684;
+  cursor: pointer;
+}
+
+.dayBtnOn {
+  background: #3182f6;
+  color: #fff;
+  border-color: #3182f6;
+}
+
+.timeRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.timeField {
+  flex: 1;
+}
+
+.disclaimer {
+  padding: 16px;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.row {
+  padding-top: 28px;
+}
+
+.switchRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 0;
+  border-bottom: 1px solid #f2f4f6;
+}
+
+.bottomCta {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 480px;
+  padding: 16px 20px 32px;
+  background: linear-gradient(to top, #fff 60%, transparent);
+}
+
+.section {
+  margin-bottom: 24px;
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid #f2f4f6;
+}
+
+.removeBtn {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.checkLabel {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.checkInput {
+  width: 24px;
+  height: 24px;
+  accent-color: #3182f6;
+}

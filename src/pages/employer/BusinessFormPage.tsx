@@ -1,122 +1,113 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useBusiness } from '../../hooks/useBusiness';
-import { TextField, Button, Spacing, Paragraph, Top } from '@toss/tds-mobile';
+import { Top, Paragraph, Spacing, Button, TextField } from '@toss/tds-mobile';
+import styles from './BusinessFormPage.module.css';
 
 const formatNumber = (v: string) => {
   const digits = v.replace(/\D/g, '').slice(0, 10);
-  if (digits.length > 5) return `${digits.slice(0,3)}-${digits.slice(3,5)}-${digits.slice(5)}`;
-  if (digits.length > 3) return `${digits.slice(0,3)}-${digits.slice(3)}`;
+  if (digits.length > 5) return `${digits.slice(0, 3)}-${digits.slice(3, 5)}-${digits.slice(5)}`;
+  if (digits.length > 3) return `${digits.slice(0, 3)}-${digits.slice(3)}`;
   return digits;
 };
+
+const KEYPAD = [
+  ['1', '2', '3'],
+  ['4', '5', '6'],
+  ['7', '8', '9'],
+  ['', '0', '⌫'],
+];
 
 export default function BusinessFormPage() {
   const navigate = useNavigate();
   const { createBusiness } = useBusiness();
-  const [form, setForm] = useState({
-    business_number: '', business_name: '', representative: '', address: '', phone: '',
-  });
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [step, setStep] = useState<'number' | 'info'>('number');
+  const [businessNumber, setBusinessNumber] = useState('');
+  const [form, setForm] = useState({ business_name: '', representative: '', address: '', phone: '' });
   const [submitting, setSubmitting] = useState(false);
 
-  const handleChange = (field: string, value: string) => {
-    if (field === 'business_number') value = formatNumber(value);
-    setForm(prev => ({ ...prev, [field]: value }));
-    setErrors(prev => ({ ...prev, [field]: '' }));
+  const handleKeypad = (key: string) => {
+    if (key === '⌫') setBusinessNumber(p => formatNumber(p.replace(/\D/g, '').slice(0, -1)));
+    else setBusinessNumber(p => formatNumber(p.replace(/\D/g, '') + key));
   };
 
-  const validate = () => {
-    const e: Record<string, string> = {};
-    if (!/^\d{3}-\d{2}-\d{5}$/.test(form.business_number)) e.business_number = '사업자등록번호 형식: 000-00-00000';
-    if (!form.business_name.trim()) e.business_name = '상호를 입력하세요';
-    if (!form.representative.trim()) e.representative = '대표자명을 입력하세요';
-    if (!form.address.trim()) e.address = '사업장 소재지를 입력하세요';
-    setErrors(e);
-    return Object.keys(e).length === 0;
-  };
+  const canNext = /^\d{3}-\d{2}-\d{5}$/.test(businessNumber);
 
   const handleSubmit = async () => {
-    if (!validate()) return;
     setSubmitting(true);
     try {
-      await createBusiness(form);
+      await createBusiness({
+        business_number: businessNumber,
+        business_name: form.business_name,
+        representative: form.representative,
+        address: form.address,
+        phone: form.phone,
+      });
       navigate('/employer/dashboard', { replace: true });
-    } catch (err) {
-      console.error(err);
-      alert('사업장 등록에 실패했습니다.');
-    } finally {
-      setSubmitting(false);
-    }
+    } catch { alert('등록에 실패했어요.'); }
+    finally { setSubmitting(false); }
   };
 
+  if (step === 'info') {
+    return (
+      <div className={styles.page}>
+        <Top title="사업장 등록" onBack={() => setStep('number')} />
+        <div className={styles.content}>
+          <Spacing size={40} />
+          <Paragraph typography="st2" fontWeight="bold">사업장 정보를</Paragraph>
+          <Paragraph typography="st2" fontWeight="bold">입력해주세요</Paragraph>
+          <Spacing size={32} />
+          <TextField variant="box" labelOption="sustain" label="상호" placeholder="사업장 이름"
+            value={form.business_name} onChange={e => setForm(p => ({ ...p, business_name: e.target.value }))} />
+          <Spacing size={16} />
+          <TextField variant="box" labelOption="sustain" label="대표자" placeholder="대표자 이름"
+            value={form.representative} onChange={e => setForm(p => ({ ...p, representative: e.target.value }))} />
+          <Spacing size={16} />
+          <TextField variant="box" labelOption="sustain" label="사업장 소재지" placeholder="주소"
+            value={form.address} onChange={e => setForm(p => ({ ...p, address: e.target.value }))} />
+          <Spacing size={16} />
+          <TextField variant="box" labelOption="sustain" label="전화번호 (선택)" placeholder="02-1234-5678"
+            value={form.phone} onChange={e => setForm(p => ({ ...p, phone: e.target.value }))} />
+          <Spacing size={40} />
+          <Button color="primary" variant="fill" display="block" size="xlarge"
+            onClick={handleSubmit} disabled={submitting}>
+            {submitting ? '등록 중...' : '등록하기'}
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <Top>
-      <Paragraph typography="st3" fontWeight="bold">사업장 등록</Paragraph>
-      <Spacing size={24} />
-
-      <TextField
-        variant="box"
-        label="사업자등록번호"
-        placeholder="000-00-00000"
-        value={form.business_number}
-        onChange={e => handleChange('business_number', e.target.value)}
-        hasError={!!errors.business_number}
-        help={errors.business_number}
-      />
-      <Spacing size={16} />
-
-      <TextField
-        variant="box"
-        label="상호"
-        placeholder="사업장 이름"
-        value={form.business_name}
-        onChange={e => handleChange('business_name', e.target.value)}
-        hasError={!!errors.business_name}
-        help={errors.business_name}
-      />
-      <Spacing size={16} />
-
-      <TextField
-        variant="box"
-        label="대표자"
-        placeholder="대표자 이름"
-        value={form.representative}
-        onChange={e => handleChange('representative', e.target.value)}
-        hasError={!!errors.representative}
-        help={errors.representative}
-      />
-      <Spacing size={16} />
-
-      <TextField
-        variant="box"
-        label="사업장 소재지"
-        placeholder="주소"
-        value={form.address}
-        onChange={e => handleChange('address', e.target.value)}
-        hasError={!!errors.address}
-        help={errors.address}
-      />
-      <Spacing size={16} />
-
-      <TextField
-        variant="box"
-        label="전화 (선택)"
-        placeholder="02-1234-5678"
-        value={form.phone}
-        onChange={e => handleChange('phone', e.target.value)}
-      />
-      <Spacing size={24} />
-
-      <Button
-        color="primary"
-        variant="fill"
-        display="block"
-        size="large"
-        onClick={handleSubmit}
-        disabled={submitting}
-      >
-        {submitting ? '등록 중...' : '사업장 등록'}
-      </Button>
-    </Top>
+    <div className={styles.page}>
+      <Top title="사업장 등록" onBack={() => navigate(-1)} />
+      <div className={styles.content}>
+        <Spacing size={48} />
+        <Paragraph typography="st1" fontWeight="bold">사업자등록번호를</Paragraph>
+        <Paragraph typography="st1" fontWeight="bold">입력해주세요</Paragraph>
+        <Spacing size={32} />
+        <TextField variant="line" labelOption="sustain" label="사업자등록번호"
+          placeholder="000-00-00000" value={businessNumber} readOnly />
+        <Spacing size={40} />
+        <div className={styles.keypad}>
+          {KEYPAD.map((row, i) => (
+            <div key={i} className={styles.keypadRow}>
+              {row.map((key) => (
+                <button key={key || `empty-${i}`}
+                  className={`${styles.keypadBtn} ${!key ? styles.keypadEmpty : ''}`}
+                  type="button" onClick={() => key && handleKeypad(key)} disabled={!key}>
+                  {key}
+                </button>
+              ))}
+            </div>
+          ))}
+        </div>
+        <Spacing size={32} />
+        <Button color="primary" variant="fill" display="block" size="xlarge"
+          onClick={() => setStep('info')} disabled={!canNext}>
+          확인
+        </Button>
+      </div>
+    </div>
   );
 }

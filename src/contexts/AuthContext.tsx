@@ -1,3 +1,6 @@
+const MOCK_AUTH_DELAY_MS = 500;
+const MOCK_INIT_DELAY_MS = 1000;
+
 import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from 'react';
 import { IS_MOCK } from '../api/supabase';
 
@@ -49,12 +52,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [ci, setCi] = useState<string | null>(null);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
 
-  // Restore mock session from sessionStorage
+  // 디자인 프리뷰: Mock 모드에서 항상 사장님으로 자동 로그인
   useEffect(() => {
     if (IS_MOCK) {
       const savedRole = sessionStorage.getItem('mock_role') as 'employer' | 'worker' | null;
-      if (savedRole && MOCK_PROFILES[savedRole]) {
-        const p = MOCK_PROFILES[savedRole];
+      const role = savedRole ?? 'employer';
+      const p = MOCK_PROFILES[role];
+      if (p) {
         setIsAuthenticated(true);
         setUserName(p.name);
         setCi(p.ci);
@@ -68,7 +72,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setIsLoading(true);
     try {
       if (IS_MOCK) {
-        await new Promise(r => setTimeout(r, 500));
+        await new Promise(r => setTimeout(r, MOCK_AUTH_DELAY_MS));
         const selectedRole = role ?? 'employer';
         const p = MOCK_PROFILES[selectedRole];
         if (!p) throw new Error('Invalid role');
@@ -81,7 +85,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return;
       }
       // TODO: Real Toss Login integration
-      await new Promise(r => setTimeout(r, 1000));
+      await new Promise(r => setTimeout(r, MOCK_INIT_DELAY_MS));
       setIsAuthenticated(true);
       setUserName('사용자');
     } finally {

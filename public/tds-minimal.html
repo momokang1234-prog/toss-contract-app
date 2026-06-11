@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head><meta charset="UTF-8"><title>TDS 테스트</title></head>
+<body><div id="root"></div>
+<script type="module">
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import { ThemeProvider, Button, Top, Paragraph, Spacing } from '@toss/tds-mobile';
+
+function Test() {
+  return React.createElement(ThemeProvider, null,
+    React.createElement(Top, { title: "TDS 2.3.0 테스트" },
+      React.createElement(Spacing, { size: 24 }),
+      React.createElement(Paragraph, { typography: "st2" }, "안녕하세요!"),
+      React.createElement(Spacing, { size: 16 }),
+      React.createElement(Button, { color: "primary", variant: "fill", size: "xlarge" }, "버튼 클릭")
+    )
+  );
+}
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(React.createElement(Test));
+</script>
+</body>
+</html>

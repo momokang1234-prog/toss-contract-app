@@ -4,6 +4,24 @@
   box-sizing: border-box;
 }
 
+:root {
+  /* TDS 2.4.0 Typography Scale */
+  --tds-t-st1-text-fontSize: 32px;
+  --tds-t-st1-text-lineHeight: 44px;
+  --tds-t-st2-text-fontSize: 28px;
+  --tds-t-st2-text-lineHeight: 40px;
+  --tds-t-st3-text-fontSize: 24px;
+  --tds-t-st3-text-lineHeight: 34px;
+  --tds-t-st4-text-fontSize: 20px;
+  --tds-t-st4-text-lineHeight: 30px;
+  --tds-t-st5-text-fontSize: 17px;
+  --tds-t-st5-text-lineHeight: 24px;
+  --tds-t-st6-text-fontSize: 15px;
+  --tds-t-st6-text-lineHeight: 22px;
+  --tds-t-st7-text-fontSize: 13px;
+  --tds-t-st7-text-lineHeight: 20px;
+}
+
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Pretendard", sans-serif;
   background-color: #f5f6f8;

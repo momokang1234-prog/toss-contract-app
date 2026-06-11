@@ -59,9 +59,9 @@ export default function ContractListPage() {
           </List>
         ) : (
           <div className={styles.empty}>
-            <Paragraph typography="st1"><img src="https://static.toss.im/2d-emojis/png/4x/u1F4CB.png" alt=""
-  style={{ width: 72, height: 72 }}
-/></Paragraph>
+            <img src="https://static.toss.im/2d-emojis/png/4x/u1F4CB.png" alt=""
+              style={{ width: 72, height: 72 }}
+            />
             <Spacing size={16} />
             <Paragraph typography="st5" color="grey-500">
               첫 계약서를 작성해보세요

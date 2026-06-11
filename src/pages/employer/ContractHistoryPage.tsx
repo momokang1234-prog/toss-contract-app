@@ -1,130 +1,59 @@
 import { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { useContracts, type Contract } from '../../hooks/useContracts';
-import { Spacing, Paragraph, Button } from '@toss/tds-mobile';
+import { useParams } from 'react-router-dom';
+import { useContracts } from '../../hooks/useContracts';
+import { Top, Paragraph, Spacing, Badge, List, ListRow } from '@toss/tds-mobile';
+import styles from './ContractHistoryPage.module.css';
+
+const ACTION_LABELS: Record<string,string> = {
+  create:'작성', send:'전송', view:'열람', sign:'서명', complete:'확정', cancel:'취소', expire:'만료'
+};
+const ROLE_LABELS: Record<string,string> = { employer:'사장님', worker:'근로자' };
 
 interface HistoryEntry {
-  id: string;
-  contract_id: string;
-  action: string;
-  actor_role: string;
-  created_at: string;
+  id:string; contract_id:string; action:string; actor_role:string; created_at:string;
 }
 
-const ACTION_LABELS: Record<string, string> = {
-  created: '계약서 작성',
-  sent: '근로자에게 전송',
-  viewed: '근로자가 확인',
-  signed: '근로자 서명 완료',
-  completed: '계약 확정',
-  cancelled: '계약 취소',
-  expired: '계약 만료',
-};
-
-const ROLE_LABELS: Record<string, string> = {
-  employer: '사장님',
-  worker: '근로자',
-};
-
 export default function ContractHistoryPage() {
-  const { id } = useParams();
-  const navigate = useNavigate();
-  const { getContract, getHistory } = useContracts();
-  const [contract, setContract] = useState<Contract | null>(null);
-  const [history, setHistory] = useState<HistoryEntry[]>([]);
+  const { id = '' } = useParams();
+  const { getHistory } = useContracts();
+  const [entries, setEntries] = useState<HistoryEntry[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!id) return;
-    Promise.all([
-      getContract(id),
-      getHistory(id),
-    ]).then(([c, h]) => {
-      setContract(c);
-      setHistory(h);
-      setLoading(false);
-    });
+    getHistory(id).then(setEntries).finally(() => setLoading(false));
   }, [id]);
 
-  if (loading) {
-    return <div style={{ padding: 24, textAlign: 'center', color: '#6B7684' }}>로딩 중...</div>;
-  }
-
-  if (!contract) {
-    return <div style={{ padding: 24, textAlign: 'center', color: '#6B7684' }}>계약을 찾을 수 없습니다.</div>;
-  }
-
   return (
-    <div style={{ padding: 24, maxWidth: 480, margin: '0 auto', paddingBottom: 40 }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Paragraph typography="st3" fontWeight="bold">계약 이력</Paragraph>
-        <Button
-          color="primary"
-          variant="weak"
-          size="small"
-          onClick={() => navigate(-1)}
-        >
-          뒤로
-        </Button>
-      </div>
+    <div className={styles.page}>
+      <Top title="계약 이력" />
+      <div className={styles.content}>
+        <Spacing size={24} />
+        <Paragraph typography="st2" fontWeight="bold">계약 이력</Paragraph>
+        <Spacing size={8} />
+        <Paragraph typography="st5" color="grey-500">
+          {loading ? '불러오는 중...' : entries.length > 0 ? `총 ${entries.length}건의 변경 기록` : '아직 기록이 없어요'}
+        </Paragraph>
+        <Spacing size={24} />
 
-      <Spacing size={8} />
-
-      <div style={{ marginBottom: 24 }}>
-        <Paragraph typography="st3" fontWeight="bold" style={{ margin: 0 }}>{contract.worker_name}</Paragraph>
-        <Paragraph typography="st6" color="grey500" style={{ margin: '4px 0 0 0' }}>{contract.job_description}</Paragraph>
-      </div>
-
-      <Spacing size={16} />
-
-      {history.length === 0 ? (
-        <div style={{ textAlign: 'center', color: '#8B95A1', padding: 40 }}>
-          아직 이력이 없습니다.
-        </div>
-      ) : (
-        <div style={{ position: 'relative', paddingLeft: 28 }}>
-          {/* Vertical timeline line */}
-          <div
-            style={{
-              position: 'absolute',
-              left: 8,
-              top: 0,
-              bottom: 0,
-              width: 2,
-              backgroundColor: '#E5E8EB',
-            }}
-          />
-
-          {history.map((entry, index) => (
-            <div key={entry.id} style={{ position: 'relative', marginBottom: 24 }}>
-              {/* Timeline dot */}
-              <div
-                style={{
-                  position: 'absolute',
-                  left: -20,
-                  top: 4,
-                  width: 10,
-                  height: 10,
-                  borderRadius: '50%',
-                  backgroundColor: index === 0 ? '#3182F6' : '#E5E8EB',
-                  border: '2px solid #FFFFFF',
-                  zIndex: 1,
-                }}
+        {entries.length > 0 && (
+          <List>
+            {entries.map(e => (
+              <ListRow key={e.id}
+                left={
+                  <div className={styles.entryRow}>
+                    <Paragraph typography="st5" fontWeight="bold">{ACTION_LABELS[e.action] || e.action}</Paragraph>
+                    <Paragraph typography="st7" color="grey-500">
+                      {ROLE_LABELS[e.actor_role] || e.actor_role} · {new Date(e.created_at).toLocaleString('ko-KR')}
+                    </Paragraph>
+                  </div>
+                }
+                right={<Badge size="small" variant="weak" color="elephant">{e.action}</Badge>}
               />
-
-              {/* Content */}
-              <div>
-                <Paragraph typography="st5" fontWeight="bold" style={{ margin: 0, color: '#191F28' }}>
-                  {ACTION_LABELS[entry.action] ?? entry.action}
-                </Paragraph>
-                <Paragraph typography="st6" color="grey500" style={{ margin: '4px 0 0 0' }}>
-                  {ROLE_LABELS[entry.actor_role] ?? entry.actor_role} · {new Date(entry.created_at).toLocaleString('ko-KR')}
-                </Paragraph>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
+            ))}
+          </List>
+        )}
+        <Spacing size={40} />
+      </div>
     </div>
   );
 }
