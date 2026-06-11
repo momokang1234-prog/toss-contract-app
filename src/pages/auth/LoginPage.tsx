@@ -15,6 +15,13 @@ export default function LoginPage() {
   const navigate = useNavigate();
   const { login, isAuthenticated, userRole, isLoading } = useAuth();
 
+  // 이미 인증된 상태면 바로 대시보드로
+  useEffect(() => {
+    if (isAuthenticated && userRole) {
+      navigate(userRole === 'employer' ? '/employer/dashboard' : '/worker/contracts', { replace: true });
+    }
+  }, [isAuthenticated, userRole]);
+
   // 디자인 프리뷰: 자동 리디렉트 비활성화
   const handleLogin = async (role?: 'employer' | 'worker') => {
     if (role) {

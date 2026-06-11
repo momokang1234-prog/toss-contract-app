@@ -52,18 +52,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [ci, setCi] = useState<string | null>(null);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
 
-  // 디자인 프리뷰: Mock 모드에서 항상 사장님으로 자동 로그인
+  // 로그인 페이지에서 명시적으로 역할 선택 — 자동 로그인 없음
   useEffect(() => {
     if (IS_MOCK) {
       const savedRole = sessionStorage.getItem('mock_role') as 'employer' | 'worker' | null;
-      const role = savedRole ?? 'employer';
-      const p = MOCK_PROFILES[role];
-      if (p) {
-        setIsAuthenticated(true);
-        setUserName(p.name);
-        setCi(p.ci);
-        setUserRole(p.role);
-        setUserProfile({ userKey: p.userKey, name: p.name, phone: p.phone, ci: p.ci });
+      if (savedRole) {
+        const p = MOCK_PROFILES[savedRole];
+        if (p) {
+          setIsAuthenticated(true);
+          setUserName(p.name);
+          setCi(p.ci);
+          setUserRole(p.role);
+          setUserProfile({ userKey: p.userKey, name: p.name, phone: p.phone, ci: p.ci });
+        }
       }
     }
   }, []);
