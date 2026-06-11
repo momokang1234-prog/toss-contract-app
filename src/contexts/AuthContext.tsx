@@ -1,8 +1,8 @@
-const MOCK_AUTH_DELAY_MS = 500;
-const MOCK_INIT_DELAY_MS = 1000;
 
 import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from 'react';
 import { IS_MOCK } from '../api/supabase';
+const MOCK_AUTH_DELAY_MS = 500;
+const MOCK_INIT_DELAY_MS = 1000;
 
 export type UserRole = 'employer' | 'worker' | null;
 
