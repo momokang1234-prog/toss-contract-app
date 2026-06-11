@@ -47,7 +47,7 @@ function SwitchRow({ label, description, checked, onChange }: {
   return (
     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', padding: '10px 0', gap: 12 }}>
       <div style={{ flex: 1, minWidth: 0 }}>
-        <Paragraph typography="st6">{label}</Paragraph>
+        <Paragraph typography="st6" fontWeight="bold">{label}</Paragraph>
         {description && (
           <Paragraph typography="st7" color="grey-500" style={{ marginTop: 4, lineHeight: '1.6', wordBreak: 'keep-all' }}>
             {description}
@@ -63,8 +63,8 @@ function SwitchRow({ label, description, checked, onChange }: {
 function DetailBox({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div style={{ backgroundColor: '#F0F6FF', borderRadius: 8, padding: 12, marginBottom: 12, border: '1px solid #D1E3FF' }}>
-      <Paragraph typography="st6" fontWeight="bold" color="grey800">{title}</Paragraph>
-      <Paragraph typography="st8" color="grey-600">{children}</Paragraph>
+      <Paragraph typography="st6" fontWeight="bold" color="grey800" style={{ marginBottom: 6 }}>{title}</Paragraph>
+      <Paragraph typography="st7" color="grey-600" style={{ lineHeight: '1.6', wordBreak: 'keep-all' }}>{children}</Paragraph>
     </div>
   );
 }
