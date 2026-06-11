@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { lazy, Suspense, useEffect } from 'react';
-import { partner, tdsEvent } from '@apps-in-toss/web-framework';
-
+import { tdsEvent } from '@apps-in-toss/web-framework';
+import { AuthProvider } from './contexts/AuthContext';
 import LoginPage from './pages/auth/LoginPage';
 
 const DeeplinkHandler = lazy(() => import('./pages/shared/DeeplinkHandler').then(m => ({ default: m.DeeplinkHandler })));
