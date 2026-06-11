@@ -1,12 +1,13 @@
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
 import { useContracts } from '../../hooks/useContracts';
 import { ContractCard } from '../../components/contract/ContractCard';
 import { Top, Paragraph, Spacing, Button, GridList } from '@toss/tds-mobile';
 import styles from './DashboardPage.module.css';
-
 export default function DashboardPage() {
   const navigate = useNavigate();
   const { contracts } = useContracts();
+  const { setRole } = useAuth();
 
   const totalCount = contracts.length;
   const inProgress = contracts.filter(c => c.status === 'sent' || c.status === 'viewed').length;
@@ -112,6 +113,14 @@ export default function DashboardPage() {
           </Paragraph>
         </div>
       )}
+    </div>
+
+      <div style={{ display: 'flex', justifyContent: 'center', padding: '0 24px 24px' }}>
+        <Button color="light" variant="weak" size="small"
+          onClick={async () => { await setRole('worker'); navigate('/worker/contracts', { replace: true }); }}>
+          🔄 근로자로 전환
+        </Button>
+      </div>
     </div>
   );
 }

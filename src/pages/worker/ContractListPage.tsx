@@ -1,11 +1,14 @@
 import { useNavigate } from 'react-router-dom';
 import { useContracts } from '../../hooks/useContracts';
+import { useAuth } from '../../contexts/AuthContext';
 import { Top, Paragraph, Spacing, Button, List, ListRow, Badge } from '@toss/tds-mobile';
 import styles from './ContractListPage.module.css';
+
 
 export default function WorkerContractListPage() {
   const navigate = useNavigate();
   const { contracts } = useContracts();
+  const { setRole } = useAuth();
 
   const badgeFor = (status: string) => {
     if (status === 'sent') return { label: '미열람', color: 'blue' as const };
@@ -50,6 +53,13 @@ export default function WorkerContractListPage() {
           </div>
         )}
         <Spacing size={40} />
+      </div>
+
+      <div style={{ display: 'flex', justifyContent: 'center', padding: '0 24px 24px' }}>
+        <Button color="light" variant="weak" size="small"
+          onClick={async () => { await setRole('employer'); navigate('/employer/dashboard', { replace: true }); }}>
+          🔄 사장님으로 전환
+        </Button>
       </div>
     </div>
   );
