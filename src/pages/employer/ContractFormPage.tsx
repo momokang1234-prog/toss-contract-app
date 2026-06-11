@@ -53,7 +53,7 @@ function SwitchRow({ label, description, checked, onChange }: {
           </Paragraph>
         )}
       </div>
-      <Switch checked={checked} onChange={(e) => onChange((e.target as HTMLInputElement).checked)} />
+      <Switch checked={checked} onChange={(e) => onChange((e.target as HTMLInputElement).checked)} aria-label={label} />
     </div>
   );
 }
@@ -285,16 +285,16 @@ export default function ContractFormPage() {
           <FieldLabel>근로자 이름</FieldLabel>
           <TextField variant="box" placeholder="예: 홍길동" value={form.worker_name}
             onChange={e => handleChange('worker_name', e.target.value)}
-            hasError={!!errors.worker_name} help={errors.worker_name} />
+            hasError={!!errors.worker_name} help={errors.worker_name} aria-label="근로자 이름" />
           <Spacing size={16} />
           <FieldLabel>전화번호</FieldLabel>
           <TextField variant="box" placeholder="01012345678" value={form.worker_phone}
             onChange={e => handleChange('worker_phone', e.target.value.replace(/\D/g, '').slice(0, 11))}
-            hasError={!!errors.worker_phone} help={errors.worker_phone} />
+            hasError={!!errors.worker_phone} help={errors.worker_phone} aria-label="전화번호" />
           <Spacing size={16} />
           <FieldLabel>근로자 주소 (선택)</FieldLabel>
           <TextField variant="box" placeholder="서울특별시 강남구..." value={form.worker_address}
-            onChange={e => handleChange('worker_address', e.target.value)} />
+            onChange={e => handleChange('worker_address', e.target.value)} aria-label="근로자 주소" />
         </div>
       )}
 
@@ -312,24 +312,24 @@ export default function ContractFormPage() {
           <FieldLabel>근무 장소</FieldLabel>
           <TextField variant="box" placeholder="예: 서울시 강남구" value={form.workplace}
             onChange={e => handleChange('workplace', e.target.value)}
-            hasError={!!errors.workplace} help={errors.workplace} />
+            hasError={!!errors.workplace} help={errors.workplace} aria-label="근무 장소" />
           <Spacing size={16} />
           <FieldLabel>직무 내용</FieldLabel>
           <TextField variant="box" placeholder="예: 매장 관리 및 고객 응대" value={form.job_description}
             onChange={e => handleChange('job_description', e.target.value)}
-            hasError={!!errors.job_description} help={errors.job_description} />
+            hasError={!!errors.job_description} help={errors.job_description} aria-label="직무 내용" />
           <Spacing size={16} />
           <div style={{ display: 'flex', gap: 12 }}>
             <div style={{ flex: 1 }}>
               <FieldLabel>시작일</FieldLabel>
               <TextField variant="box" type="date" value={form.start_date}
                 onChange={e => handleChange('start_date', e.target.value)}
-                hasError={!!errors.start_date} help={errors.start_date} />
+                hasError={!!errors.start_date} help={errors.start_date} aria-label="시작일" />
             </div>
             <div style={{ flex: 1 }}>
               <FieldLabel>종료일 (선택)</FieldLabel>
               <TextField variant="box" type="date" value={form.end_date}
-                onChange={e => handleChange('end_date', e.target.value)} />
+                onChange={e => handleChange('end_date', e.target.value)} aria-label="종료일" />
             </div>
           </div>
         </div>
@@ -350,7 +350,7 @@ export default function ContractFormPage() {
           <FieldLabel>금액 (원)</FieldLabel>
           <TextField variant="box" type="number" placeholder="예: 3000000" value={form.base_wage}
             onChange={e => handleChange('base_wage', e.target.value)}
-            hasError={!!errors.base_wage} help={errors.base_wage} />
+            hasError={!!errors.base_wage} help={errors.base_wage} aria-label="금액" />
           <Spacing size={16} />
           <FieldLabel>지급 방법</FieldLabel>
           <SegmentedControl value={form.wage_payment_method} onChange={v => handleChange('wage_payment_method', v)}>
@@ -408,25 +408,25 @@ export default function ContractFormPage() {
               <FieldLabel>시작</FieldLabel>
               <TextField variant="box" type="time" value={form.start_time}
                 onChange={e => handleChange('start_time', e.target.value)}
-                hasError={!!errors.start_time} help={errors.start_time} />
+                hasError={!!errors.start_time} help={errors.start_time} aria-label="시작 시간" />
             </div>
             <div style={{ flex: 1 }}>
               <FieldLabel>종료</FieldLabel>
               <TextField variant="box" type="time" value={form.end_time}
                 onChange={e => handleChange('end_time', e.target.value)}
-                hasError={!!errors.end_time} help={errors.end_time} />
+                hasError={!!errors.end_time} help={errors.end_time} aria-label="종료 시간" />
             </div>
           </div>
           <div style={{ display: 'flex', gap: 12 }}>
             <div style={{ flex: 1 }}>
               <FieldLabel>휴게 시작</FieldLabel>
               <TextField variant="box" type="time" value={form.break_start}
-                onChange={e => handleChange('break_start', e.target.value)} />
+                onChange={e => handleChange('break_start', e.target.value)} aria-label="휴게 시작 시간" />
             </div>
             <div style={{ flex: 1 }}>
               <FieldLabel>휴게 종료</FieldLabel>
               <TextField variant="box" type="time" value={form.break_end}
-                onChange={e => handleChange('break_end', e.target.value)} />
+                onChange={e => handleChange('break_end', e.target.value)} aria-label="휴게 종료 시간" />
             </div>
           </div>
         </div>

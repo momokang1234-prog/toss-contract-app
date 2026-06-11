@@ -40,6 +40,7 @@ export default function WorkerContractListPage() {
               <ListRow
                 key={c.id}
                 onClick={() => navigate(`/worker/contracts/${c.id}`)}
+                aria-label={businessMap[c.business_id] ?? c.workplace}
                 left={
                   <div className={styles.contractRow}>
                     <Paragraph typography="st5" fontWeight="bold">
