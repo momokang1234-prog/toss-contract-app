@@ -74,10 +74,12 @@ export default function ContractSignPage() {
   if (!id) return <Navigate to="/worker/contracts" replace />;
   if (!contract) return <div className={styles.page}><Top title="서명하기" /><div className={styles.center}><Spacing size={24} /><Paragraph typography="st5" color="grey-500">불러오는 중...</Paragraph></div></div>;
   if (done) {
+    // Auto-navigate back to detail after 2s
+    useEffect(() => { const t = setTimeout(() => navigate(`/worker/contracts/${id}`), 2000); return () => clearTimeout(t); }, [id]);
     return (
       <div className={styles.page}>
         <Top title="서명 완료" />
-        <div className={styles.center}>
+        <div className={styles.center} style={{ textAlign: 'center' }}>
           <Spacing size={60} />
           <div style={{ textAlign: 'center' }}>
             <img src="https://static.toss.im/3d-common/check-success.png" alt=""
@@ -87,7 +89,7 @@ export default function ContractSignPage() {
           <Spacing size={16} />
           <Paragraph typography="st2" fontWeight="bold">서명이 완료되었어요</Paragraph>
           <Spacing size={8} />
-          <Paragraph typography="st5" color="grey-500">사장님이 확인 후 계약이 확정돼요</Paragraph>
+          <Paragraph typography="st5" color="grey-500">잠시 후 계약서로 이동합니다</Paragraph>
           <Spacing size={32} />
           <Button color="primary" variant="weak" size="large"
             onClick={() => navigate(`/worker/contracts/${id}`)}>계약서 보기</Button>
