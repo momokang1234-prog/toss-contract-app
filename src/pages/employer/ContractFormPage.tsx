@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useContracts } from '../../hooks/useContracts';
 import { useBusiness } from '../../hooks/useBusiness';
@@ -9,6 +9,7 @@ const DAYS = ['mon','tue','wed','thu','fri','sat','sun'] as const;
 const DAY_LABELS: Record<string, string> = { mon:'월', tue:'화', wed:'수', thu:'목', fri:'금', sat:'토', sun:'일' };
 
 const STEPS = ['근로자 정보', '계약 조건', '임금', '근무 시간', '근로조건', '법정 검증', '최종 확인'];
+const STEP_ICONS = ['🧑', '📋', '💰', '⏰', '🛡️', '🔍', '✅'];
 const TOTAL_STEPS = STEPS.length;
 
 function computeBreakMinutes(start: string, end: string): number {
@@ -39,16 +40,19 @@ function FieldLabel({ children }: { children: React.ReactNode }) {
   return <div style={{ fontSize: 13, fontWeight: 600, color: '#4E5968', marginBottom: 8 }}>{children}</div>;
 }
 
-// ── Switch row with optional description ──
 function SwitchRow({ label, description, checked, onChange }: {
   label: string; description?: string; checked: boolean;
   onChange: (v: boolean) => void;
 }) {
   return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 0' }}>
-      <div style={{ flex: 1, marginRight: 12 }}>
+    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', padding: '10px 0', gap: 12 }}>
+      <div style={{ flex: 1, minWidth: 0 }}>
         <Paragraph typography="st6">{label}</Paragraph>
-        {description && <Paragraph typography="st8" color="grey-500">{description}</Paragraph>}
+        {description && (
+          <Paragraph typography="st7" color="grey-500" style={{ marginTop: 4, lineHeight: '1.6', wordBreak: 'keep-all' }}>
+            {description}
+          </Paragraph>
+        )}
       </div>
       <Switch checked={checked} onChange={(e) => onChange((e.target as HTMLInputElement).checked)} />
     </div>
@@ -87,6 +91,13 @@ export default function ContractFormPage() {
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [warnings, setWarnings] = useState<ValidationWarning[]>([]);
+  // 근무 장소 기본값 = 사업장 주소
+  useEffect(() => {
+    if (businesses.length > 0 && !form.workplace) {
+      setForm(prev => ({ ...prev, workplace: businesses[0].address }));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [businesses]);
   const [validationResult, setValidationResult] = useState<{
     valid: boolean;
     errors: Array<{ field: string; message: string }>;
@@ -226,9 +237,13 @@ export default function ContractFormPage() {
 
   return (
     <div style={{ padding: 24, maxWidth: 480, margin: '0 auto', paddingBottom: 120 }}>
-      <Paragraph typography="st3" fontWeight="bold">근로계약서 작성</Paragraph>
+      <Paragraph typography="st3" fontWeight="bold">
+        <span className="tossface">📄</span> 근로계약서 작성
+      </Paragraph>
       <Spacing size={8} />
-      <Paragraph typography="st7" color="grey-500">{STEPS[step]} ({step + 1}/{TOTAL_STEPS})</Paragraph>
+      <Paragraph typography="st7" color="grey-500">
+        <span className="tossface">{STEP_ICONS[step]}</span> {STEPS[step]} ({step + 1}/{TOTAL_STEPS})
+      </Paragraph>
       <Spacing size={12} />
       <div style={{ height: 4, borderRadius: 2, backgroundColor: '#E5E8EB', overflow: 'hidden', marginBottom: 24 }}>
         <div style={{ height: '100%', width: `${progressPct}%`, borderRadius: 2, backgroundColor: '#3182F6', transition: 'width 0.3s ease' }} />
@@ -441,7 +456,10 @@ export default function ContractFormPage() {
           )}
           {validationResult && validationResult.valid && validationResult.warnings.length === 0 && (
             <div style={{ padding: 24, textAlign: 'center' }}>
-              <Paragraph typography="st4" fontWeight="bold" color="grey-800">✅ 모든 검증을 통과했습니다</Paragraph>
+              <img src="https://static.toss.im/3d-common/check-success.png" alt=""
+                style={{ width: 120, height: 120, marginBottom: 16 }}
+              />
+              <Paragraph typography="st4" fontWeight="bold" color="grey-800">모든 검증을 통과했습니다</Paragraph>
               <Spacing size={8} />
               <Paragraph typography="st6" color="grey-500">법정 요건을 충족하는 계약서입니다.</Paragraph>
             </div>
