@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate, Navigate } from 'react-router-dom';
 import { useContracts, type Contract } from '../../hooks/useContracts';
 import { Top, Paragraph, Spacing, Button, Badge } from '@toss/tds-mobile';
+import SendContractSheet from '../../components/delivery/SendContractSheet';
 import styles from './ContractDetailPage.module.css';
 
 export default function ContractDetailPage() {
@@ -9,9 +10,9 @@ export default function ContractDetailPage() {
   const navigate = useNavigate();
   const { getContract, sendContract, completeContract, cancelContract } = useContracts();
   const [contract, setContract] = useState<Contract | null>(null);
-  const [error, setError] = useState<string | null>(null);
   const [sending, setSending] = useState(false);
   const [completing, setCompleting] = useState(false);
+  const [showSheet, setShowSheet] = useState(false);
 
   useEffect(() => {
     if (!id) { setError('계약서 ID가 없습니다'); return; }
@@ -138,7 +139,7 @@ export default function ContractDetailPage() {
         {canSend && (
           <>
             <Button color="primary" variant="fill" display="block" size="large"
-              onClick={async () => { setSending(true); try { const u = await sendContract(id); setContract(u); } catch { alert('전송 실패'); } finally { setSending(false); }}}
+              onClick={() => setShowSheet(true)}
               disabled={sending}>{sending ? '전송 중...' : '근로자에게 전송'}</Button>
             <Spacing size={12} />
             <Button color="light" variant="weak" display="block" size="large"
@@ -212,6 +213,27 @@ export default function ContractDetailPage() {
           계약 이력 보기
         </Button>
       </div>
+
+      {showSheet && contract && (
+        <div style={{
+          position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', zIndex: 100,
+          display: 'flex', alignItems: 'flex-end', justifyContent: 'center',
+        }} onClick={() => setShowSheet(false)}>
+          <div style={{
+            background: '#fff', borderRadius: '20px 20px 0 0', width: '100%', maxWidth: 480,
+          }} onClick={e => e.stopPropagation()}>
+            <SendContractSheet
+              contractTitle={contract.worker_name}
+              deepLink={`${window.location.origin}/contract/${id}`}
+              onSend={async () => {
+                try { const u = await sendContract(id); setContract(u); setShowSheet(false); }
+                catch { alert('전송에 실패했습니다'); }
+              }}
+              onCancel={() => setShowSheet(false)}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

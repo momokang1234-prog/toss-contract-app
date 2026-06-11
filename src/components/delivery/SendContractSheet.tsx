@@ -1,62 +1,91 @@
 import { useState } from 'react';
-import { useDelivery } from '../../hooks/useDelivery';
-import { Button, Paragraph, SegmentedControl, Spacing } from '@toss/tds-mobile';
+import { Paragraph, Spacing, Button } from '@toss/tds-mobile';
 
-interface SendContractSheetProps {
-  contractId: string;
-  workerName: string;
-  onClose: () => void;
-  onSent: () => void;
+interface Props {
+  contractTitle: string;
+  deepLink: string;
+  onSend: () => void;
+  onCancel: () => void;
 }
 
-export function SendContractSheet({ contractId, workerName, onClose, onSent }: SendContractSheetProps) {
-  const { send, sending } = useDelivery();
-  const [method, setMethod] = useState<'sms' | 'push' | 'share'>('sms');
+export default function SendContractSheet({ contractTitle, deepLink, onSend, onCancel }: Props) {
+  const [sending, setSending] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  const handleCopyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(deepLink);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // fallback
+    }
+  };
+
+  const handleShare = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: '근로계약서 확인',
+          text: `${contractTitle}님의 근로계약서가 도착했습니다.`,
+          url: deepLink,
+        });
+      } catch {}
+    } else {
+      handleCopyLink();
+    }
+  };
 
   const handleSend = async () => {
-    await send(contractId, method);
-    onSent();
-    onClose();
+    setSending(true);
+    // Haptic feedback
+    try { navigator.vibrate?.(10); } catch {}
+    await new Promise(r => setTimeout(r, 800));
+    setSending(false);
+    onSend();
   };
 
   return (
-    <div style={{
-      position: 'fixed', bottom: 0, left: 0, right: 0,
-      backgroundColor: '#fff', borderTopLeftRadius: 20, borderTopRightRadius: 20,
-      padding: 24, boxShadow: '0 -4px 20px rgba(0,0,0,0.1)',
-      maxWidth: 480, margin: '0 auto',
-    }}>
-      <div style={{ width: 40, height: 4, backgroundColor: '#E5E8EB', borderRadius: 2, margin: '0 auto 16px' }} />
-      <Paragraph typography="st2" fontWeight="bold">{workerName}에게 전송</Paragraph>
-      <Spacing size={8} />
-      <Paragraph typography="st4" color="grey600">전송 방식을 선택해주세요.</Paragraph>
-      <Spacing size={16} />
+    <div style={{ padding: '24px 24px 32px' }}>
+      <Paragraph typography="st3" fontWeight="bold" style={{ marginBottom: 8 }}>
+        계약서 전송
+      </Paragraph>
+      <Paragraph typography="st7" color="grey-500" style={{ marginBottom: 24 }}>
+        {contractTitle}님에게 전송 방법을 선택하세요
+      </Paragraph>
 
-      <SegmentedControl
-        value={method}
-        onChange={(value) => setMethod(value as 'sms' | 'push' | 'share')}
+      <Button
+        color="primary" variant="fill" display="block" size="xlarge"
+        loading={sending} onClick={handleSend}
+        style={{ marginBottom: 12 }}
       >
-        <SegmentedControl.Item value="sms">SMS</SegmentedControl.Item>
-        <SegmentedControl.Item value="push">Push 알림</SegmentedControl.Item>
-        <SegmentedControl.Item value="share">직접 공유</SegmentedControl.Item>
-      </SegmentedControl>
-      <Spacing size={24} />
+        {sending ? '전송 중...' : '📨 스마트 메시지로 전송'}
+      </Button>
 
-      <div style={{ display: 'flex', gap: 8 }}>
-        <Button color="light" variant="weak" size="large" style={{ flex: 1 }} onClick={onClose}>
-          취소
-        </Button>
-        <Button
-          color="primary"
-          variant="fill"
-          size="large"
-          style={{ flex: 2 }}
-          onClick={handleSend}
-          disabled={sending}
-        >
-          {sending ? '전송 중...' : '전송하기'}
-        </Button>
-      </div>
+      <Button
+        color="light" variant="weak" display="block" size="large"
+        onClick={handleShare}
+        style={{ marginBottom: 12 }}
+      >
+        📤 공유하기
+      </Button>
+
+      <Button
+        color="light" variant="weak" display="block" size="large"
+        onClick={handleCopyLink}
+        style={{ marginBottom: 24 }}
+      >
+        {copied ? '✅ 복사 완료' : '🔗 링크 복사'}
+      </Button>
+
+      <Button color="grey" variant="weak" display="block" size="large" onClick={onCancel}>
+        취소
+      </Button>
+
+      <Spacing size={8} />
+      <Paragraph typography="st8" color="grey-400" style={{ textAlign: 'center' }}>
+        토스 스마트 메시지로 Push·SMS·인박스 발송
+      </Paragraph>
     </div>
   );
 }
