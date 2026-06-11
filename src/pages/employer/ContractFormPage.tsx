@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useContracts } from '../../hooks/useContracts';
 import { useBusiness } from '../../hooks/useBusiness';
@@ -96,6 +96,23 @@ export default function ContractFormPage() {
       setForm(prev => ({ ...prev, workplace: businesses[0].address }));
     }
   }, [businesses]);
+
+  // 세션에 폼/스텝 저장 (새로고침 복구용)
+  useEffect(() => { sessionStorage.setItem('wiz_form', JSON.stringify(form)); }, [form]);
+  useEffect(() => { sessionStorage.setItem('wiz_step', String(step)); }, [step]);
+
+  // 마운트 시 세션에서 복구
+  const mounted = useRef(false);
+  useEffect(() => {
+    if (mounted.current) return;
+    mounted.current = true;
+    const savedForm = sessionStorage.getItem('wiz_form');
+    const savedStep = sessionStorage.getItem('wiz_step');
+    if (savedForm !== null) {
+      try { setForm(prev => ({ ...prev, ...JSON.parse(savedForm) })); } catch { /* ignore */ }
+    }
+    if (savedStep !== null) setStep(Number(savedStep));
+  }, []);
 
   // 페이지 이탈 경고 (입력 데이터 있을 때)
   useEffect(() => {

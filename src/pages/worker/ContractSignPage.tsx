@@ -19,10 +19,15 @@ export default function ContractSignPage() {
   useEffect(() => { if (!done) return; const t = setTimeout(() => navigate(`/worker/contracts/${id}`), 2000); return () => clearTimeout(t); }, [done, id]);
 
   useEffect(() => {
-    if (!id) return;
-    getContract(id).then(setContract);
-  }, [id]);
+  }, [done, id]);
 
+  // 서명 그린 상태에서 페이지 이탈 경고
+  useEffect(() => {
+    if (!hasSignature) return;
+    const handler = (e: BeforeUnloadEvent) => { e.preventDefault(); };
+    window.addEventListener('beforeunload', handler);
+    return () => window.removeEventListener('beforeunload', handler);
+  }, [hasSignature]);
 
   const clearCanvas = () => {
     const c = canvasRef.current;
