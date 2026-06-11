@@ -15,10 +15,14 @@ export default function ContractSignPage() {
   const [done, setDone] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
+  // Auto-navigate after signing done
+  useEffect(() => { if (!done) return; const t = setTimeout(() => navigate(`/worker/contracts/${id}`), 2000); return () => clearTimeout(t); }, [done, id]);
+
   useEffect(() => {
     if (!id) return;
     getContract(id).then(setContract);
   }, [id]);
+
 
   const clearCanvas = () => {
     const c = canvasRef.current;
@@ -74,8 +78,6 @@ export default function ContractSignPage() {
   if (!id) return <Navigate to="/worker/contracts" replace />;
   if (!contract) return <div className={styles.page}><Top title="서명하기" /><div className={styles.center}><Spacing size={24} /><Paragraph typography="st5" color="grey-500">불러오는 중...</Paragraph></div></div>;
   if (done) {
-    // Auto-navigate back to detail after 2s
-    useEffect(() => { const t = setTimeout(() => navigate(`/worker/contracts/${id}`), 2000); return () => clearTimeout(t); }, [id]);
     return (
       <div className={styles.page}>
         <Top title="서명 완료" />
@@ -116,7 +118,7 @@ export default function ContractSignPage() {
           />
         </div>
         <Spacing size={12} />
-        <Button color="primary" variant="outline" size="small" onClick={clearCanvas}>지우기</Button>
+        <Button color="primary" variant="weak" size="small" onClick={clearCanvas}>지우기</Button>
 
         <Spacing size={32} />
         <Button color="primary" variant="fill" display="block" size="xlarge"
