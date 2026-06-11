@@ -9,6 +9,7 @@ export interface Contract {
   worker_name: string;
   worker_phone: string;
   worker_user_key?: string;
+  worker_address?: string;
   contract_type: string;
   status: string;
   start_date: string;
@@ -41,53 +42,90 @@ const MOCK_CONTRACTS: Contract[] = [
     id: 'mock-contract-1',
     business_id: 'mock-biz-1',
     employer_user_key: 'mock-employer-key',
-    worker_name: '김알바',
-    worker_phone: '01098765432',
-    contract_type: 'partTime',
-    status: 'draft',
+    worker_name: '김알바', worker_phone: '01098765432',
+    contract_type: 'partTime', status: 'draft',
     start_date: '2026-07-01',
-    workplace: '서울특별시 강남구 테헤란로 123',
+    workplace: '서울 강남구 테헤란로 123',
     job_description: '카페 서빙 및 음료 제조',
-    wage_type: 'hourly',
-    base_wage: 10030,
-    wage_payment_date: '매월 10일',
-    wage_payment_method: 'bankTransfer',
-    work_days: ['mon', 'tue', 'wed', 'thu', 'fri'],
-    start_time: '09:00',
-    end_time: '18:00',
-    break_minutes: 60,
+    wage_type: 'hourly', base_wage: 10030,
+    wage_payment_date: '매월 10일', wage_payment_method: 'bankTransfer',
+    work_days: ['mon','tue','wed','thu','fri'],
+    start_time: '09:00', end_time: '18:00', break_minutes: 60,
     weekly_holiday: 'sun',
-    paid_leave_clause: true,
-    social_insurance_clause: true,
-    severance_clause: true,
-    created_at: '2026-06-05T10:00:00+09:00',
-    updated_at: '2026-06-05T10:00:00+09:00',
+    paid_leave_clause: true, social_insurance_clause: true, severance_clause: true,
+    created_at: '2026-06-05T10:00:00+09:00', updated_at: '2026-06-05T10:00:00+09:00',
   },
   {
     id: 'mock-contract-2',
     business_id: 'mock-biz-1',
     employer_user_key: 'mock-employer-key',
-    worker_name: '이파트',
-    worker_phone: '01011112222',
-    contract_type: 'partTime',
-    status: 'sent',
+    worker_name: '이아르', worker_phone: '01011112222',
+    contract_type: 'fullTime', status: 'sent',
     start_date: '2026-06-15',
-    workplace: '서울특별시 강남구 테헤란로 123',
+    workplace: '서울 강남구 테헤란로 123',
     job_description: '매장 관리 및 고객 응대',
-    wage_type: 'hourly',
-    base_wage: 11000,
-    wage_payment_date: '매월 15일',
-    wage_payment_method: 'bankTransfer',
-    work_days: ['sat', 'sun'],
-    start_time: '10:00',
-    end_time: '20:00',
-    break_minutes: 60,
-    weekly_holiday: undefined,
-    paid_leave_clause: true,
-    social_insurance_clause: true,
-    severance_clause: true,
-    created_at: '2026-06-04T14:00:00+09:00',
-    updated_at: '2026-06-04T14:00:00+09:00',
+    wage_type: 'monthly', base_wage: 2500000,
+    wage_payment_date: '매월 25일', wage_payment_method: 'bankTransfer',
+    work_days: ['mon','tue','wed','thu','fri'],
+    start_time: '10:00', end_time: '19:00', break_minutes: 60,
+    paid_leave_clause: true, social_insurance_clause: true, severance_clause: true,
+    created_at: '2026-06-04T14:00:00+09:00', updated_at: '2026-06-08T09:00:00+09:00',
+  },
+  {
+    id: 'mock-contract-3',
+    business_id: 'mock-biz-1',
+    employer_user_key: 'mock-employer-key',
+    worker_name: '박워커', worker_phone: '01033334444',
+    contract_type: 'partTime', status: 'viewed',
+    start_date: '2026-06-01',
+    workplace: '서울 마포구 와우산로 45',
+    job_description: '배달 및 주방 보조',
+    wage_type: 'hourly', base_wage: 11000,
+    wage_payment_date: '매월 5일', wage_payment_method: 'cash',
+    work_days: ['tue','thu','sat'],
+    start_time: '17:00', end_time: '22:00', break_minutes: 30,
+    weekly_holiday: 'mon',
+    paid_leave_clause: false, social_insurance_clause: false, severance_clause: false,
+    created_at: '2026-05-28T16:00:00+09:00', updated_at: '2026-06-01T11:30:00+09:00',
+  },
+  {
+    id: 'mock-contract-4',
+    business_id: 'mock-biz-1',
+    employer_user_key: 'mock-employer-key',
+    worker_name: '최서명', worker_phone: '01055556666',
+    contract_type: 'fullTime', status: 'signed',
+    start_date: '2026-05-15',
+    workplace: '서울 송파구 올림픽로 300',
+    job_description: '오피스 어드민 및 회계 보조',
+    wage_type: 'monthly', base_wage: 2800000,
+    wage_payment_date: '매월 30일', wage_payment_method: 'bankTransfer',
+    work_days: ['mon','tue','wed','thu','fri'],
+    start_time: '09:00', end_time: '18:00', break_minutes: 60,
+    weekly_holiday: 'sat',
+    paid_leave_clause: true, social_insurance_clause: true, severance_clause: true,
+    worker_signed_at: '2026-05-20T14:00:00+09:00',
+    worker_signature_data: 'data:image/png;base64,iVBORw0KGgo=',
+    created_at: '2026-05-10T09:00:00+09:00', updated_at: '2026-05-20T14:00:00+09:00',
+  },
+  {
+    id: 'mock-contract-5',
+    business_id: 'mock-biz-1',
+    employer_user_key: 'mock-employer-key',
+    worker_name: '정완료', worker_phone: '01077778888',
+    contract_type: 'fullTime', status: 'completed',
+    start_date: '2026-04-01',
+    workplace: '서울 중구 을지로 100',
+    job_description: '프론트엔드 개발',
+    wage_type: 'monthly', base_wage: 3500000,
+    wage_payment_date: '매월 25일', wage_payment_method: 'bankTransfer',
+    work_days: ['mon','tue','wed','thu','fri'],
+    start_time: '10:00', end_time: '19:00', break_minutes: 60,
+    weekly_holiday: 'sun',
+    paid_leave_clause: true, social_insurance_clause: true, severance_clause: true,
+    employer_signed_at: '2026-04-10T17:00:00+09:00',
+    worker_signed_at: '2026-04-08T11:00:00+09:00',
+    worker_signature_data: 'data:image/png;base64,iVBORw0KGgo=',
+    created_at: '2026-03-25T10:00:00+09:00', updated_at: '2026-04-10T17:00:00+09:00',
   },
 ];
 
@@ -132,7 +170,17 @@ export function useContracts() {
 
   const getContract = async (id: string) => {
     if (IS_MOCK) {
-      return mockContractStore.find(c => c.id === id) ?? null;
+      const c = mockContractStore.find(x => x.id === id);
+      if (!c) return null;
+      // Auto-expire: sent/viewed + 30일 경과 → expired
+      const now = new Date();
+      const updated = new Date(c.updated_at);
+      const daysSinceUpdate = (now.getTime() - updated.getTime()) / (1000 * 60 * 60 * 24);
+      if ((c.status === 'sent' || c.status === 'viewed') && daysSinceUpdate > 30) {
+        c.status = 'expired';
+        c.updated_at = now.toISOString();
+      }
+      return { ...c };
     }
     const { data } = await supabase.from('contracts').select('*').eq('id', id).single();
     return data;
@@ -274,6 +322,21 @@ export function useContracts() {
     return data;
   };
 
+  const viewContract = async (id: string) => {
+    if (IS_MOCK) {
+      return updateContract(id, { status: 'viewed' });
+    }
+    const { data, error } = await supabase
+      .from('contracts')
+      .update({ status: 'viewed' })
+      .eq('id', id)
+      .eq('status', 'sent')
+      .select()
+      .single();
+    if (error) throw error;
+    return data;
+  };
+
   return {
     contracts,
     loading,
@@ -286,6 +349,7 @@ export function useContracts() {
     cancelContract,
     expireContract,
     getHistory,
+    viewContract,
     refetch: fetchContracts,
   };
 }
@@ -293,9 +357,34 @@ export function useContracts() {
 // getHistory is a standalone helper (not a hook)
 async function getHistory(contractId: string) {
   if (IS_MOCK) {
-    return [
-      { id: 'hist-1', contract_id: contractId, action: 'created', actor_role: 'employer', created_at: '2026-06-05T10:00:00+09:00' },
-    ];
+    const histories: Record<string, Array<{id:string; contract_id:string; action:string; actor_role:string; created_at:string}>> = {
+      'mock-contract-1': [
+        { id:'h1-1', contract_id: contractId, action:'create', actor_role:'employer', created_at:'2026-06-05T10:00:00+09:00' },
+      ],
+      'mock-contract-2': [
+        { id:'h2-1', contract_id: contractId, action:'create', actor_role:'employer', created_at:'2026-06-04T14:00:00+09:00' },
+        { id:'h2-2', contract_id: contractId, action:'send', actor_role:'employer', created_at:'2026-06-08T09:00:00+09:00' },
+      ],
+      'mock-contract-3': [
+        { id:'h3-1', contract_id: contractId, action:'create', actor_role:'employer', created_at:'2026-05-28T16:00:00+09:00' },
+        { id:'h3-2', contract_id: contractId, action:'send', actor_role:'employer', created_at:'2026-05-28T17:00:00+09:00' },
+        { id:'h3-3', contract_id: contractId, action:'view', actor_role:'worker', created_at:'2026-06-01T11:30:00+09:00' },
+      ],
+      'mock-contract-4': [
+        { id:'h4-1', contract_id: contractId, action:'create', actor_role:'employer', created_at:'2026-05-10T09:00:00+09:00' },
+        { id:'h4-2', contract_id: contractId, action:'send', actor_role:'employer', created_at:'2026-05-10T10:00:00+09:00' },
+        { id:'h4-3', contract_id: contractId, action:'view', actor_role:'worker', created_at:'2026-05-12T14:00:00+09:00' },
+        { id:'h4-4', contract_id: contractId, action:'sign', actor_role:'worker', created_at:'2026-05-20T14:00:00+09:00' },
+      ],
+      'mock-contract-5': [
+        { id:'h5-1', contract_id: contractId, action:'create', actor_role:'employer', created_at:'2026-03-25T10:00:00+09:00' },
+        { id:'h5-2', contract_id: contractId, action:'send', actor_role:'employer', created_at:'2026-03-25T11:00:00+09:00' },
+        { id:'h5-3', contract_id: contractId, action:'view', actor_role:'worker', created_at:'2026-03-26T09:00:00+09:00' },
+        { id:'h5-4', contract_id: contractId, action:'sign', actor_role:'worker', created_at:'2026-04-08T11:00:00+09:00' },
+        { id:'h5-5', contract_id: contractId, action:'complete', actor_role:'employer', created_at:'2026-04-10T17:00:00+09:00' },
+      ],
+    };
+    return histories[contractId] || [];
   }
 
   const { data } = await supabase
