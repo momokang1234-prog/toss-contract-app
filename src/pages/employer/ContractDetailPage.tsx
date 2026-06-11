@@ -139,7 +139,7 @@ export default function ContractDetailPage() {
         {canSend && (
           <>
             <Button color="primary" variant="fill" display="block" size="large"
-              onClick={() => setShowSheet(true)}>{'근로자에게 전송'}</Button>
+              onClick={() => { if (!showSheet) setShowSheet(true); }}>{'근로자에게 전송'}</Button>
             <Spacing size={12} />
             <Button color="light" variant="weak" display="block" size="large"
               onClick={async () => {
