@@ -85,6 +85,7 @@ export default function ContractFormPage() {
     start_time: '09:00', end_time: '18:00', break_start: '12:00', break_end: '13:00',
     weekly_holiday: 'sun',
     paid_leave_clause: false,
+    pension: true, health_insurance: true, employment_insurance: true, accident_insurance: true,
     severance_clause: true,
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
