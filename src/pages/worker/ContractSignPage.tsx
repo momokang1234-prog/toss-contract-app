@@ -84,7 +84,7 @@ export default function ContractSignPage() {
         <div className={styles.center} style={{ textAlign: 'center' }}>
           <Spacing size={60} />
           <div style={{ textAlign: 'center' }}>
-            <img src="https://static.toss.im/3d-common/check-success.png" alt=""
+            <img src="https://static.toss.im/2d-emojis/png/4x/u2705.png" alt=""
               style={{ width: 80, height: 80, marginBottom: 12 }}
             />
           </div>

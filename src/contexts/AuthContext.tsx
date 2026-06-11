@@ -1,8 +1,8 @@
 
 import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from 'react';
 import { IS_MOCK } from '../api/supabase';
+import { tossLogin } from '../api/toss-auth';
 const MOCK_AUTH_DELAY_MS = 500;
-const MOCK_INIT_DELAY_MS = 1000;
 
 export type UserRole = 'employer' | 'worker' | null;
 
@@ -85,10 +85,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUserProfile({ userKey: p.userKey, name: p.name, phone: p.phone, ci: p.ci });
         return;
       }
-      // TODO: Real Toss Login integration
-      await new Promise(r => setTimeout(r, MOCK_INIT_DELAY_MS));
+
+      // Real Toss Login: appLogin() → Fly.io API → 사용자 정보
+      const user = await tossLogin();
+      const selectedRole = role ?? 'worker';
+
+      sessionStorage.setItem('user_role', selectedRole);
       setIsAuthenticated(true);
-      setUserName('사용자');
+      setUserName(user.name ?? '사용자');
+      setCi(user.ci);
+      setUserRole(selectedRole);
+      setUserProfile({
+        userKey: String(user.userKey),
+        name: user.name ?? '사용자',
+        phone: user.phone ?? undefined,
+        ci: user.ci ?? '',
+      });
+    } catch (err) {
+      console.error('[Auth] login failed', err);
+      throw err;
     } finally {
       setIsLoading(false);
     }

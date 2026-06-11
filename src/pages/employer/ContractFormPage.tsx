@@ -459,7 +459,7 @@ export default function ContractFormPage() {
           )}
           {validationResult && validationResult.valid && validationResult.warnings.length === 0 && (
             <div style={{ padding: 24, textAlign: 'center' }}>
-              <img src="https://static.toss.im/3d-common/check-success.png" alt=""
+              <img src="https://static.toss.im/2d-emojis/png/4x/u2705.png" alt=""
                 style={{ width: 120, height: 120, marginBottom: 16 }}
               />
               <Paragraph typography="st4" fontWeight="bold" color="grey-800">모든 검증을 통과했습니다</Paragraph>

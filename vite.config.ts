@@ -13,7 +13,7 @@ export default defineConfig({
     port: 5173,
     host: '0.0.0.0',
     cors: true,
-    allowedHosts: ['toss-contract-app.private-apps.tossmini.com', 'localhost'],
+    allowedHosts: ['bossimclockedin.private-apps.tossmini.com', 'localhost'],
     headers: {
       'Content-Security-Policy': "frame-ancestors *;",
     },

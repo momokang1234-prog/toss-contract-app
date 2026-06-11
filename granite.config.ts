@@ -1,17 +1,17 @@
 import { defineConfig } from "@apps-in-toss/web-framework/config";
 
 export default defineConfig({
-  appName: "toss-contract-app",
+  appName: "bossimclockedin",
   brand: {
     displayName: "근로계약",
     primaryColor: "#3182F6",
     icon: "/icon.png",
   },
   web: {
-    host: "localhost",
+    host: "192.168.0.3",
     port: 5173,
     commands: {
-      dev: "vite dev",
+      dev: "vite dev --host",
       build: "vite build",
     },
   },
@@ -26,9 +26,9 @@ export default defineConfig({
       },
     },
   },
-  permissions: [
-    { name: "push", reason: "계약서 전송 알림" },
-    { name: "Smart Messenger", reason: "근로자에게 계약서 링크 전송" },
-  ],
+  webViewProps: {
+    type: "partner",
+  },
+  permissions: [],
   outdir: "dist",
 });
