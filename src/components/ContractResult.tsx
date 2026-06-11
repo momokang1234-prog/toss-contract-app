@@ -14,7 +14,7 @@ export function ContractResult() {
     <div>
       <Top spacing={RESULT_TOP_SPACING} />
       <div style={{ textAlign: 'center', paddingTop: 20 }}>
-        <img src="https://static.toss.im/2d-emojis/png/4x/u2705.png" alt=""
+        <img src="https://static.toss.im/illusts/wiki-highlight-L.png" alt=""
           style={{ width: 100, height: 100 }}
         />
       </div>
