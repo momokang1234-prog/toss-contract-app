@@ -95,8 +95,17 @@ export default function ContractFormPage() {
     if (businesses.length > 0 && !form.workplace) {
       setForm(prev => ({ ...prev, workplace: businesses[0].address }));
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [businesses]);
+
+  // 페이지 이탈 경고 (입력 데이터 있을 때)
+  useEffect(() => {
+    const hasData = form.worker_name || form.worker_phone || form.workplace || form.base_wage;
+    if (submitting || !hasData) return;
+    const handler = (e: BeforeUnloadEvent) => { e.preventDefault(); };
+    window.addEventListener('beforeunload', handler);
+    return () => window.removeEventListener('beforeunload', handler);
+  }, [form.worker_name, form.worker_phone, form.workplace, form.base_wage, submitting]);
+
   const [validationResult, setValidationResult] = useState<{
     valid: boolean;
     errors: Array<{ field: string; message: string }>;

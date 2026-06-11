@@ -45,29 +45,38 @@ const MOCK_PROFILES: Record<string, UserProfile & { role: UserRole }> = {
 };
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [userRole, setUserRole] = useState<UserRole>(null);
+  // 새로고침 시 세션 복구 — useState 초기값으로 설정
+  const [isAuthenticated, setIsAuthenticated] = useState(() => {
+    if (IS_MOCK) return !!sessionStorage.getItem('mock_role');
+    return false;
+  });
+  const [userRole, setUserRole] = useState<UserRole>(() => {
+    if (IS_MOCK) return (sessionStorage.getItem('mock_role') as 'employer' | 'worker') || null;
+    return null;
+  });
   const [isLoading, setIsLoading] = useState(false);
-  const [userName, setUserName] = useState<string | null>(null);
-  const [ci, setCi] = useState<string | null>(null);
-  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
-
-  // 로그인 페이지에서 명시적으로 역할 선택 — 자동 로그인 없음
-  useEffect(() => {
+  const [userName, setUserName] = useState<string | null>(() => {
     if (IS_MOCK) {
-      const savedRole = sessionStorage.getItem('mock_role') as 'employer' | 'worker' | null;
-      if (savedRole) {
-        const p = MOCK_PROFILES[savedRole];
-        if (p) {
-          setIsAuthenticated(true);
-          setUserName(p.name);
-          setCi(p.ci);
-          setUserRole(p.role);
-          setUserProfile({ userKey: p.userKey, name: p.name, phone: p.phone, ci: p.ci });
-        }
-      }
+      const role = sessionStorage.getItem('mock_role') as 'employer' | 'worker' | null;
+      return role ? MOCK_PROFILES[role]?.name ?? null : null;
     }
-  }, []);
+    return null;
+  });
+  const [ci, setCi] = useState<string | null>(() => {
+    if (IS_MOCK) {
+      const role = sessionStorage.getItem('mock_role') as 'employer' | 'worker' | null;
+      return role ? MOCK_PROFILES[role]?.ci ?? null : null;
+    }
+    return null;
+  });
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(() => {
+    if (IS_MOCK) {
+      const role = sessionStorage.getItem('mock_role') as 'employer' | 'worker' | null;
+      const p = role ? MOCK_PROFILES[role] : null;
+      return p ? { userKey: p.userKey, name: p.name, phone: p.phone, ci: p.ci } : null;
+    }
+    return null;
+  });
 
   const login = useCallback(async (role?: 'employer' | 'worker') => {
     setIsLoading(true);
