@@ -141,13 +141,11 @@ export function useContracts() {
     setLoading(true);
 
     if (IS_MOCK) {
-      await new Promise(r => setTimeout(r, 300));
       let filtered = mockContractStore;
       if (userRole === 'employer') {
         filtered = filtered.filter(c => c.employer_user_key === userProfile.userKey);
-      } else if (userRole === 'worker') {
-        filtered = filtered.filter(c => c.worker_user_key === userProfile.userKey || c.worker_phone === userProfile.phone);
       }
+      // Mock 모드: 근로자는 모든 계약서를 볼 수 있음 (프로덕션: worker_user_key 필터)
       setContracts(filtered);
       setLoading(false);
       return;
