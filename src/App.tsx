@@ -22,19 +22,22 @@ function Lazy({ children }: { children: React.ReactNode }) {
 
 export default function App() {
   useEffect(() => {
-    const cleanup = tdsEvent.addEventListener('navigationAccessoryEvent', {
-      onEvent: ({ id }) => {
-        if (id === 'share-contract') {
-          const url = window.location.href;
-          if (navigator.share) {
-            navigator.share({ title: '근로계약서', url });
-          } else {
-            navigator.clipboard.writeText(url).catch(() => {});
+    // tdsEvent는 토스 앱 WebView 환경에서만 동작 — 브라우저 dev 모드에선 무시
+    try {
+      const cleanup = tdsEvent.addEventListener('navigationAccessoryEvent', {
+        onEvent: ({ id }) => {
+          if (id === 'share-contract') {
+            const url = window.location.href;
+            if (navigator.share) {
+              navigator.share({ title: '근로계약서', url });
+            } else {
+              navigator.clipboard.writeText(url).catch(() => {});
+            }
           }
-        }
-      },
-    });
-    return cleanup;
+        },
+      });
+      return cleanup;
+    } catch { /* 브라우저 환경 — 무시 */ }
   }, []);
 
   return (
