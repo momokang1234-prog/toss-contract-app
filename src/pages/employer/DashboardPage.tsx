@@ -113,9 +113,8 @@ export default function DashboardPage() {
           </Paragraph>
         </div>
       )}
-    </div>
 
-      <div style={{ display: 'flex', justifyContent: 'center', padding: '0 24px 24px' }}>
+      <div style={{ display: 'flex', justifyContent: 'center', padding: '24px' }}>
         <Button color="light" variant="weak" size="small"
           onClick={async () => { await setRole('worker'); navigate('/worker/contracts', { replace: true }); }}>
           🔄 근로자로 전환
