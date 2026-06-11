@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { lazy, Suspense } from 'react';
-import { AuthProvider } from './contexts/AuthContext';
+import { lazy, Suspense, useEffect } from 'react';
+import { partner, tdsEvent } from '@apps-in-toss/web-framework';
 
 import LoginPage from './pages/auth/LoginPage';
 
@@ -21,6 +21,22 @@ function Lazy({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
+  useEffect(() => {
+    const cleanup = tdsEvent.addEventListener('navigationAccessoryEvent', {
+      onEvent: ({ id }) => {
+        if (id === 'share-contract') {
+          const url = window.location.href;
+          if (navigator.share) {
+            navigator.share({ title: '근로계약서', url });
+          } else {
+            navigator.clipboard.writeText(url).catch(() => {});
+          }
+        }
+      },
+    });
+    return cleanup;
+  }, []);
+
   return (
     <AuthProvider>
       <BrowserRouter>

@@ -15,9 +15,16 @@ export default defineConfig({
       build: "vite build",
     },
   },
+  navigationBar: {
+    withBackButton: true,
+    withHomeButton: true,
+    initialAccessoryButton: {
+      id: 'share-contract',
+      title: '공유',
+      icon: {
+        name: 'icon-share-mono',
+      },
+    },
+  },
   permissions: [
-    { name: "push", reason: "계약서 전송 알림" },
-    { name: "Smart Messenger", reason: "근로자에게 계약서 링크 전송" },
-  ],
-  outdir: "dist",
 });
