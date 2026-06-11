@@ -78,14 +78,13 @@ export default function ContractFormPage() {
     worker_name: '', worker_phone: '', worker_address: '',
     contract_type: 'partTime',
     workplace: '', job_description: '',
-    start_date: '', end_date: '',
+    start_date: new Date().toISOString().slice(0, 10), end_date: '',
     wage_type: 'hourly', base_wage: '',
     wage_payment_day: '25', wage_payment_method: 'bankTransfer',
     work_days: ['mon','tue','wed','thu','fri'] as string[],
     start_time: '09:00', end_time: '18:00', break_start: '12:00', break_end: '13:00',
     weekly_holiday: 'sun',
-    paid_leave_clause: true,
-    pension: true, health_insurance: true, employment_insurance: true, accident_insurance: true,
+    paid_leave_clause: false,
     severance_clause: true,
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
