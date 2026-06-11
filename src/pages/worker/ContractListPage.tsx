@@ -1,17 +1,21 @@
 import { useNavigate } from 'react-router-dom';
 import { useContracts } from '../../hooks/useContracts';
+import { useBusiness } from '../../hooks/useBusiness';
 import { useAuth } from '../../contexts/AuthContext';
 import { Top, Paragraph, Spacing, Button, List, ListRow, Badge } from '@toss/tds-mobile';
 import styles from './ContractListPage.module.css';
 
-
 export default function WorkerContractListPage() {
   const navigate = useNavigate();
   const { contracts } = useContracts();
+  const { businesses } = useBusiness();
   const { setRole } = useAuth();
 
+  const businessMap = Object.fromEntries(businesses.map(b => [b.id, b.business_name]));
+
   const badgeFor = (status: string) => {
-    if (status === 'sent') return { label: '미열람', color: 'blue' as const };
+    if (status === 'draft') return { label: '작성중', color: 'elephant' as const };
+    if (status === 'sent') return { label: '수신', color: 'blue' as const };
     if (status === 'viewed') return { label: '확인완료', color: 'blue' as const };
     if (status === 'signed') return { label: '서명완료', color: 'yellow' as const };
     if (status === 'completed') return { label: '계약완료', color: 'teal' as const };
@@ -33,15 +37,24 @@ export default function WorkerContractListPage() {
         {contracts.length > 0 ? (
           <List>
             {contracts.map(c => (
-              <ListRow key={c.id}
+              <ListRow
+                key={c.id}
                 onClick={() => navigate(`/worker/contracts/${c.id}`)}
                 left={
                   <div className={styles.contractRow}>
-                    <Paragraph typography="st5" fontWeight="bold">{c.workplace}</Paragraph>
-                    <Paragraph typography="st7" color="grey-500">{c.job_description} · {c.start_date}</Paragraph>
+                    <Paragraph typography="st5" fontWeight="bold">
+                      {businessMap[c.business_id] ?? c.workplace}
+                    </Paragraph>
+                    <Paragraph typography="st7" color="grey-500">
+                      {c.job_description} · {c.start_date}
+                    </Paragraph>
                   </div>
                 }
-                right={<Badge size="small" variant="weak" color={badgeFor(c.status).color}>{badgeFor(c.status).label}</Badge>}
+                right={
+                  <Badge size="small" variant="weak" color={badgeFor(c.status).color}>
+                    {badgeFor(c.status).label}
+                  </Badge>
+                }
               />
             ))}
           </List>
