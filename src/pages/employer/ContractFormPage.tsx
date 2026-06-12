@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
+import { josa } from 'es-hangul';
 import { useNavigate } from 'react-router-dom';
 import { useContracts } from '../../hooks/useContracts';
 import { useBusiness } from '../../hooks/useBusiness';
-import { Spacing, TextField, SegmentedControl, Paragraph, Switch, Button } from '@toss/tds-mobile';
+import { Spacing, TextField, SegmentedControl, Paragraph, Switch, Button, WheelDatePicker } from '@toss/tds-mobile';
 import { validateLaborContract, type ValidationWarning } from '../../domain/contract/validation';
 
 const DAYS = ['mon','tue','wed','thu','fri','sat','sun'] as const;
@@ -151,22 +152,22 @@ export default function ContractFormPage() {
     const e: Record<string, string> = {};
     switch (s) {
       case 0:
-        if (!form.worker_name.trim()) e.worker_name = '이름을 입력해주세요';
-        if (!form.worker_phone.replace(/\D/g, '')) e.worker_phone = '전화번호를 입력해주세요';
-        else if (form.worker_phone.replace(/\D/g, '').length < 10) e.worker_phone = '올바른 전화번호를 입력해주세요';
+        if (!form.worker_name.trim()) e.worker_name = `${josa('이름', '을/를')} 입력해주세요`;
+        if (!form.worker_phone.replace(/\D/g, '')) e.worker_phone = `${josa('전화번호', '을/를')} 입력해주세요`;
+        else if (form.worker_phone.replace(/\D/g, '').length < 10) e.worker_phone = `${josa('올바른 전화번호', '을/를')} 입력해주세요`;
         break;
       case 1:
-        if (!form.workplace.trim()) e.workplace = '근무 장소를 입력해주세요';
-        if (!form.job_description.trim()) e.job_description = '직무 내용을 입력해주세요';
-        if (!form.start_date) e.start_date = '시작일을 선택해주세요';
+        if (!form.workplace.trim()) e.workplace = `${josa('근무 장소', '을/를')} 입력해주세요`;
+        if (!form.job_description.trim()) e.job_description = `${josa('직무 내용', '을/를')} 입력해주세요`;
+        if (!form.start_date) e.start_date = `${josa('시작일', '을/를')} 선택해주세요`;
         break;
       case 2:
-        if (!form.base_wage || Number(form.base_wage) <= 0) e.base_wage = '금액을 입력해주세요';
+        if (!form.base_wage || Number(form.base_wage) <= 0) e.base_wage = `${josa('금액', '을/를')} 입력해주세요`;
         break;
       case 3:
-        if (form.work_days.length === 0) e.work_days = '근무 요일을 선택해주세요';
-        if (!form.start_time) e.start_time = '시작 시간을 입력해주세요';
-        if (!form.end_time) e.end_time = '종료 시간을 입력해주세요';
+        if (form.work_days.length === 0) e.work_days = `${josa('근무 요일', '을/를')} 선택해주세요`;
+        if (!form.start_time) e.start_time = `${josa('시작 시간', '을/를')} 입력해주세요`;
+        if (!form.end_time) e.end_time = `${josa('종료 시간', '을/를')} 입력해주세요`;
         break;
       case 5: {
         if (businesses.length === 0) { alert('먼저 사업장을 등록해주세요.'); return false; }
@@ -322,14 +323,23 @@ export default function ContractFormPage() {
           <div style={{ display: 'flex', gap: 12 }}>
             <div style={{ flex: 1 }}>
               <FieldLabel>시작일</FieldLabel>
-              <TextField variant="box" type="date" value={form.start_date}
-                onChange={e => handleChange('start_date', e.target.value)}
-                hasError={!!errors.start_date} help={errors.start_date} aria-label="시작일" />
+              <WheelDatePicker
+                value={form.start_date ? new Date(form.start_date) : undefined}
+                onChange={(date) => handleChange('start_date', date ? date.toISOString().slice(0, 10) : '')}
+                title="시작일"
+                triggerLabel={form.start_date || '날짜 선택'}
+                buttonText="확인"
+              />
             </div>
             <div style={{ flex: 1 }}>
               <FieldLabel>종료일 (선택)</FieldLabel>
-              <TextField variant="box" type="date" value={form.end_date}
-                onChange={e => handleChange('end_date', e.target.value)} aria-label="종료일" />
+              <WheelDatePicker
+                value={form.end_date ? new Date(form.end_date) : undefined}
+                onChange={(date) => handleChange('end_date', date ? date.toISOString().slice(0, 10) : '')}
+                title="종료일"
+                triggerLabel={form.end_date || '날짜 선택'}
+                buttonText="확인"
+              />
             </div>
           </div>
         </div>

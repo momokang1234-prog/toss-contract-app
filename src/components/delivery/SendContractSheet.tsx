@@ -1,14 +1,19 @@
 import { useState } from 'react';
 import { Paragraph, Spacing, Button } from '@toss/tds-mobile';
+import { overlay } from 'overlay-kit';
 
-interface Props {
+export interface SendContractSheetProps {
   contractTitle: string;
   deepLink: string;
-  onSend: () => void;
+}
+
+interface ViewProps extends SendContractSheetProps {
+  isOpen: boolean;
+  onConfirm: () => void;
   onCancel: () => void;
 }
 
-export default function SendContractSheet({ contractTitle, deepLink, onSend, onCancel }: Props) {
+function SendContractSheetView({ contractTitle, deepLink, onConfirm, onCancel }: ViewProps) {
   const [sending, setSending] = useState(false);
   const [copied, setCopied] = useState(false);
 
@@ -38,11 +43,10 @@ export default function SendContractSheet({ contractTitle, deepLink, onSend, onC
 
   const handleSend = async () => {
     setSending(true);
-    // Haptic feedback
     try { navigator.vibrate?.(10); } catch {}
     await new Promise(r => setTimeout(r, 800));
     setSending(false);
-    onSend();
+    onConfirm();
   };
 
   return (
@@ -88,4 +92,15 @@ export default function SendContractSheet({ contractTitle, deepLink, onSend, onC
       </Paragraph>
     </div>
   );
+}
+
+export async function openSendContractSheet(props: SendContractSheetProps): Promise<boolean> {
+  return overlay.openAsync<boolean>(({ isOpen, close }) => (
+    <SendContractSheetView
+      isOpen={isOpen}
+      {...props}
+      onConfirm={() => close(true)}
+      onCancel={() => close(false)}
+    />
+  ));
 }

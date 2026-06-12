@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
+import { josa } from 'es-hangul';
 import { useParams, useNavigate, Navigate } from 'react-router-dom';
 import { useContracts, type Contract } from '../../hooks/useContracts';
 import { Top, Paragraph, Spacing, Button, Badge } from '@toss/tds-mobile';
-import SendContractSheet from '../../components/delivery/SendContractSheet';
+import { openSendContractSheet } from '../../components/delivery/SendContractSheet';
 import styles from './ContractDetailPage.module.css';
 
 export default function ContractDetailPage() {
@@ -12,7 +13,6 @@ export default function ContractDetailPage() {
   const [contract, setContract] = useState<Contract | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [completing, setCompleting] = useState(false);
-  const [showSheet, setShowSheet] = useState(false);
 
   useEffect(() => {
     if (!id) { setError('계약서 ID가 없습니다'); return; }
@@ -139,11 +139,20 @@ export default function ContractDetailPage() {
         {canSend && (
           <>
             <Button color="primary" variant="fill" display="block" size="large"
-              onClick={() => { if (!showSheet) setShowSheet(true); }}>{'근로자에게 전송'}</Button>
+              onClick={async () => {
+                const sent = await openSendContractSheet({
+                  contractTitle: contract.worker_name,
+                  deepLink: `${window.location.origin}/contract/${id}`,
+                });
+                if (sent) {
+                  try { const u = await sendContract(id); setContract(u); }
+                  catch { alert('전송에 실패했습니다'); }
+                }
+              }}>{'근로자에게 전송'}</Button>
             <Spacing size={12} />
             <Button color="light" variant="weak" display="block" size="large"
               onClick={async () => {
-                if (!confirm('계약을 취소하시겠습니까?\n\n되돌릴 수 없습니다.')) return;
+                if (!confirm(`${josa('계약', '을/를')} 취소하시겠습니까?\n\n되돌릴 수 없습니다.`)) return;
                 try { const u = await cancelContract(id); setContract(u); }
                 catch { alert('취소 처리에 실패했습니다'); }
               }}>계약 취소하기</Button>
@@ -152,7 +161,7 @@ export default function ContractDetailPage() {
         {(contract.status === 'sent' || contract.status === 'viewed') && (
           <Button color="light" variant="weak" display="block" size="large"
             onClick={async () => {
-              if (!confirm('계약을 취소하시겠습니까?\n\n되돌릴 수 없습니다.')) return;
+              if (!confirm(`${josa('계약', '을/를')} 취소하시겠습니까?\n\n되돌릴 수 없습니다.`)) return;
               try { const u = await cancelContract(id); setContract(u); }
               catch { alert('취소 처리에 실패했습니다'); }
             }}>계약 취소하기</Button>
@@ -160,7 +169,7 @@ export default function ContractDetailPage() {
         {canComplete && (
           <Button color="primary" variant="fill" display="block" size="large"
             onClick={async () => {
-              if (!confirm('계약을 확정하시겠습니까?\n\n완료된 계약은 변경할 수 없습니다.')) return;
+              if (!confirm(`${josa('계약', '을/를')} 확정하시겠습니까?\n\n완료된 계약은 변경할 수 없습니다.`)) return;
               setCompleting(true);
               try { const u = await completeContract(id); setContract(u); }
               catch { alert('확정 실패'); }
@@ -213,26 +222,6 @@ export default function ContractDetailPage() {
         </Button>
       </div>
 
-      {showSheet && contract && (
-        <div style={{
-          position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', zIndex: 100,
-          display: 'flex', alignItems: 'flex-end', justifyContent: 'center',
-        }} onClick={() => setShowSheet(false)}>
-          <div style={{
-            background: '#fff', borderRadius: '20px 20px 0 0', width: '100%', maxWidth: 480,
-          }} onClick={e => e.stopPropagation()}>
-            <SendContractSheet
-              contractTitle={contract.worker_name}
-              deepLink={`${window.location.origin}/contract/${id}`}
-              onSend={async () => {
-                try { const u = await sendContract(id); setContract(u); setShowSheet(false); }
-                catch { alert('전송에 실패했습니다'); }
-              }}
-              onCancel={() => setShowSheet(false)}
-            />
-          </div>
-        </div>
-      )}
     </div>
   );
 }

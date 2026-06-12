@@ -1,8 +1,71 @@
 import { useNavigate } from 'react-router-dom';
 import { useContracts } from '../../hooks/useContracts';
 import { Top, Paragraph, Spacing, Button, List, ListRow, Badge } from '@toss/tds-mobile';
+import { Suspense, Delay } from '@suspensive/react';
 import styles from './ContractListPage.module.css';
 
+
+function ContractListContent({ contracts, navigate, badgeFor }: {
+  contracts: any[];
+  navigate: (path: string) => void;
+  badgeFor: (status: string) => { label: string; color: string };
+}) {
+  return (
+    <div className={styles.content}>
+      <Spacing size={24} />
+
+      <Paragraph typography="st2" fontWeight="bold">근로계약서</Paragraph>
+      <Spacing size={8} />
+      <Paragraph typography="st5" color="grey-500">
+        {contracts.length > 0
+          ? `총 ${contracts.length}건의 계약서가 있어요`
+          : '아직 작성한 계약서가 없어요'}
+      </Paragraph>
+
+      <Spacing size={24} />
+
+      {contracts.length > 0 ? (
+        <List>
+          {contracts.map(c => (
+            <ListRow
+              key={c.id}
+              onClick={() => navigate(`/employer/contracts/${c.id}`)}
+              aria-label={c.worker_name}
+              left={
+                <div className={styles.contractRow}>
+                  <Paragraph typography="st5" fontWeight="bold">{c.worker_name}</Paragraph>
+                  <Paragraph typography="st7" color="grey-500">{c.workplace} · {c.start_date}</Paragraph>
+                </div>
+              }
+              right={
+                <Badge size="small" variant="weak" color={badgeFor(c.status).color}>
+                  {badgeFor(c.status).label}
+                </Badge>
+              }
+            />
+          ))}
+        </List>
+      ) : (
+        <div className={styles.empty}>
+          <img src="https://static.toss.im/2d-emojis/png/4x/u1F4CB.png" alt=""
+            style={{ width: 72, height: 72 }}
+          />
+          <Spacing size={16} />
+          <Paragraph typography="st5" color="grey-500">
+            첫 계약서를 작성해보세요
+          </Paragraph>
+          <Spacing size={20} />
+          <Button color="primary" variant="fill" size="large"
+            onClick={() => navigate('/employer/contracts/new')}>
+            계약서 작성하기
+          </Button>
+        </div>
+      )}
+
+      <Spacing size={40} />
+    </div>
+  );
+}
 export default function ContractListPage() {
   const navigate = useNavigate();
   const { contracts } = useContracts();
@@ -24,59 +87,25 @@ export default function ContractListPage() {
         </Button>
       </Top>
 
-      <div className={styles.content}>
-        <Spacing size={24} />
-
-        <Paragraph typography="st2" fontWeight="bold">근로계약서</Paragraph>
-        <Spacing size={8} />
-        <Paragraph typography="st5" color="grey-500">
-          {contracts.length > 0
-            ? `총 ${contracts.length}건의 계약서가 있어요`
-            : '아직 작성한 계약서가 없어요'}
-        </Paragraph>
-
-        <Spacing size={24} />
-
-        {contracts.length > 0 ? (
-          <List>
-            {contracts.map(c => (
-              <ListRow
-                key={c.id}
-                onClick={() => navigate(`/employer/contracts/${c.id}`)}
-                aria-label={c.worker_name}
-                left={
-                  <div className={styles.contractRow}>
-                    <Paragraph typography="st5" fontWeight="bold">{c.worker_name}</Paragraph>
-                    <Paragraph typography="st7" color="grey-500">{c.workplace} · {c.start_date}</Paragraph>
-                  </div>
-                }
-                right={
-                  <Badge size="small" variant="weak" color={badgeFor(c.status).color}>
-                    {badgeFor(c.status).label}
-                  </Badge>
-                }
-              />
-            ))}
-          </List>
-        ) : (
-          <div className={styles.empty}>
-            <img src="https://static.toss.im/2d-emojis/png/4x/u1F4CB.png" alt=""
-              style={{ width: 72, height: 72 }}
-            />
-            <Spacing size={16} />
-            <Paragraph typography="st5" color="grey-500">
-              첫 계약서를 작성해보세요
-            </Paragraph>
-            <Spacing size={20} />
-            <Button color="primary" variant="fill" size="large"
-              onClick={() => navigate('/employer/contracts/new')}>
-              계약서 작성하기
-            </Button>
-          </div>
-        )}
-
-        <Spacing size={40} />
-      </div>
+      <Suspense
+        clientOnly
+        fallback={
+          <Delay ms={200}>
+            {({ isDelayed }) => isDelayed && (
+              <div style={{ opacity: isDelayed ? 1 : 0 }}>
+                {[1,2,3].map(i => (
+                  <div key={i} style={{
+                    height: 72, margin: '8px 0', borderRadius: 12,
+                    background: '#F5F6F8', animation: 'pulse 1.5s infinite'
+                  }} />
+                ))}
+              </div>
+            )}
+          </Delay>
+        }
+      >
+        <ContractListContent contracts={contracts} navigate={navigate} badgeFor={badgeFor} />
+      </Suspense>
     </div>
   );
 }

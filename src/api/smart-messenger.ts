@@ -27,5 +27,5 @@ export async function shareContract(contractId: string) {
     const url = `intoss://bossimclockedin/contract/${contractId}`;
     await navigator.clipboard.writeText(url);
     alert('링크가 클립보드에 복사되었습니다.');
-  }
+  } catch { /* 공유 실패 — 무시 */ }
 }

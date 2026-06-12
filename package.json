@@ -16,13 +16,18 @@
     "@emotion/babel-plugin": "^11.13.5",
     "@emotion/react": "^11.14.0",
     "@supabase/supabase-js": "^2.107.0",
+    "@suspensive/react": "^3.21.2",
     "@toss/tds-mobile": "2.4.0",
     "@types/react-router-dom": "^5.3.3",
+    "@use-funnel/browser": "^0.0.17",
+    "es-hangul": "^2.3.8",
     "html2canvas-pro": "^2.0.4",
     "jspdf": "^4.2.1",
+    "overlay-kit": "^1.9.0",
     "react": "^18.3.0",
     "react-dom": "^18.3.0",
     "react-router-dom": "^7.17.0",
+    "react-simplikit": "^0.0.51",
     "zod": "^3.25.76"
   },
   "devDependencies": {
