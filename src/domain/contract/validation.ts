@@ -55,6 +55,7 @@ export function calcDailyWorkMinutes(
   const start = parseTimeToMinutes(startTime);
   const end = parseTimeToMinutes(endTime);
   const diff = end - start;
+  if (diff === 0) return 0;
   return diff > 0 ? diff : diff + 24 * 60;
 }
 
@@ -113,41 +114,65 @@ export function validateLaborContract(input: unknown): ValidationResult {
     }
   }
 
-  // 2-2. 최저임금 검증 (시급인 경우에만)
-  if (contract.wageType === "hourly") {
-    if (contract.baseWage < MINIMUM_HOURLY_WAGE_2026) {
-      errors.push({
-        field: "contract.baseWage",
-        message: `시급 ${contract.baseWage.toLocaleString()}원은 2026년 최저시급 ${MINIMUM_HOURLY_WAGE_2026.toLocaleString()}원 미만입니다.`,
-        code: "BELOW_MINIMUM_WAGE",
-      });
-    } else if (
-      contract.baseWage >= MINIMUM_HOURLY_WAGE_2026 &&
-      contract.baseWage < MINIMUM_HOURLY_WAGE_2026 * 1.1
-    ) {
-      warnings.push({
-        field: "contract.baseWage",
-        message: `시급이 최저시급 대비 ${((contract.baseWage / MINIMUM_HOURLY_WAGE_2026) * 100).toFixed(1)}% 수준입니다. 최저임금 위반 가능성을 검토하세요.`,
-        code: "NEAR_MINIMUM_WAGE",
-      });
-    }
-  }
-
-  // 2-3. 휴게시간 검증 (가장 높은 기준만 체크)
+  // 2-2. 근무시간 계산 (최저임금/휴게/주휴 검증에 사용)
   const dailyMinutes = calcDailyWorkMinutes(
     contract.startTime,
     contract.endTime,
   );
   const dailyHours = dailyMinutes / 60;
+  const breakMinutes = calcDailyWorkMinutes(contract.breakStartTime, contract.breakEndTime);
+  const effectiveMinutes = calcEffectiveWorkMinutes(
+    contract.startTime,
+    contract.endTime,
+    breakMinutes,
+  );
+  const weeklyHours = calcWeeklyWorkHours(
+    effectiveMinutes,
+    contract.workDays.length,
+  );
+
+  // 2-3. 최저임금 검증 (모든 임금 유형)
+  let hourlyEquivalent: number;
+  switch (contract.wageType) {
+    case "hourly":
+      hourlyEquivalent = contract.baseWage;
+      break;
+    case "daily":
+      hourlyEquivalent = contract.baseWage / dailyHours;
+      break;
+    case "weekly":
+      hourlyEquivalent =
+        contract.baseWage / (dailyHours * contract.workDays.length);
+      break;
+    case "monthly":
+      hourlyEquivalent = contract.baseWage / (weeklyHours * 4.345);
+      break;
+  }
+
+  if (hourlyEquivalent < MINIMUM_HOURLY_WAGE_2026) {
+    errors.push({
+      field: "contract.baseWage",
+      message: `시급 환산 시 ${Math.round(hourlyEquivalent).toLocaleString()}원으로 최저임금(${MINIMUM_HOURLY_WAGE_2026.toLocaleString()}원)에 미달합니다.`,
+      code: "BELOW_MINIMUM_WAGE",
+    });
+  } else if (hourlyEquivalent < MINIMUM_HOURLY_WAGE_2026 * 1.1) {
+    warnings.push({
+      field: "contract.baseWage",
+      message: `시급 환산 시 ${Math.round(hourlyEquivalent).toLocaleString()}원으로 최저시급 대비 ${((hourlyEquivalent / MINIMUM_HOURLY_WAGE_2026) * 100).toFixed(1)}% 수준입니다. 최저임금 위반 가능성을 검토하세요.`,
+      code: "NEAR_MINIMUM_WAGE",
+    });
+  }
+
+  // 2-4. 휴게시간 검증 (가장 높은 기준만 체크)
 
   // BREAK_RULES는 오름차순이므로 역순 탐색 → 가장 높은 기준 매칭
   for (let i = BREAK_RULES.length - 1; i >= 0; i--) {
     const rule = BREAK_RULES[i];
     if (dailyHours >= rule.minWorkHours) {
-      if (contract.breakMinutes < rule.minBreakMinutes) {
+      if (breakMinutes < rule.minBreakMinutes) {
         errors.push({
-          field: "contract.breakMinutes",
-          message: `일 ${rule.minWorkHours}시간 이상 근무 시 휴게시간 ${rule.minBreakMinutes}분 이상 필요 (현재: ${contract.breakMinutes}분).`,
+          field: "contract.breakStartTime",
+          message: `일 ${rule.minWorkHours}시간 이상 근무 시 휴게시간 ${rule.minBreakMinutes}분 이상 필요 (현재: ${breakMinutes}분).`,
           code: "INSUFFICIENT_BREAK",
         });
       }
@@ -155,17 +180,7 @@ export function validateLaborContract(input: unknown): ValidationResult {
     }
   }
 
-  // 2-4. 주휴일 검증
-  const effectiveMinutes = calcEffectiveWorkMinutes(
-    contract.startTime,
-    contract.endTime,
-    contract.breakMinutes,
-  );
-  const weeklyHours = calcWeeklyWorkHours(
-    effectiveMinutes,
-    contract.workDays.length,
-  );
-
+  // 2-5. 주휴일 검증
   if (weeklyHours >= WEEKLY_REST_THRESHOLD_HOURS && !contract.weeklyHoliday) {
     errors.push({
       field: "contract.weeklyHoliday",
@@ -174,7 +189,7 @@ export function validateLaborContract(input: unknown): ValidationResult {
     });
   }
 
-  // 2-5. 주휴일-근무일 겹침 검증
+  // 2-6. 주휴일-근무일 겹침 검증
   if (
     contract.weeklyHoliday &&
     contract.workDays.includes(contract.weeklyHoliday)
@@ -188,7 +203,7 @@ export function validateLaborContract(input: unknown): ValidationResult {
     });
   }
 
-  // 2-6. 단시간 근로자 경고
+  // 2-7. 단시간 근로자 경고
   if (weeklyHours < 15) {
     warnings.push({
       field: "contract.contractType",
@@ -198,7 +213,7 @@ export function validateLaborContract(input: unknown): ValidationResult {
     });
   }
 
-  // 2-7. 연차/4대보험/퇴직금 조항 미포함 경고
+  // 2-8. 연차/4대보험/퇴직금 조항 미포함 경고
   if (!contract.paidLeaveClause) {
     warnings.push({
       field: "contract.paidLeaveClause",
@@ -264,7 +279,8 @@ export function createEmptyContractDraft(): LaborContract {
       workDays: ["mon", "tue", "wed", "thu", "fri"],
       startTime: "09:00",
       endTime: "18:00",
-      breakMinutes: 60,
+      breakStartTime: "12:00",
+      breakEndTime: "13:00",
       paidLeaveClause: false,
       socialInsuranceClause: false,
       severanceClause: false,

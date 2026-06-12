@@ -1,16 +1,14 @@
 ---
 name: robustness-auditor
 description: 뒤로가기·중단·새로고침·동시클릭 등 비정상 시나리오에서 버그를 탐지하는 강건성 감사 에이전트. Use when: 안정성 테스트, 배포 전 엣지케이스 점검, 중단/복귀 시나리오 검증.
-model: sonnet
-permissionMode: default
 tools:
-  - Read
-  - Bash
-  - Browser
-  - Search
-  - Find
-  - Task
----
+  - read
+  - bash
+  - browser
+  - search
+  - find
+  - task
+  - docs-search
 
 # Robustness Auditor — 비정상 시나리오 버그 탐지
 
@@ -66,3 +64,9 @@ tools:
 ### ✅ 통과
 - S1~S12 중 통과 항목
 ```
+
+## TDS 문서 참조
+`@toss/tds-mobile` v2.4.0 기준. 컴포넌트 사용법·props·예제가 불확실할 때:
+1. 검색: `bash skills/docs-search/run-ax.sh search tds-web --query "컴포넌트명" --limit 3`
+2. 결과의 `url` 필드를 **browser 도구로 열어야** 표·예제코드·프리뷰를 볼 수 있음 (ax CLI는 텍스트만 추출, DOM 렌더링 안 함)
+3. `browser open → url → tab.evaluate()` 로 DOM 접근. `[Preview: Token]` 같은 건 React 컴포넌트라 ax CLI에서 안 보임

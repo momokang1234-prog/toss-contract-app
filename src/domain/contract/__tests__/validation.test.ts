@@ -35,7 +35,7 @@ function validContract(overrides?: any): LaborContract {
       workDays: ["mon", "tue", "wed", "thu", "fri"],
       startTime: "09:00",
       endTime: "18:00",
-      breakMinutes: 60,
+      breakStartTime: "12:00", breakEndTime: "13:00",
       weeklyHoliday: "sun",
       ...overrides?.contract,
     },
@@ -157,7 +157,7 @@ describe("validateLaborContract", () => {
   // 12. 4시간 근무 + 휴게 0분 — 에러
   it("12) 4시간 근무 + 휴게 0분 — INSUFFICIENT_BREAK 에러", () => {
     const contract = validContract({
-      contract: { startTime: "09:00", endTime: "13:00", breakMinutes: 0 } as any,
+      contract: { startTime: "09:00", endTime: "13:00", breakStartTime: "12:00", breakEndTime: "12:00" } as any,
     });
     const result = validateLaborContract(contract);
     expect(result.valid).toBe(false);
@@ -167,7 +167,7 @@ describe("validateLaborContract", () => {
   // 13. 4시간 근무 + 휴게 30분 — 통과
   it("13) 4시간 근무 + 휴게 30분 — 통과", () => {
     const contract = validContract({
-      contract: { startTime: "09:00", endTime: "13:00", breakMinutes: 30 } as any,
+      contract: { startTime: "09:00", endTime: "13:00", breakStartTime: "12:00", breakEndTime: "12:30" } as any,
     });
     const result = validateLaborContract(contract);
     expect(result.errors.filter((e) => e.code === "INSUFFICIENT_BREAK")).toHaveLength(0);
@@ -176,7 +176,7 @@ describe("validateLaborContract", () => {
   // 14. 8시간 근무 + 휴게 30분 — 에러
   it("14) 8시간 근무 + 휴게 30분 — INSUFFICIENT_BREAK 에러", () => {
     const contract = validContract({
-      contract: { startTime: "09:00", endTime: "17:00", breakMinutes: 30 } as any,
+      contract: { startTime: "09:00", endTime: "17:00", breakStartTime: "12:00", breakEndTime: "12:30" } as any,
     });
     const result = validateLaborContract(contract);
     expect(result.valid).toBe(false);
@@ -186,7 +186,7 @@ describe("validateLaborContract", () => {
   // 15. 8시간 근무 + 휴게 60분 — 통과
   it("15) 8시간 근무 + 휴게 60분 — 통과", () => {
     const contract = validContract({
-      contract: { startTime: "09:00", endTime: "17:00", breakMinutes: 60 } as any,
+      contract: { startTime: "09:00", endTime: "17:00", breakStartTime: "12:00", breakEndTime: "13:00" } as any,
     });
     const result = validateLaborContract(contract);
     expect(result.errors.filter((e) => e.code === "INSUFFICIENT_BREAK")).toHaveLength(0);
@@ -201,7 +201,7 @@ describe("validateLaborContract", () => {
         workDays: ["mon", "tue", "wed", "thu"],
         startTime: "09:00",
         endTime: "13:00",
-        breakMinutes: 0,
+        breakStartTime: "12:00", breakEndTime: "12:00",
         weeklyHoliday: undefined,
       } as any,
     });
@@ -218,7 +218,7 @@ describe("validateLaborContract", () => {
         workDays: ["mon", "tue", "wed", "thu"],
         startTime: "09:00",
         endTime: "12:30",
-        breakMinutes: 0,
+        breakStartTime: "12:00", breakEndTime: "12:00",
         weeklyHoliday: undefined,
       } as any,
     });
@@ -325,7 +325,8 @@ describe("createEmptyContractDraft", () => {
     expect(draft.contract.workDays).toEqual(["mon", "tue", "wed", "thu", "fri"]);
     expect(draft.contract.startTime).toBe("09:00");
     expect(draft.contract.endTime).toBe("18:00");
-    expect(draft.contract.breakMinutes).toBe(60);
+    expect(draft.contract.breakStartTime).toBe("12:00");
+    expect(draft.contract.breakEndTime).toBe("13:00");;
     expect(draft.contract.paidLeaveClause).toBe(false);
     expect(draft.contract.socialInsuranceClause).toBe(false);
     expect(draft.contract.severanceClause).toBe(false);

@@ -372,3 +372,184 @@
 | **품질**: 빈 `useEffect` (ContractSignPage L22) | 삭제 완료 |
 | **품질**: 미사용 import (useEffect, josa, getContract) | 3건 정리 완료 |
 | **품질**: `api/smart-messenger.ts` 누락된 `catch` | 추가 완료 |
+
+---
+
+## 🔴 카테고리 9: 2026-06-12 심층 분석 — 누락된 크리티컬 이슈
+
+> 추가일: 2026-06-12 | 범위: 소스코드 전수 재분석 + Edge Functions 실코드 검증 + 백엔드 아키텍처 교차 검증
+
+### 9-1. Edge Functions 실코드 및 누락 함수 ⚠️
+
+기존 1-3 항목에서 "디렉토리만 존재, 함수 코드 없음"으로 기술했으나, **실제 코드가 존재**합니다. 단, 치명적 누락이 있습니다:
+
+| Edge Function | 파일 | 상태 | 문제 |
+|---------------|------|------|------|
+| `contracts-send` | `supabase/functions/contracts-send/index.ts` | ✅ 구현 | 인증 검증 포함, SMS/Push 발송은 `// TODO` 스텁 |
+| `contracts-sign` | `supabase/functions/contracts-sign/index.ts` | ✅ 구현 | `sign_contract()` RPC 호출 — 정상 |
+| `contracts-view` | `supabase/functions/contracts-view/index.ts` | ✅ 구현 | 근로자 권한 검증 + 상태 전이 — 정상 |
+| `contracts-complete` | ❌ **존재하지 않음** | 🔴 없음 | 프론트엔드 `completeContract()`가 호출하지만 대응 함수 없음 |
+
+**영향**: `signed → completed` 전이 시 `supabase.functions.invoke('contracts-complete')` 가 404 에러 반환. 현재는 Mock 모드라 발견 안 됨.
+
+### 9-2. Mock 데이터 — Schema enum 값 전면 불일치 🔴🔴
+
+`useContracts.ts` L40-L175의 Mock 데이터 5건이 Zod Schema와 **전혀 다른 값**을 사용 중입니다. Real 모드 전환 시 즉시 크래시 예상:
+
+| 필드 | Mock 데이터 값 | Schema 정의 값 | 불일치 건수 |
+|------|---------------|---------------|------------|
+| `contract_type` | `'정규직'`, `'아르바이트'`, `'계약직'`, `'프리랜서'` | `'fullTime'`, `'partTime'`, `'fixedTerm'` | **4/5** |
+| `wage_payment_method` | `'계좌이체'` | `'bankTransfer'`, `'cash'`, `'mixed'` | **5/5** |
+| `work_days` | `['월', '화', '수', '목', '금']` | `['mon', 'tue', 'wed', 'thu', 'fri']` | **5/5** |
+| `weekly_holiday` | `'일요일'`, `'월요일'`, `'토요일,일요일'`, `'주말'` | `'sun'`, `'mon'`, … `'sat'` | **5/5** |
+| `wage_type` | `'project'` (mock-5) | `'hourly'`, `'daily'`, `'weekly'`, `'monthly'` | **1/5** |
+
+**심각도**: Mock→Real 전환 시 Zod 검증에서 전부 실패. Phase 2 착수 전 **반드시** Mock 데이터를 Schema enum 값으로 치환해야 함.
+
+### 9-3. 상태 전이 백엔드 검증 부재 🔴
+
+프론트엔드 `useContracts.ts`의 Real 모드 함수 중 다음이 **직접 Supabase `.update()`** 를 호출합니다:
+
+| 함수 | 호출 방식 | 문제 |
+|------|----------|------|
+| `cancelContract()` | `supabase.from('contracts').update({ status: 'cancelled' })` | 상태 전이 검증 없음. `completed` 상태도 취소 가능 |
+| `expireContract()` | `supabase.from('contracts').update({ status: 'expired' })` | 동일. 어느 상태든 만료 가능 |
+| `viewContract()` | `supabase.from('contracts').update({ status: 'viewed' })` | `contracts-view` Edge Function 있음에도 사용 안 함 |
+| `createContract()` | `supabase.from('contracts').insert()` | business_id FK 검증 없음 |
+| `updateContract()` | `supabase.from('contracts').update()` | 상태 불변 검증 없음 |
+
+**반면**, `sendContract()`와 `signContract()`은 **Edge Function**을 거치므로 서버 측 검증이 있습니다.
+
+**필요 조치**:
+1. `viewContract()` → 기존 `contracts-view` Edge Function 사용
+2. `cancelContract()`, `expireContract()`, `completeContract()` → Edge Function 신규 생성
+3. `createContract()`, `updateContract()` → 서버 측 권한/상태 검증 추가
+
+### 9-4. server/ 백엔드 — 계약 앱과 무관 🔵
+
+`server/` 디렉토리의 Express 백엔드는 **결제/계좌 이체** 목적의 독립 서버입니다:
+
+* `routes/accounts.ts` — 계좌 CRUD
+* `routes/transfers.ts` — 이체 처리
+* `routes/transactions.ts` — 거래 내역
+* `routes/auth.ts` — 이메일/비밀번호 기반 인증 (Toss OAuth와 무관)
+
+이 서버는 근로계약서 앱과 **연동되지 않습니다**. `toss-auth.ts`가 가리키는 `bossimclockedin-api.fly.dev`도 이 Express 서버이지만, 현재 인증 경로가 이메일/패스워드 방식이라 Toss `appLogin()` OAuth 흐름과 완전히 다릅니다.
+
+**의미**: 프로덕션 배포 시 (A) 이 서버에 Toss OAuth 엔드포인트를 추가, 또는 (B) Edge Functions만으로 인증 처리. 현재는 **둘 다 안 되는 상태**.
+
+### 9-5. 테스트 0건 🔴
+
+* `vitest.config.ts` 존재
+* `server/tests/` 에 4개 테스트 파일 (accounts, transfers, transactions, auth) — **결제 서버 테스트**
+* `src/` 디렉토리에 **테스트 파일 0건**
+* `domain/contract/validation.ts` 가 가장 테스트가 필요한 순수 함수 — 검증 7종 테스트 전무
+
+**필요 최소 테스트**:
+* `validation.ts` — 최저임금, 휴게시간, 주휴일 규칙 단위 테스트
+* `schema.ts` — Zod 파싱 엣지 케이스
+* `useContracts.ts` — 상태 전이 시퀀스
+
+### 9-6. 보안 — Edge Functions CORS `*` 🔴
+
+3개 Edge Functions 모두 동일한 CORS 설정:
+
+```typescript
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+};
+```
+
+프로덕션에서는 `bossimclockedin.private-apps.tossmini.com` (또는 실제 도메인)으로 제한해야 합니다.
+
+### 9-7. `shareContract()` 하드코딩 placeholder URL 🟡
+
+`smart-messenger.ts` L21:
+```typescript
+'https://your-app.com/og/contract.png'
+```
+→ OG 이미지 URL이 placeholder. 토스 앱 내 공유 시 미리보기 이미지가 없음.
+
+### 9-8. `employer_signed_at` 필드 미사용 🟡
+
+DB 스키마에 `employer_signed_at` 컬럼이 존재하나, 프론트엔드 어디에서도 값을 쓰거나 저장하지 않습니다. 사업주 전자서명 타임스탬프가 기록되지 않음 → 법적 효력 약화.
+
+### 9-9. `contract_html` / `contract_pdf_url` DB 컬럼 미사용 🟡
+
+`contracts` 테이블에 `contract_html` TEXT, `contract_pdf_url` TEXT 컬럼이 존재하나:
+* `contract_html`: 프론트엔드에서 생성만 하고 DB에 저장 안 함
+* `contract_pdf_url`: PDF 저장 후 URL 업데이트하는 로직 전무
+
+**의미**: `completed` 상태에서도 계약서 원본이 DB에 영속화되지 않음. 새로고침 시 재생성 필요.
+
+### 9-10. `businesses[0]` null 체크 없음 🟡
+
+`ContractFormPage.tsx` L181:
+```typescript
+const business = businesses[0];
+const laborContract = {
+  employer: { businessNumber: business.business_number, ... }
+```
+→ `businesses` 가 빈 배열이면 `business` 가 `undefined` → 런타임 크래시. 사업장 등록 전 계약서 작성 불가해야 함.
+
+---
+
+## 🗺️ 카테고리 10: 업데이트된 출시 로드맵 (2026-06-12 심층 분석 반영)
+
+> 기존 Phase 0~5 로드맵에서 **누락되었던 작업**을 추가하고 우선순위를 재조정합니다.
+
+### Phase 0.5: Mock→Real 전환 준비 (기존 Phase 2 전, 1~2일) — 신규
+
+* [ ] Mock 데이터 5건의 enum 값을 Schema 정의에 맞게 수정 (`contract_type`, `wage_payment_method`, `work_days`, `weekly_holiday`, `wage_type`)
+* [ ] `contracts-complete` Edge Function 신규 생성
+* [ ] `viewContract()` → 기존 `contracts-view` Edge Function 사용하도록 수정
+* [ ] `cancelContract()`, `expireContract()` → 상태 전이 검증이 포함된 Edge Function 생성 또는 RLS + DB Trigger로 보완
+* [ ] `businesses[0]` null 가드 추가 (사업장 미등록 시 작성 페이지 진입 차단)
+
+### Phase 2.5: 보안 강화 (Edge Functions) — 기존 Phase 4에서 승격
+
+* [ ] Edge Functions CORS `*` → 실제 도메인으로 제한
+* [ ] `employer_signed_at` 기록 로직 추가 (사업주 확정 시)
+* [ ] `contract_html` DB 저장 로직 추가 (PDF 생성 시점에)
+* [ ] `shareContract()` placeholder URL → 실 OG 이미지 경로로 교체
+
+### Phase 5.5: 테스트 인프라 — 신규
+
+* [ ] `validation.ts` 단위 테스트 작성 (최저임금, 휴게시간, 주휴일, 야간근로)
+* [ ] `schema.ts` Zod 파싱 엣지 케이스 테스트
+* [ ] 상태 전이 시퀀스 테스트 (draft→sent→viewed→signed→completed)
+* [ ] Mock 데이터 → Schema 정합성 회귀 테스트
+
+---
+
+## 📊 업데이트된 심각도 매트릭스
+
+| 항목 | 심각도 | 기존 분류 | 비고 |
+|------|--------|-----------|------|
+| Mock 데이터 enum 불일치 | 🔴 크리티컬 | 4-4 (낮음) → 승격 | 5/5 필드 불일치, Real 전환 시 즉시 크래시 |
+| `contracts-complete` 누락 | 🔴 크리티컬 | 신규 | 사장님 확정 불가 |
+| 상태 전이 백엔드 검증 부재 | 🔴 크리티컬 | 신규 | 임의 상태 전이 가능 |
+| 테스트 0건 | 🔴 크리티컬 | 신규 | 검증 엔진 테스트 전무 |
+| CORS `*` | 🟠 높음 | 신규 | Edge Functions 보안 |
+| `employer_signed_at` 미사용 | 🟡 중간 | 신규 | 법적 효력 저하 |
+| `contract_html` 미저장 | 🟡 중간 | 신규 | 계약서 영속성 없음 |
+| server/ 무관 백엔드 | 🔵 정보 | 신규 | 아키텍처 인식 필요 |
+| `shareContract` placeholder | 🟡 중간 | 신규 | 공유 기능 무력화 |
+| `businesses[0]` null | 🟡 중간 | 신규 | 런타임 크래시 가능 |
+| Edge Functions 실존 | ✅ 수정 | 1-3 오류 | 코드 있음, complete만 누락 |
+
+---
+
+## 📋 업데이트된 결론
+
+> [!IMPORTANT]
+> 기존 분석 대비 **추가 발견 사항**:
+>
+> 1. **Mock→Real 전환 장벽이 예상보다 훨씬 높음**: Mock 데이터가 Schema enum과 전면 불일치하여, `IS_MOCK=false` 전환 시 즉시 런타임 크래시 발생
+> 2. **`contracts-complete` Edge Function 누락**: 사장님 확정 프로세스의 마지막 단계가 서버 측에 구현되지 않음
+> 3. **상태 전이 검증이 프론트엔드에만 존재**: 서버 측 검증 없이 임의 상태 전이 가능 → 법적 효력 위험
+> 4. **테스트 0건**: 핵심 검증 엔진이 테스트 커버리지 없이 방치됨
+>
+> **수정된 예상 소요**: Phase 0~5.5까지 **6~9주** (기존 7~8주에서 +1~2주). Mock→Real 전환 준비와 테스트 인프라가 병목.
+>
+> **최우선 작업 변동**: Phase 2(백엔드 실연동) 전에 **Phase 0.5(Mock 데이터 정합성)** 를 반드시 선행해야 함. 그렇지 않으면 Real 모드 테스트 자체가 불가.

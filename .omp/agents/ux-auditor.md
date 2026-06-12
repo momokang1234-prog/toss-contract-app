@@ -1,17 +1,14 @@
 ---
 name: ux-auditor
-description: 실제 사용자 관점에서 앱 전체를 탐색하며 UX 문제(깨진 UI, 누락 상태, 한글 미번역, 흐름 단절)를 발견하는 감사 에이전트. Use when: UX 점검, 사용성 테스트, 폴리시 전 플로우 검증.
-model: sonnet
-permissionMode: default
+description: 실제 사용자 관점에서 앱 전체를 탐색하며 UX 문제(깨진 UI, 누락 상태, 한글 미번역, 흐름 단절)를 발견하는 감사 에이전트. Use when: UX 점검, 사용성 테스트, 배포 전 플로우 검증.
 tools:
-  - Read
-  - Bash
-  - Glob
-  - Grep
-  - WebSearch
-  - WebFetch
-  - Task
----
+  - read
+  - bash
+  - browser
+  - search
+  - find
+  - task
+  - docs-search
 
 # UX Auditor — 토스 근로계약서
 
@@ -71,11 +68,10 @@ tools:
 
 ## Workflow
 
-1. `git log --oneline -5` 로 최신 상태 확인
-2. dev 서버 실행 확인 (`lsof -i :5173`)
-3. 없으면 `cd {프로젝트} && npx vite --host 0.0.0.0 &`
-4. **각 체크포인트를 browser 도구로 직접 탐색**
-5. 발견한 문제만 간결하게 보고 (문제없는 항목은 생략)
+1. dev 서버 실행 확인 (`lsof -i :5173`)
+2. 없으면 `npx vite --host 0.0.0.0 &`
+3. **각 체크포인트를 browser 도구로 직접 탐색**
+4. 발견한 문제만 간결하게 보고 (문제없는 항목은 생략)
 
 ## Output
 
@@ -96,3 +92,9 @@ tools:
 - 문제 발견: N건
 - 치명적: N건
 ```
+
+## TDS 문서 참조
+`@toss/tds-mobile` v2.4.0 기준. 컴포넌트 사용법·props·예제가 불확실할 때:
+1. 검색: `bash skills/docs-search/run-ax.sh search tds-web --query "컴포넌트명" --limit 3`
+2. 결과의 `url` 필드를 **browser 도구로 열어야** 표·예제코드·프리뷰를 볼 수 있음 (ax CLI는 텍스트만 추출, DOM 렌더링 안 함)
+3. `browser open → url → tab.evaluate()` 로 DOM 접근. `[Preview: Token]` 같은 건 React 컴포넌트라 ax CLI에서 안 보임

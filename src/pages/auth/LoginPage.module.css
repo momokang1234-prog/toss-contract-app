@@ -13,8 +13,10 @@
   bottom: 0;
   left: 0;
   right: 0;
-  padding: 16px 20px 32px;
-  background: linear-gradient(to top, #fff 60%, transparent);
+  padding: 20px 24px 32px;
+  background: #fff;
+  border-top: 1px solid #e5e5ec;
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.04);
 }
 
 .buttonGroup {

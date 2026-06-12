@@ -2,8 +2,9 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { useContracts } from '../../hooks/useContracts';
 import { ContractCard } from '../../components/contract/ContractCard';
-import { Top, Paragraph, Spacing, Button, GridList } from '@toss/tds-mobile';
+import { Top, Paragraph, Spacing, Button, GridList, Badge, Text } from '@toss/tds-mobile';
 import styles from './DashboardPage.module.css';
+
 export default function DashboardPage() {
   const navigate = useNavigate();
   const { contracts } = useContracts();
@@ -18,27 +19,16 @@ export default function DashboardPage() {
     <div className={styles.page}>
       <Top title="내 사업장" />
 
-      <div style={{ position: 'relative' }}>
-        <img
-          src="https://static.toss.im/lotties/point-blue2.png" alt=""
-          style={{ position: 'absolute', top: -20, right: -10, width: 140, height: 140, opacity: 0.25, pointerEvents: 'none' }}
-        />
-        <img
-          src="https://static.toss.im/lotties/point-purple2.png" alt=""
-          style={{ position: 'absolute', bottom: -10, right: 20, width: 100, height: 100, opacity: 0.2, pointerEvents: 'none' }}
-        />
-        <div className={styles.hero}>
-          <Paragraph typography="st1" fontWeight="bold">
-            근로계약서
-          </Paragraph>
-          <Paragraph typography="st1" fontWeight="bold">
-            한눈에 확인해요
-          </Paragraph>
-          <Spacing size={12} />
-          <Paragraph typography="st4" color="grey-500">
-            작성부터 서명까지 토스에서 간편하게
-          </Paragraph>
-        </div>
+      <div className={styles.hero}>
+        <Paragraph typography="st1" fontWeight="bold" style={{ marginBottom: 4 }}>
+          근로계약서
+        </Paragraph>
+        <Paragraph typography="st1" fontWeight="bold" style={{ marginBottom: 16 }}>
+          한눈에 확인해요
+        </Paragraph>
+        <Paragraph typography="st4" color="grey-500">
+          작성부터 서명까지 토스에서 간편하게
+        </Paragraph>
       </div>
 
       <Spacing size={36} />
@@ -46,19 +36,29 @@ export default function DashboardPage() {
       <div className={styles.stats}>
         <GridList column={3}>
           <div className={styles.statCardA}>
-            <Paragraph typography="st2" fontWeight="bold">{totalCount}<Paragraph typography="st6" color="grey-500" display="inline">건</Paragraph></Paragraph>
+            <div style={{ marginBottom: 8 }}>
+              <Text typography="t4" fontWeight="bold">{totalCount}</Text>
+              <Text typography="st6" color="grey-500" style={{ marginLeft: 2 }}>건</Text>
+            </div>
             <Paragraph typography="st7" color="grey-500">전체 계약</Paragraph>
           </div>
           <div className={styles.statCardA}>
-            <Paragraph typography="st2" fontWeight="bold">{inProgress}<Paragraph typography="st6" color="grey-500" display="inline">건</Paragraph></Paragraph>
-            <Paragraph typography="st7" color="grey-500">진행 중</Paragraph>
+            <div style={{ marginBottom: 8 }}>
+              <Text typography="t4" fontWeight="bold">{inProgress}</Text>
+              <Text typography="st6" color="grey-500" style={{ marginLeft: 2 }}>건</Text>
+            </div>
+            <Badge size="small" variant="fill" color="blue">진행 중</Badge>
           </div>
           <div className={styles.statCardA}>
-            <Paragraph typography="st2" fontWeight="bold">{signedCount}<Paragraph typography="st6" color="grey-500" display="inline">건</Paragraph></Paragraph>
-            <Paragraph typography="st7" color="grey-500">서명 완료</Paragraph>
+            <div style={{ marginBottom: 8 }}>
+              <Text typography="t4" fontWeight="bold">{signedCount}</Text>
+              <Text typography="st6" color="grey-500" style={{ marginLeft: 2 }}>건</Text>
+            </div>
+            <Badge size="small" variant="fill" color="green">계약 완료</Badge>
           </div>
         </GridList>
       </div>
+
       <Spacing size={32} />
 
       <div className={styles.actions}>
@@ -73,8 +73,8 @@ export default function DashboardPage() {
         </Button>
         <Spacing size={12} />
         <Button
-          color="light"
-          variant="fill"
+          color="primary"
+          variant="weak"
           display="block"
           size="xlarge"
           onClick={() => navigate('/employer/contracts')}
@@ -115,7 +115,7 @@ export default function DashboardPage() {
       )}
 
       <div style={{ display: 'flex', justifyContent: 'center', padding: '24px' }}>
-        <Button color="light" variant="weak" size="small"
+        <Button color="dark" variant="weak" size="small"
           onClick={async () => { await setRole('worker'); navigate('/worker/contracts', { replace: true }); }}>
           🔄 근로자로 전환
         </Button>

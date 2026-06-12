@@ -11,7 +11,7 @@ function ContractListContent({ contracts, navigate, businessMap, badgeFor }: {
   contracts: any[];
   navigate: (path: string) => void;
   businessMap: Record<string, string>;
-  badgeFor: (status: string) => { label: string; color: string };
+  badgeFor: (status: string) => { label: string; color: 'blue' | 'teal' | 'green' | 'red' | 'yellow' | 'elephant' };
 }) {
   return (
     <div className={styles.content}>
@@ -30,18 +30,18 @@ function ContractListContent({ contracts, navigate, businessMap, badgeFor }: {
               key={c.id}
               onClick={() => navigate(`/worker/contracts/${c.id}`)}
               aria-label={businessMap[c.business_id] ?? c.workplace}
-              left={
+              contents={
                 <div className={styles.contractRow}>
-                  <Paragraph typography="st5" fontWeight="bold">
+                  <Paragraph typography="t4" fontWeight="bold" color="grey-800">
                     {businessMap[c.business_id] ?? c.workplace}
                   </Paragraph>
-                  <Paragraph typography="st7" color="grey-500">
-                    {c.job_description} · {c.start_date}
+                  <Paragraph typography="st7" color="grey-400" style={{ fontSize: 12, marginTop: 4 }}>
+                    {c.start_date}
                   </Paragraph>
                 </div>
               }
               right={
-                <Badge size="small" variant="weak" color={badgeFor(c.status).color}>
+                <Badge size="small" variant="fill" color={badgeFor(c.status).color}>
                   {badgeFor(c.status).label}
                 </Badge>
               }
@@ -68,12 +68,17 @@ export default function WorkerContractListPage() {
   const businessMap = Object.fromEntries(businesses.map(b => [b.id, b.business_name]));
 
   const badgeFor = (status: string) => {
-    if (status === 'draft') return { label: '작성중', color: 'elephant' as const };
-    if (status === 'sent') return { label: '수신', color: 'blue' as const };
-    if (status === 'viewed') return { label: '확인완료', color: 'blue' as const };
-    if (status === 'signed') return { label: '서명완료', color: 'yellow' as const };
-    if (status === 'completed') return { label: '계약완료', color: 'teal' as const };
-    return { label: status, color: 'elephant' as const };
+    switch (status) {
+      case 'draft': return { label: '작성중', color: 'blue' as const };
+      case 'sent': return { label: '수신됨', color: 'teal' as const };
+      case 'viewed': return { label: '확인중', color: 'teal' as const };
+      case 'signed': return { label: '계약 완료', color: 'green' as const };
+      case 'completed': return { label: '계약 완료', color: 'green' as const };
+      case 'cancelled':
+      case 'expired': return { label: '취소됨', color: 'red' as const };
+      case 'rejected': return { label: '수정 요청됨', color: 'blue' as const };
+      default: return { label: status, color: 'elephant' as const };
+    }
   };
 
   return (

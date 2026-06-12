@@ -20,7 +20,7 @@ const WorkerContractDetail = lazy(() => import('./pages/worker/ContractDetailPag
 const ContractSign = lazy(() => import('./pages/worker/ContractSignPage'));
 
 function Lazy({ children }: { children: ReactNode }) {
-  return <Suspense fallback={null}>{children}</Suspense>;
+  return <Suspense fallback={<div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', background: 'var(--toss-bg, #fff)' }}><div className="loading-spinner">로딩 중...</div></div>}>{children}</Suspense>;
 }
 
 export default function App() {
@@ -55,8 +55,9 @@ export default function App() {
             <Route path="/employer/business/new" element={<Lazy><BusinessFormPage /></Lazy>} />
             <Route path="/employer/contracts" element={<Lazy><EmployerContractList /></Lazy>} />
             <Route path="/employer/contracts/new" element={<Lazy><EmployerContractForm /></Lazy>} />
+            <Route path="/employer/contracts/:id/edit" element={<Lazy><EmployerContractForm /></Lazy>} />
             <Route path="/employer/contracts/:id" element={<Lazy><EmployerContractDetail /></Lazy>} />
-            <Route path="/employer/contracts/:id/history" element={<Lazy><ContractHistoryPage /></Lazy>} />
+            <Route path="/employer/contracts/history" element={<Lazy><ContractHistoryPage /></Lazy>} />
 
             <Route path="/worker/contracts" element={<Lazy><WorkerContractList /></Lazy>} />
             <Route path="/worker/contracts/:id" element={<Lazy><WorkerContractDetail /></Lazy>} />

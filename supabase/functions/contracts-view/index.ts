@@ -1,14 +1,19 @@
 import { serve } from 'https://deno.land/std@0.177.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
+const ALLOWED_ORIGINS = [
+  'https://bossimclockedin.private-apps.tossmini.com',
+  'http://localhost:5173',
+];
+
+const corsHeaders = (origin: string) => ({
+  'Access-Control-Allow-Origin': ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0],
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+});
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders });
+    return new Response('ok', { headers: corsHeaders(req.headers.get('origin') || '') });
   }
 
   try {
@@ -17,14 +22,21 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
     );
 
-    const url = new URL(req.url);
-    const contractId = url.pathname.split('/').pop();
+    // contractId는 body 또는 URL path에서 추출
+    let contractId: string | undefined;
+    if (req.method === 'GET') {
+      const url = new URL(req.url);
+      contractId = url.pathname.split('/').pop();
+    } else {
+      const body = await req.json();
+      contractId = body.contractId;
+    }
     const authHeader = req.headers.get('Authorization')!;
     const token = authHeader.replace('Bearer ', '');
     const { data: { user } } = await supabase.auth.getUser(token);
 
     if (!user) {
-      return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401, headers: corsHeaders });
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401, headers: corsHeaders(req.headers.get('origin') || '') });
     }
 
     const userKey = user.user_metadata?.user_key;
@@ -39,7 +51,7 @@ serve(async (req) => {
       .single();
 
     if (error || !contract) {
-      return new Response(JSON.stringify({ error: 'Contract not found' }), { status: 404, headers: corsHeaders });
+      return new Response(JSON.stringify({ error: 'Contract not found' }), { status: 404, headers: corsHeaders(req.headers.get('origin') || '') });
     }
 
     // viewed 상태로 업데이트 (sent인 경우만)
@@ -61,12 +73,12 @@ serve(async (req) => {
 
     return new Response(
       JSON.stringify({ contract: { ...contract, status: contract.status === 'sent' ? 'viewed' : contract.status } }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      { headers: { ...corsHeaders(req.headers.get('origin') || ''), 'Content-Type': 'application/json' } }
     );
   } catch (error) {
     return new Response(
       JSON.stringify({ error: error.message }),
-      { status: 500, headers: corsHeaders }
+      { status: 500, headers: corsHeaders(req.headers.get('origin') || '') }
     );
   }
 });

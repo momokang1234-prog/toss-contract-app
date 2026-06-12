@@ -51,10 +51,11 @@ export default function BusinessFormPage() {
   if (step === 'info') {
     return (
       <div className={styles.page}>
-        <Top title="사업장 등록" onBack={() => setStep('number')} />
+        <Top title="사업장 등록" />
         <div className={styles.content}>
           <Spacing size={40} />
           <Paragraph typography="st2" fontWeight="bold">사업장 정보를</Paragraph>
+          <Spacing size={4} />
           <Paragraph typography="st2" fontWeight="bold">입력해주세요</Paragraph>
           <Spacing size={32} />
           <TextField variant="box" labelOption="sustain" label="상호" placeholder="사업장 이름"
@@ -80,10 +81,10 @@ export default function BusinessFormPage() {
 
   return (
     <div className={styles.page}>
-      <Top title="사업장 등록" onBack={() => navigate(-1)} />
+      <Top title="사업장 등록" />
       <div className={styles.content}>
-        <Spacing size={48} />
         <Paragraph typography="st1" fontWeight="bold">사업자등록번호를</Paragraph>
+        <Spacing size={4} />
         <Paragraph typography="st1" fontWeight="bold">입력해주세요</Paragraph>
         <Spacing size={32} />
         <TextField variant="line" labelOption="sustain" label="사업자등록번호"

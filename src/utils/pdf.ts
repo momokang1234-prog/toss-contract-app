@@ -1,4 +1,6 @@
 import type { Contract } from '../hooks/useContracts';
+import { escapeHtml } from './sanitize';
+import { WORK_DAY_LABEL, WAGE_TYPE_LABEL, CONTRACT_TYPE_LABEL, WAGE_PAYMENT_METHOD_LABEL } from './labels';
 
 // ── A4 상수 (mm) ──────────────────────────────────────────────
 const A4_WIDTH_MM = 210;
@@ -7,23 +9,17 @@ const A4_MARGIN_MM = 20;            // 좌우 여백
 // html2canvas 2배 스케일 → 실제 px 해상도는 무시됨 (mm→px 변환은 브라우저가 처리)
 
 // ── 라벨 유틸 ─────────────────────────────────────────────────
-const DAY_LABELS: Record<string, string> = {
-  mon: '월', tue: '화', wed: '수', thu: '목', fri: '금', sat: '토', sun: '일',
-};
 
 function wageLabel(c: Contract): string {
-  const map: Record<string, string> = { hourly: '시급', daily: '일급', weekly: '주급', monthly: '월급' };
-  return map[c.wage_type] ?? c.wage_type;
+  return WAGE_TYPE_LABEL[c.wage_type] ?? c.wage_type;
 }
 
 function contractTypeLabel(c: Contract): string {
-  const map: Record<string, string> = { fullTime: '정규직', partTime: '단시간(아르바이트)', fixedTerm: '기간제' };
-  return map[c.contract_type] ?? c.contract_type;
+  return CONTRACT_TYPE_LABEL[c.contract_type] ?? c.contract_type;
 }
 
 function paymentMethodLabel(c: Contract): string {
-  const map: Record<string, string> = { bankTransfer: '통장이체', cash: '현금', mixed: '통장이체+현금' };
-  return map[c.wage_payment_method] ?? c.wage_payment_method;
+  return WAGE_PAYMENT_METHOD_LABEL[c.wage_payment_method] ?? c.wage_payment_method;
 }
 
 // ── 공통 CSS (Pretendard CDN + Print 스타일) ──────────────────
@@ -134,16 +130,16 @@ function baseCSS(): string {
 
 // ── HTML 생성 ─────────────────────────────────────────────────
 export function generatePrintableHTML(contract: Contract): string {
-  const workDaysStr = contract.work_days.map(d => DAY_LABELS[d] ?? d).join(', ');
+  const workDaysStr = contract.work_days.map(d => WORK_DAY_LABEL[d] ?? d).join(', ');
   const holidayStr = contract.weekly_holiday
-    ? DAY_LABELS[contract.weekly_holiday] ?? contract.weekly_holiday
+    ? WORK_DAY_LABEL[contract.weekly_holiday] ?? contract.weekly_holiday
     : '없음';
 
   return `<!DOCTYPE html>
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>근로계약서 - ${contract.worker_name}</title>
+  <title>근로계약서 - ${escapeHtml(contract.worker_name)}</title>
   <style>${baseCSS()}</style>
 </head>
 <body>
@@ -156,23 +152,23 @@ export function generatePrintableHTML(contract: Contract): string {
 
     <p class="section-title">1. 근로자</p>
     <table>
-      <tr><th>성명</th><td>${contract.worker_name}</td></tr>
-      <tr><th>연락처</th><td>${contract.worker_phone}</td></tr>
+      <tr><th>성명</th><td>${escapeHtml(contract.worker_name)}</td></tr>
+      <tr><th>연락처</th><td>${escapeHtml(contract.worker_phone)}</td></tr>
     </table>
 
     <p class="section-title">2. 근로조건</p>
     <table>
       <tr><th>계약 유형</th><td>${contractTypeLabel(contract)}</td></tr>
-      <tr><th>근무 장소</th><td>${contract.workplace}</td></tr>
-      <tr><th>직무 내용</th><td>${contract.job_description}</td></tr>
-      <tr><th>계약 기간</th><td>${contract.start_date}${contract.end_date ? ` ~ ${contract.end_date}` : ' ~ (무기한)'}</td></tr>
+      <tr><th>근무 장소</th><td>${escapeHtml(contract.workplace)}</td></tr>
+      <tr><th>직무 내용</th><td>${escapeHtml(contract.job_description)}</td></tr>
+      <tr><th>계약 기간</th><td>${escapeHtml(contract.start_date)}${contract.end_date ? ` ~ ${escapeHtml(contract.end_date)}` : ' ~ (무기한)'}</td></tr>
     </table>
 
     <p class="section-title">3. 임금</p>
     <table>
       <tr><th>임금 형태</th><td>${wageLabel(contract)}</td></tr>
       <tr><th>기본 임금</th><td>${contract.base_wage.toLocaleString()}원</td></tr>
-      <tr><th>임금 지급일</th><td>${contract.wage_payment_date}</td></tr>
+      <tr><th>임금 지급일</th><td>${escapeHtml(contract.wage_payment_date)}</td></tr>
       <tr><th>지급 방법</th><td>${paymentMethodLabel(contract)}</td></tr>
     </table>
   </div>
@@ -184,15 +180,18 @@ export function generatePrintableHTML(contract: Contract): string {
     <p class="section-title">4. 근무 시간</p>
     <table>
       <tr><th>근무일</th><td>${workDaysStr}</td></tr>
-      <tr><th>근무 시간</th><td>${contract.start_time} ~ ${contract.end_time}</td></tr>
-      <tr><th>휴게시간</th><td>${contract.break_minutes}분</td></tr>
+      <tr><th>근무 시간</th><td>${escapeHtml(contract.start_time)} ~ ${escapeHtml(contract.end_time)}</td></tr>
+      <tr><th>휴게시간</th><td>${escapeHtml(contract.break_start_time)} ~ ${escapeHtml(contract.break_end_time)}</td></tr>
       <tr><th>주휴일</th><td>${holidayStr}</td></tr>
     </table>
 
     <p class="section-title">5. 기타 근로조건</p>
     <table>
       <tr><th>연차유급휴가</th><td>${contract.paid_leave_clause ? '근로기준법 제60조에 따름' : '미포함'}</td></tr>
-      <tr><th>사회보험</th><td>${contract.social_insurance_clause ? '국민연금, 건강보험, 고용보험, 산재보험 적용' : '미적용'}</td></tr>
+      <tr><th>국민연금</th><td>${contract.pension ? '가입' : '미가입'}</td></tr>
+      <tr><th>건강보험</th><td>${contract.health_insurance ? '가입' : '미가입'}</td></tr>
+      <tr><th>고용보험</th><td>${contract.employment_insurance ? '가입' : '미가입'}</td></tr>
+      <tr><th>산재보험</th><td>${contract.accident_insurance ? '가입' : '미가입'}</td></tr>
       <tr><th>퇴직금</th><td>${contract.severance_clause ? '근로자퇴직급여 보장법에 따름' : '해당 없음'}</td></tr>
     </table>
 
@@ -203,7 +202,7 @@ export function generatePrintableHTML(contract: Contract): string {
     <div class="signatures">
       <div class="sign-box">
         <p style="font-weight: 600;">근로자</p>
-        <p style="font-size: 10pt;">${contract.worker_name}</p>
+        <p style="font-size: 10pt;">${escapeHtml(contract.worker_name)}</p>
         <div class="sign-line">
           ${contract.worker_signature_data
             ? `<img src="${contract.worker_signature_data}" class="sign-img" alt="근로자 서명" />`

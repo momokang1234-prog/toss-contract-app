@@ -1,6 +1,5 @@
 import { Button, Paragraph, Spacing, Top, Badge } from "@toss/tds-mobile";
 
-const RESULT_TOP_SPACING = 60;
 
 export function ContractResult() {
   const steps = [
@@ -12,7 +11,7 @@ export function ContractResult() {
 
   return (
     <div>
-      <Top spacing={RESULT_TOP_SPACING} />
+      <Top title="제출 완료" />
       <div style={{ textAlign: 'center', paddingTop: 20 }}>
         <img src="https://static.toss.im/illusts/wiki-highlight-L.png" alt=""
           style={{ width: 100, height: 100 }}

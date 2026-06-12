@@ -1,27 +1,22 @@
-import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useContracts } from '../../hooks/useContracts';
 import { Top, Paragraph, Spacing, Badge, List, ListRow } from '@toss/tds-mobile';
 import styles from './ContractHistoryPage.module.css';
 
-const ACTION_LABELS: Record<string,string> = {
-  create:'작성', send:'전송', view:'열람', sign:'서명', complete:'확정', cancel:'취소', expire:'만료'
-};
-const ROLE_LABELS: Record<string,string> = { employer:'사장님', worker:'근로자' };
+const HISTORY_STATUSES: Record<string, true> = { completed: true, cancelled: true, expired: true };
 
-interface HistoryEntry {
-  id:string; contract_id:string; action:string; actor_role:string; created_at:string;
+function badgeFor(status: string): { label: string; color: 'teal' | 'red' | 'elephant' } {
+  if (status === 'completed') return { label: '계약완료', color: 'teal' };
+  if (status === 'cancelled') return { label: '취소', color: 'red' };
+  if (status === 'expired')  return { label: '만료', color: 'elephant' };
+  return { label: status, color: 'elephant' };
 }
 
 export default function ContractHistoryPage() {
-  const { id = '' } = useParams();
-  const { getHistory } = useContracts();
-  const [entries, setEntries] = useState<HistoryEntry[]>([]);
-  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+  const { contracts, loading } = useContracts();
 
-  useEffect(() => {
-    getHistory(id).then(setEntries).finally(() => setLoading(false));
-  }, [id]);
+  const historyContracts = contracts.filter(c => HISTORY_STATUSES[c.status]);
 
   return (
     <div className={styles.page}>
@@ -31,27 +26,46 @@ export default function ContractHistoryPage() {
         <Paragraph typography="st2" fontWeight="bold">계약 이력</Paragraph>
         <Spacing size={8} />
         <Paragraph typography="st5" color="grey-500">
-          {loading ? '불러오는 중...' : entries.length > 0 ? `총 ${entries.length}건의 변경 기록` : '아직 기록이 없어요'}
+          {loading
+            ? '불러오는 중...'
+            : historyContracts.length > 0
+              ? `완료·취소·만료된 계약 ${historyContracts.length}건`
+              : '완료·취소·만료된 계약이 없어요'}
         </Paragraph>
         <Spacing size={24} />
 
-        {entries.length > 0 && (
+        {historyContracts.length > 0 && (
           <List>
-            {entries.map(e => (
-              <ListRow key={e.id}
-                left={
-                  <div className={styles.entryRow}>
-                    <Paragraph typography="st5" fontWeight="bold">{ACTION_LABELS[e.action] || e.action}</Paragraph>
-                    <Paragraph typography="st7" color="grey-500">
-                      {ROLE_LABELS[e.actor_role] || e.actor_role} · {new Date(e.created_at).toLocaleString('ko-KR')}
-                    </Paragraph>
-                  </div>
-                }
-                right={<Badge size="small" variant="weak" color="elephant">{e.action}</Badge>}
-              />
-            ))}
+            {historyContracts.map(c => {
+              const b = badgeFor(c.status);
+              const dateLabel = c.end_date
+                ? `${c.start_date} ~ ${c.end_date}`
+                : c.start_date;
+
+              return (
+                <ListRow
+                  key={c.id}
+                  onClick={() => navigate(`/employer/contracts/${c.id}`)}
+                  aria-label={`${c.worker_name} 계약 상세`}
+                  contents={
+                    <div className={styles.contractRow}>
+                      <Paragraph typography="st5" fontWeight="bold">{c.worker_name}</Paragraph>
+                      <Paragraph typography="st7" color="grey-500">
+                        {c.workplace} · {dateLabel}
+                      </Paragraph>
+                    </div>
+                  }
+                  right={
+                    <Badge size="small" variant="fill" color={b.color}>
+                      {b.label}
+                    </Badge>
+                  }
+                />
+              );
+            })}
           </List>
         )}
+
         <Spacing size={40} />
       </div>
     </div>

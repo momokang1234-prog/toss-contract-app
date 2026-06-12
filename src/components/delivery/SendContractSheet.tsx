@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { Paragraph, Spacing, Button } from '@toss/tds-mobile';
+import { Paragraph, Button } from '@toss/tds-mobile';
 import { overlay } from 'overlay-kit';
 
 export interface SendContractSheetProps {
   contractTitle: string;
+  contractId: string;
   deepLink: string;
 }
 
@@ -12,21 +13,21 @@ interface ViewProps extends SendContractSheetProps {
   onConfirm: () => void;
   onCancel: () => void;
 }
-
-function SendContractSheetView({ contractTitle, deepLink, onConfirm, onCancel }: ViewProps) {
+function SendContractSheetView({ contractTitle, contractId, deepLink, onConfirm, onCancel }: ViewProps) {
   const [sending, setSending] = useState(false);
   const [copied, setCopied] = useState(false);
 
   const handleCopyLink = async () => {
     try {
-      await navigator.clipboard.writeText(deepLink);
+      const url = `https://bossimclockedin.private-apps.tossmini.com/contract/${contractId}`;
+      await navigator.clipboard.writeText(url);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
+      alert('링크가 복사되었습니다');
     } catch {
       // fallback
     }
   };
-
   const handleShare = async () => {
     if (navigator.share) {
       try {
@@ -50,7 +51,7 @@ function SendContractSheetView({ contractTitle, deepLink, onConfirm, onCancel }:
   };
 
   return (
-    <div style={{ padding: '24px 24px 32px' }}>
+    <div style={{ padding: '24px 24px 32px', backgroundColor: '#FFFFFF', borderTopLeftRadius: 16, borderTopRightRadius: 16 }}>
       <Paragraph typography="st3" fontWeight="bold" style={{ marginBottom: 8 }}>
         계약서 전송
       </Paragraph>
@@ -86,10 +87,6 @@ function SendContractSheetView({ contractTitle, deepLink, onConfirm, onCancel }:
         취소
       </Button>
 
-      <Spacing size={8} />
-      <Paragraph typography="st8" color="grey-400" style={{ textAlign: 'center' }}>
-        토스 스마트 메시지로 Push·SMS·인박스 발송
-      </Paragraph>
     </div>
   );
 }

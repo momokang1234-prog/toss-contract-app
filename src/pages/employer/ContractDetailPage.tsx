@@ -1,9 +1,13 @@
 import { useEffect, useState } from 'react';
+import { supabase, IS_MOCK } from '../../api/supabase';
+import { downloadContractPDF } from '../../utils/pdf';
+import { maskPhoneNumber } from '../../utils/format';
 import { josa } from 'es-hangul';
 import { useParams, useNavigate, Navigate } from 'react-router-dom';
 import { useContracts, type Contract } from '../../hooks/useContracts';
 import { Top, Paragraph, Spacing, Button, Badge } from '@toss/tds-mobile';
 import { openSendContractSheet } from '../../components/delivery/SendContractSheet';
+import { CONTRACT_TYPE_LABEL, WAGE_TYPE_LABEL, WORK_DAY_LABEL, WAGE_PAYMENT_METHOD_LABEL } from '../../utils/labels';
 import styles from './ContractDetailPage.module.css';
 
 export default function ContractDetailPage() {
@@ -22,12 +26,29 @@ export default function ContractDetailPage() {
     }).catch(() => setError('불러오기에 실패했습니다'));
   }, [id]);
 
+  // Realtime: 페이지 열려 있는 동안 계약 상태 변경 자동 반영
+  useEffect(() => {
+    if (!id || IS_MOCK) return;
+    const channel = supabase
+      .channel(`contract-${id}`)
+      .on('postgres_changes',
+        { event: 'UPDATE', schema: 'public', table: 'contracts', filter: `id=eq.${id}` },
+        (payload) => { setContract(payload.new as Contract); }
+      )
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [id]);
+
   const badgeFor = (s: string) => {
-    if (s === 'draft') return { label: '작성중', color: 'elephant' as const };
-    if (s === 'sent' || s === 'viewed') return { label: '진행중', color: 'blue' as const };
-    if (s === 'signed') return { label: '서명완료', color: 'yellow' as const };
-    if (s === 'completed') return { label: '계약완료', color: 'teal' as const };
-    return { label: s, color: 'elephant' as const };
+    switch (s) {
+      case 'draft': return { label: '작성중', color: 'teal' as const };
+      case 'sent': return { label: '전송됨', color: 'blue' as const };
+      case 'viewed': return { label: '확인됨', color: 'yellow' as const };
+      case 'signed': return { label: '서명완료', color: 'green' as const };
+      case 'completed': return { label: '계약완료', color: 'elephant' as const };
+      case 'cancelled': case 'expired': case 'rejected': return { label: s === 'rejected' ? '거절됨' : '취소/만료', color: 'red' as const };
+      default: return { label: s, color: 'elephant' as const };
+    }
   };
 
   if (!id) return <Navigate to="/employer/dashboard" replace />;
@@ -63,10 +84,9 @@ export default function ContractDetailPage() {
   const canSend = contract.status === 'draft';
   const canComplete = contract.status === 'signed';
 
-  const wageLabel = { hourly: '시급', daily: '일급', weekly: '주급', monthly: '월급' }[contract.wage_type] || contract.wage_type;
-  const payLabel = { bankTransfer: '계좌이체', cash: '현금', mixed: '혼합' }[contract.wage_payment_method] || contract.wage_payment_method;
-  const days = { mon: '월', tue: '화', wed: '수', thu: '목', fri: '금', sat: '토', sun: '일' };
-  const dayStr = contract.work_days.map(d => days[d as keyof typeof days] || d).join(', ');
+  const wageLabel = WAGE_TYPE_LABEL[contract.wage_type] || contract.wage_type;
+  const payLabel = WAGE_PAYMENT_METHOD_LABEL[contract.wage_payment_method] || contract.wage_payment_method;
+  const dayStr = contract.work_days.map(d => WORK_DAY_LABEL[d] || d).join(', ');
 
   return (
     <div className={styles.page}>
@@ -84,10 +104,10 @@ export default function ContractDetailPage() {
 
           <Section title="근로자" />
           <Row label="이름" value={contract.worker_name} />
-          <Row label="연락처" value={contract.worker_phone} />
+          <Row label="연락처" value={maskPhoneNumber(contract.worker_phone)} />
 
           <Section title="근로조건" />
-          <Row label="계약 유형" value={contract.contract_type === 'fullTime' ? '정규직' : contract.contract_type === 'partTime' ? '단시간' : '기간제'} />
+          <Row label="계약 유형" value={CONTRACT_TYPE_LABEL[contract.contract_type] || contract.contract_type} />
           <Row label="근무 장소" value={contract.workplace} />
           <Row label="직무" value={contract.job_description} />
           <Row label="시작일" value={contract.start_date} />
@@ -102,14 +122,17 @@ export default function ContractDetailPage() {
           <Section title="근무시간" />
           <Row label="근무 요일" value={dayStr} />
           <Row label="근무 시간" value={`${contract.start_time} ~ ${contract.end_time}`} />
-          <Row label="휴게시간" value={`${contract.break_minutes}분`} />
+          <Row label="휴게시간" value={`${contract.break_start_time} ~ ${contract.break_end_time}`} />
           {contract.weekly_holiday && (
-            <Row label="주휴일" value={days[contract.weekly_holiday as keyof typeof days] || contract.weekly_holiday} />
+            <Row label="주휴일" value={WORK_DAY_LABEL[contract.weekly_holiday] || contract.weekly_holiday} />
           )}
 
           <Section title="기타 근로조건" />
           <Row label="연차유급휴가" value={contract.paid_leave_clause ? '근로기준법에 따름' : '미포함'} />
-          <Row label="사회보험" value={contract.social_insurance_clause ? '4대보험 적용' : '미적용'} />
+          <Row label="국민연금" value={contract.pension ? '가입' : '미가입'} />
+          <Row label="건강보험" value={contract.health_insurance ? '가입' : '미가입'} />
+          <Row label="고용보험" value={contract.employment_insurance ? '가입' : '미가입'} />
+          <Row label="산재보험" value={contract.accident_insurance ? '가입' : '미가입'} />
           <Row label="퇴직금" value={contract.severance_clause ? '퇴직급여 보장법에 따름' : '해당 없음'} />
 
           {/* Signature */}
@@ -142,6 +165,7 @@ export default function ContractDetailPage() {
               onClick={async () => {
                 const sent = await openSendContractSheet({
                   contractTitle: contract.worker_name,
+                  contractId: id,
                   deepLink: `${window.location.origin}/contract/${id}`,
                 });
                 if (sent) {
@@ -158,7 +182,7 @@ export default function ContractDetailPage() {
               }}>계약 취소하기</Button>
           </>
         )}
-        {(contract.status === 'sent' || contract.status === 'viewed') && (
+        {(contract.status === 'sent' || contract.status === 'viewed' || contract.status === 'signed') && (
           <Button color="light" variant="weak" display="block" size="large"
             onClick={async () => {
               if (!confirm(`${josa('계약', '을/를')} 취소하시겠습니까?\n\n되돌릴 수 없습니다.`)) return;
@@ -188,7 +212,7 @@ export default function ContractDetailPage() {
               <Paragraph typography="st7" color="grey-600">완료된 계약은 수정할 수 없습니다</Paragraph>
             </div>
             <Button color="primary" variant="fill" display="block" size="large"
-              onClick={() => { alert('PDF 다운로드 기능은 추후 제공됩니다 (utils/pdf.ts 연결 필요)'); }}>
+              onClick={() => downloadContractPDF(contract)}>
               📥 PDF 다운로드
             </Button>
           </>
@@ -201,6 +225,24 @@ export default function ContractDetailPage() {
             <Paragraph typography="st5" fontWeight="bold" color="grey-800">🚫 취소된 계약입니다</Paragraph>
             <Spacing size={4} />
             <Paragraph typography="st7" color="grey-600">이 계약은 더 이상 진행할 수 없습니다</Paragraph>
+          </div>
+        )}
+        {contract.status === 'rejected' && (
+          <div style={{
+            backgroundColor: '#E8F3FF', borderRadius: 8, padding: 16,
+            textAlign: 'center', border: '1px solid #C9E2FF',
+          }}>
+            <Paragraph typography="st5" fontWeight="bold" color="blue-500">💬 근로자가 계약 수정을 요청했습니다</Paragraph>
+            {contract.rejection_reason && (
+              <>
+                <Spacing size={8} />
+                <Paragraph typography="st7" color="blue-500">요청 사유: {contract.rejection_reason}</Paragraph>
+              </>
+            )}
+            <Spacing size={16} />
+            <Button color="primary" variant="fill" size="medium" onClick={() => navigate(`/employer/contracts/${id}/edit`)}>
+              계약서 수정하기
+            </Button>
           </div>
         )}
         {contract.status === 'expired' && (

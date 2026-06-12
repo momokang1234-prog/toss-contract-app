@@ -19,7 +19,7 @@ export async function shareContract(contractId: string) {
     const { getTossShareLink, share } = await import('@apps-in-toss/web-framework');
     const deepLink = await getTossShareLink(
       `intoss://bossimclockedin/contract/${contractId}`,
-      'https://your-app.com/og/contract.png'
+      import.meta.env.VITE_OG_IMAGE_URL || '/og-contract.png'
     );
     await share({ message: `근로계약서가 도착했습니다. 확인하기: ${deepLink}` });
 

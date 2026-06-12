@@ -4,10 +4,11 @@ const STATUS_CONFIG: Record<string, { label: string; color: 'blue' | 'teal' | 'g
   draft: { label: '작성 중', color: 'elephant' },
   sent: { label: '전송 완료', color: 'blue' },
   viewed: { label: '확인 완료', color: 'teal' },
-  signed: { label: '서명 완료', color: 'green' },
+  signed: { label: '계약 완료', color: 'green' },
   completed: { label: '계약 완료', color: 'green' },
   cancelled: { label: '취소됨', color: 'red' },
   expired: { label: '만료됨', color: 'elephant' },
+  rejected: { label: '수정 요청됨', color: 'blue' },
 };
 
 export function ContractStatusBadge({ status }: { status: string }) {

@@ -18,7 +18,7 @@ export function BusinessVerify({ result }: BusinessVerifyProps) {
       <Spacing size={16} />
       <List>
         <ListRow
-          left={
+          contents={
             <div>
               <Paragraph typography="st6" color="grey-500">사업자등록번호</Paragraph>
               <Paragraph typography="st6" fontWeight="bold">{result.businessNumber}</Paragraph>
@@ -26,7 +26,7 @@ export function BusinessVerify({ result }: BusinessVerifyProps) {
           }
         />
         <ListRow
-          left={
+          contents={
             <div>
               <Paragraph typography="st6" color="grey-500">상호(법인명)</Paragraph>
               <Paragraph typography="st6" fontWeight="bold">{result.businessName}</Paragraph>
@@ -34,7 +34,7 @@ export function BusinessVerify({ result }: BusinessVerifyProps) {
           }
         />
         <ListRow
-          left={
+          contents={
             <div>
               <Paragraph typography="st6" color="grey-500">대표자</Paragraph>
               <Paragraph typography="st6" fontWeight="bold">{result.representative}</Paragraph>
@@ -42,7 +42,7 @@ export function BusinessVerify({ result }: BusinessVerifyProps) {
           }
         />
         <ListRow
-          left={
+          contents={
             <div>
               <Paragraph typography="st6" color="grey-500">사업장 소재지</Paragraph>
               <Paragraph typography="st6" fontWeight="bold">{result.address}</Paragraph>

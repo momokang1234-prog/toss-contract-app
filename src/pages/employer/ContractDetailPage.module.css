@@ -2,6 +2,6 @@
 .content { padding:0 20px; }
 .center { text-align:center; padding:0 20px; }
 .card { background:#fff; }
-.row { padding:8px 0; border-bottom:1px solid #f2f4f6; display:flex; justify-content:space-between; align-items:center; }
-.divider { height:1px; background:#e5e8eb; }
+.row { padding: 12px 0; border-bottom: 1px solid #e5e5ec; display: flex; justify-content: space-between; align-items: center; }
+.divider { height: 1px; background: #e5e5ec; margin: 8px 0; }
 .sig { max-width:200px; }

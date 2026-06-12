@@ -8,7 +8,7 @@ import styles from './ContractListPage.module.css';
 function ContractListContent({ contracts, navigate, badgeFor }: {
   contracts: any[];
   navigate: (path: string) => void;
-  badgeFor: (status: string) => { label: string; color: string };
+  badgeFor: (status: string) => { label: string; color: 'blue' | 'teal' | 'green' | 'red' | 'yellow' | 'elephant' };
 }) {
   return (
     <div className={styles.content}>
@@ -31,14 +31,18 @@ function ContractListContent({ contracts, navigate, badgeFor }: {
               key={c.id}
               onClick={() => navigate(`/employer/contracts/${c.id}`)}
               aria-label={c.worker_name}
-              left={
+              contents={
                 <div className={styles.contractRow}>
-                  <Paragraph typography="st5" fontWeight="bold">{c.worker_name}</Paragraph>
-                  <Paragraph typography="st7" color="grey-500">{c.workplace} · {c.start_date}</Paragraph>
+                  <Paragraph typography="st5" fontWeight="bold">
+                    {c.worker_name} ({CONTRACT_TYPE_LABEL[c.contract_type as keyof typeof CONTRACT_TYPE_LABEL]})
+                  </Paragraph>
+                  <Paragraph typography="st7" color="grey-500">
+                    {c.workplace} · {c.start_date}
+                  </Paragraph>
                 </div>
               }
               right={
-                <Badge size="small" variant="weak" color={badgeFor(c.status).color}>
+                <Badge size="small" variant="fill" color={badgeFor(c.status).color}>
                   {badgeFor(c.status).label}
                 </Badge>
               }
@@ -71,10 +75,13 @@ export default function ContractListPage() {
   const { contracts } = useContracts();
 
   const badgeFor = (status: string) => {
-    if (status === 'draft') return { label: '작성중', color: 'elephant' as const };
-    if (status === 'sent' || status === 'viewed') return { label: '진행중', color: 'blue' as const };
-    if (status === 'signed') return { label: '서명완료', color: 'yellow' as const };
-    if (status === 'completed') return { label: '계약완료', color: 'teal' as const };
+    if (status === 'draft') return { label: '작성중', color: 'teal' as const };
+    if (status === 'sent') return { label: '진행중', color: 'blue' as const };
+    if (status === 'viewed') return { label: '진행중', color: 'yellow' as const };
+    if (status === 'signed') return { label: '서명완료', color: 'green' as const };
+    if (status === 'completed') return { label: '계약완료', color: 'elephant' as const };
+    if (status === 'cancelled' || status === 'expired') return { label: '취소', color: 'red' as const };
+    if (status === 'rejected') return { label: '수정 요청됨', color: 'blue' as const };
     return { label: status, color: 'elephant' as const };
   };
 

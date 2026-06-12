@@ -1,6 +1,6 @@
 import { appLogin } from '@apps-in-toss/web-framework';
 
-const API_BASE = 'https://bossimclockedin-api.fly.dev';
+const API_BASE = import.meta.env.VITE_API_BASE || 'https://bossimclockedin-api.fly.dev';
 
 export interface TossUserInfo {
   userKey: number;

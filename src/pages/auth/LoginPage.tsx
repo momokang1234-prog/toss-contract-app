@@ -36,16 +36,17 @@ export default function LoginPage() {
     <div className={styles.page}>
       {/* Hero area */}
       <div className={styles.hero}>
-        <Paragraph typography="st1">📄</Paragraph>
+        <Paragraph typography="st3">📄</Paragraph>
         <Spacing size={24} />
         <Paragraph typography="st2" fontWeight="bold">
           근로계약서,
         </Paragraph>
+        <Spacing size={4} />
         <Paragraph typography="st2" fontWeight="bold">
           5분이면 충분해요
         </Paragraph>
         <Spacing size={8} />
-        <Paragraph typography="st5" color="grey-500">
+        <Paragraph typography="st4" color="grey-600">
           종이 계약서 대신 토스에서 간편하게
         </Paragraph>
         <Spacing size={32} />
@@ -53,16 +54,16 @@ export default function LoginPage() {
           {benefits.map((b, i) => (
             <ListRow
               key={i}
-              left={
-                <Paragraph typography="st4">{`${b.icon}  ${b.text}`}</Paragraph>
+              contents={
+                <Paragraph typography="st5">{`${b.icon}  ${b.text}`}</Paragraph>
               }
             />
           ))}
         </List>
       </div>
       <div className={styles.bottomCta}>
-        <Paragraph typography="st7" color="grey-500" textAlign="center">
-          로그인하면 근로기준법 기반 계약서를 바로 작성할 수 있어요
+        <Paragraph typography="st5" color="grey-600" textAlign="center">
+          로그인하면 근로기준법 기반 계약서를<br />바로 작성할 수 있어요
         </Paragraph>
         <Spacing size={12} />
         {IS_MOCK ? (

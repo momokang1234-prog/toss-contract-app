@@ -10,6 +10,8 @@ export interface Contract {
   worker_phone: string;
   worker_user_key?: string;
   worker_address?: string;
+  worker_account?: string;
+  worker_ci?: string;
   contract_type: string;
   status: string;
   start_date: string;
@@ -23,15 +25,21 @@ export interface Contract {
   work_days: string[];
   start_time: string;
   end_time: string;
-  break_minutes: number;
+  break_start_time: string;
+  break_end_time: string;
   weekly_holiday?: string;
   paid_leave_clause: boolean;
+  pension: boolean;
+  health_insurance: boolean;
+  employment_insurance: boolean;
+  accident_insurance: boolean;
   social_insurance_clause: boolean;
   severance_clause: boolean;
   employer_signed_at?: string;
   worker_signed_at?: string;
   worker_signature_data?: string;
   contract_html?: string;
+  rejection_reason?: string;
   created_at: string;
   updated_at: string;
 }
@@ -44,7 +52,7 @@ const MOCK_CONTRACTS: Contract[] = [
     employer_user_key: 'mock-employer-key',
     worker_name: '박민수',
     worker_phone: '01011112222',
-    contract_type: '정규직',
+    contract_type: 'fullTime',
     status: 'draft',
     start_date: '2026-06-01',
     workplace: '강남구 논현동 123-4',
@@ -52,13 +60,18 @@ const MOCK_CONTRACTS: Contract[] = [
     wage_type: 'monthly',
     base_wage: 2500000,
     wage_payment_date: '10',
-    wage_payment_method: '계좌이체',
-    work_days: ['월', '화', '수', '목', '금'],
+    wage_payment_method: 'bankTransfer',
+    work_days: ['mon', 'tue', 'wed', 'thu', 'fri'],
     start_time: '09:00',
     end_time: '18:00',
-    break_minutes: 60,
-    weekly_holiday: '일요일',
+    break_start_time: '12:00',
+    break_end_time: '13:00',
+    weekly_holiday: 'sun',
     paid_leave_clause: true,
+    pension: true,
+    health_insurance: true,
+    employment_insurance: true,
+    accident_insurance: true,
     social_insurance_clause: true,
     severance_clause: true,
     created_at: '2026-06-01T09:00:00Z',
@@ -66,12 +79,12 @@ const MOCK_CONTRACTS: Contract[] = [
   },
   {
     id: 'mock-2',
-    business_id: 'biz-001',
+    business_id: 'biz-002',
     employer_user_key: 'mock-employer-key',
     worker_user_key: 'mock-worker-key',
     worker_name: '김알바',
     worker_phone: '01098765432',
-    contract_type: '아르바이트',
+    contract_type: 'partTime',
     status: 'sent',
     start_date: '2026-05-20',
     workplace: '서초구 서초대로 77길 55',
@@ -79,13 +92,18 @@ const MOCK_CONTRACTS: Contract[] = [
     wage_type: 'hourly',
     base_wage: 12000,
     wage_payment_date: '25',
-    wage_payment_method: '계좌이체',
-    work_days: ['화', '수', '목', '금', '토'],
+    wage_payment_method: 'bankTransfer',
+    work_days: ['tue', 'wed', 'thu', 'fri', 'sat'],
     start_time: '17:00',
     end_time: '22:00',
-    break_minutes: 30,
-    weekly_holiday: '월요일',
+    break_start_time: '19:00',
+    break_end_time: '19:30',
+    weekly_holiday: 'mon',
     paid_leave_clause: false,
+    pension: false,
+    health_insurance: false,
+    employment_insurance: false,
+    accident_insurance: false,
     social_insurance_clause: false,
     severance_clause: false,
     created_at: '2026-05-15T14:30:00Z',
@@ -93,12 +111,12 @@ const MOCK_CONTRACTS: Contract[] = [
   },
   {
     id: 'mock-3',
-    business_id: 'biz-001',
+    business_id: 'biz-003',
     employer_user_key: 'mock-employer-key',
     worker_user_key: 'worker-user-3',
     worker_name: '이지은',
     worker_phone: '01033334444',
-    contract_type: '계약직',
+    contract_type: 'fixedTerm',
     status: 'viewed',
     start_date: '2026-04-10',
     workplace: '마포구 와우산로 94',
@@ -106,26 +124,31 @@ const MOCK_CONTRACTS: Contract[] = [
     wage_type: 'monthly',
     base_wage: 2200000,
     wage_payment_date: '5',
-    wage_payment_method: '계좌이체',
-    work_days: ['월', '화', '수', '목'],
+    wage_payment_method: 'bankTransfer',
+    work_days: ['mon', 'tue', 'wed', 'thu'],
     start_time: '10:00',
     end_time: '19:00',
-    break_minutes: 60,
-    weekly_holiday: '금요일',
+    break_start_time: '13:00',
+    break_end_time: '14:00',
+    weekly_holiday: 'fri',
     paid_leave_clause: true,
+    pension: true,
+    health_insurance: true,
+    employment_insurance: true,
+    accident_insurance: true,
     social_insurance_clause: true,
     severance_clause: false,
-    created_at: '2026-04-05T11:00:00Z',
-    updated_at: '2026-04-08T16:45:00Z',
+    created_at: '2026-04-10T09:00:00Z',
+    updated_at: '2026-04-11T15:30:00Z',
   },
   {
     id: 'mock-4',
-    business_id: 'biz-001',
+    business_id: 'biz-004',
     employer_user_key: 'mock-employer-key',
     worker_user_key: 'worker-user-4',
     worker_name: '최재훈',
     worker_phone: '01055556666',
-    contract_type: '정규직',
+    contract_type: 'fullTime',
     status: 'signed',
     start_date: '2026-03-02',
     workplace: '송파구 올림픽로 300 롯데월드타워 76층',
@@ -133,47 +156,109 @@ const MOCK_CONTRACTS: Contract[] = [
     wage_type: 'monthly',
     base_wage: 4500000,
     wage_payment_date: '25',
-    wage_payment_method: '계좌이체',
-    work_days: ['월', '화', '수', '목', '금'],
+    wage_payment_method: 'bankTransfer',
+    work_days: ['mon', 'tue', 'wed', 'thu', 'fri'],
     start_time: '10:00',
     end_time: '19:00',
-    break_minutes: 60,
-    weekly_holiday: '토요일,일요일',
+    break_start_time: '14:00',
+    break_end_time: '15:00',
+    weekly_holiday: 'sat,sun',
     paid_leave_clause: true,
+    pension: true,
+    health_insurance: true,
+    employment_insurance: true,
+    accident_insurance: true,
     social_insurance_clause: true,
     severance_clause: true,
-    created_at: '2026-03-01T08:00:00Z',
-    updated_at: '2026-03-02T10:15:00Z',
+    created_at: '2026-03-02T09:00:00Z',
+    updated_at: '2026-03-03T11:00:00Z',
   },
   {
     id: 'mock-5',
-    business_id: 'biz-001',
+    business_id: 'biz-005',
     employer_user_key: 'mock-employer-key',
     worker_user_key: 'worker-user-5',
     worker_name: '한소희',
     worker_phone: '01077778888',
-    contract_type: '프리랜서',
+    contract_type: 'fixedTerm',
     status: 'completed',
     start_date: '2025-12-01',
     workplace: '용산구 이태원로 27길 18',
     job_description: '영상 촬영 및 편집, 유튜브 채널 콘텐츠 기획·운영',
-    wage_type: 'project',
+    wage_type: 'monthly',
     base_wage: 5000000,
     wage_payment_date: '15',
-    wage_payment_method: '계좌이체',
-    work_days: ['월', '수', '금'],
+    wage_payment_method: 'bankTransfer',
+    work_days: ['mon', 'wed', 'fri'],
     start_time: '13:00',
     end_time: '21:00',
-    break_minutes: 60,
-    weekly_holiday: '주말',
+    break_start_time: '17:00',
+    break_end_time: '18:00',
+    weekly_holiday: 'sat,sun',
     paid_leave_clause: false,
+    pension: false,
+    health_insurance: false,
+    employment_insurance: false,
+    accident_insurance: false,
     social_insurance_clause: false,
     severance_clause: false,
-    created_at: '2025-11-25T12:00:00Z',
-    updated_at: '2025-12-20T18:30:00Z',
+    created_at: '2025-12-01T09:00:00Z',
+    updated_at: '2026-01-15T10:00:00Z',
   },
 ];
 
+// 근로계약서 HTML 생성 헬퍼 (Mock 모드용)
+function generateContractHtml(contract: Contract): string {
+  const workDaysLabels: Record<string, string> = {
+    mon: '월', tue: '화', wed: '수', thu: '목', fri: '금', sat: '토', sun: '일',
+  };
+  const workDaysStr = contract.work_days.map(d => workDaysLabels[d] ?? d).join(', ');
+  const wageLabel = contract.wage_type === 'monthly' ? `월 ${contract.base_wage.toLocaleString()}원`
+    : contract.wage_type === 'hourly' ? `시급 ${contract.base_wage.toLocaleString()}원`
+    : `${contract.base_wage.toLocaleString()}원`;
+
+  return `<!DOCTYPE html>
+<html lang="ko">
+<head><meta charset="UTF-8"><title>근로계약서</title>
+<style>body{font-family:'Noto Sans KR',sans-serif;max-width:720px;margin:0 auto;padding:40px 20px;color:#111;line-height:1.8}
+h1{text-align:center;font-size:24px;margin-bottom:32px;border-bottom:2px solid #333;padding-bottom:16px}
+table{width:100%;border-collapse:collapse;margin-bottom:24px}
+th,td{border:1px solid #ddd;padding:10px 14px;text-align:left;font-size:14px}
+th{background:#f7f7f7;width:140px;font-weight:600}
+.section-title{font-size:16px;font-weight:700;margin:28px 0 12px;border-left:4px solid #333;padding-left:10px}
+.signature-area{display:flex;justify-content:space-between;margin-top:48px;padding-top:24px;border-top:1px solid #999}
+.signature-box{text-align:center;width:45%}
+.signature-box .name{font-size:18px;font-weight:600;margin-bottom:8px}
+.signature-box .date{font-size:13px;color:#666}
+</style></head>
+<body>
+<h1>근 로 계 약 서</h1>
+<div class="section-title">근로자 정보</div>
+<table><tr><th>성명</th><td>${contract.worker_name}</td></tr>
+<tr><th>연락처</th><td>${contract.worker_phone}</td></tr>
+<tr><th>주소</th><td>${contract.worker_address ?? '-'}</td></tr></table>
+<div class="section-title">근로 조건</div>
+<table>
+<tr><th>근무 장소</th><td>${contract.workplace}</td></tr>
+<tr><th>업무 내용</th><td>${contract.job_description}</td></tr>
+<tr><th>계약 기간</th><td>${contract.start_date}${contract.end_date ? ' ~ ' + contract.end_date : ' (기간의 정함 없음)'}</td></tr>
+<tr><th>근무일</th><td>${workDaysStr}${contract.weekly_holiday ? ' (주휴일: ' + contract.weekly_holiday + ')' : ''}</td></tr>
+<tr><th>근무 시간</th><td>${contract.start_time} ~ ${contract.end_time} (휴게 ${contract.break_start_time} ~ ${contract.break_end_time})</td></tr>
+<tr><th>임금</th><td>${wageLabel}</td></tr>
+<tr><th>임금 지급일</th><td>매월 ${contract.wage_payment_date}일</td></tr>
+<tr><th>연차 유급 휴가</th><td>${contract.paid_leave_clause ? '적용' : '미적용'}</td></tr>
+<tr><th>국민연금</th><td>${contract.pension ? '적용' : '미적용'}</td></tr>
+<tr><th>건강보험</th><td>${contract.health_insurance ? '적용' : '미적용'}</td></tr>
+<tr><th>고용보험</th><td>${contract.employment_insurance ? '적용' : '미적용'}</td></tr>
+<tr><th>산재보험</th><td>${contract.accident_insurance ? '적용' : '미적용'}</td></tr>
+<tr><th>퇴직금</th><td>${contract.severance_clause ? '적용' : '미적용'}</td></tr>
+</table>
+<div class="signature-area">
+<div class="signature-box"><div class="name">사용자(갑)</div><div class="date">${new Date().toISOString().split('T')[0]}</div></div>
+<div class="signature-box"><div class="name">근로자(을)</div><div class="date">서명일</div></div>
+</div>
+</body></html>`;
+}
 
 let mockContractStore = [...MOCK_CONTRACTS];
 
@@ -212,7 +297,33 @@ export function useContracts() {
 
   useEffect(() => { fetchContracts(); }, [fetchContracts]);
 
-  const getContract = async (id: string) => {
+  // Task 25: Supabase Realtime 구독 — UPDATE + INSERT (Real 모드에서만)
+  useEffect(() => {
+    if (IS_MOCK) return;
+    const channel = supabase
+      .channel('contract-changes')
+      .on('postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'contracts' },
+        (payload) => {
+          setContracts(prev => {
+            const exists = prev.some(c => c.id === payload.new.id);
+            return exists ? prev : [payload.new as Contract, ...prev];
+          });
+        }
+      )
+      .on('postgres_changes',
+        { event: 'UPDATE', schema: 'public', table: 'contracts' },
+        (payload) => {
+          setContracts(prev => prev.map(c =>
+            c.id === payload.new.id ? { ...c, ...payload.new as Contract } : c
+          ));
+        }
+      )
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, []);
+
+  const getContract = useCallback(async (id: string) => {
     if (IS_MOCK) {
       const c = mockContractStore.find(x => x.id === id);
       if (!c) return null;
@@ -228,7 +339,7 @@ export function useContracts() {
     }
     const { data } = await supabase.from('contracts').select('*').eq('id', id).single();
     return data;
-  };
+  }, []);
 
   const createContract = async (input: Partial<Contract> & { business_id: string }) => {
     if (!userProfile) throw new Error('Not authenticated');
@@ -253,9 +364,14 @@ export function useContracts() {
         work_days: input.work_days ?? [],
         start_time: input.start_time ?? '',
         end_time: input.end_time ?? '',
-        break_minutes: input.break_minutes ?? 0,
+        break_start_time: input.break_start_time ?? '',
+        break_end_time: input.break_end_time ?? '',
         weekly_holiday: input.weekly_holiday,
         paid_leave_clause: input.paid_leave_clause ?? true,
+        pension: input.pension ?? true,
+        health_insurance: input.health_insurance ?? true,
+        employment_insurance: input.employment_insurance ?? true,
+        accident_insurance: input.accident_insurance ?? true,
         social_insurance_clause: input.social_insurance_clause ?? true,
         severance_clause: input.severance_clause ?? true,
         created_at: new Date().toISOString(),
@@ -265,6 +381,15 @@ export function useContracts() {
       await fetchContracts();
       return newContract;
     }
+
+    // Task 15: server-side validation — business_id 소유권 검증
+    const { data: business } = await supabase
+      .from('businesses')
+      .select('id')
+      .eq('id', input.business_id)
+      .eq('owner_id', userProfile.userKey)
+      .single();
+    if (!business) throw new Error('사업장을 찾을 수 없거나 접근 권한이 없습니다.');
 
     const { data, error } = await supabase
       .from('contracts')
@@ -282,6 +407,15 @@ export function useContracts() {
       await fetchContracts();
       return mockContractStore.find(c => c.id === id)!;
     }
+
+    // Task 15: draft 상태일 때만 수정 허용
+    const { data: existing, error: fetchError } = await supabase
+      .from('contracts')
+      .select('status')
+      .eq('id', id)
+      .single();
+    if (fetchError) throw fetchError;
+    if (existing.status !== 'draft' && existing.status !== 'rejected') throw new Error('이 상태에서는 수정할 수 없습니다.');
 
     const { data, error } = await supabase
       .from('contracts')
@@ -306,26 +440,45 @@ export function useContracts() {
     return data;
   };
 
-  const signContract = async (id: string, signatureData: string) => {
+  const signContract = async (id: string, workerInfo: { phone: string; address: string; account: string; signatureData: string; userKey?: string; name?: string; ci?: string }) => {
     if (IS_MOCK) {
+      const contract = mockContractStore.find(c => c.id === id);
+      const html = contract ? generateContractHtml(contract) : undefined;
       return updateContract(id, {
-        status: 'signed',
-        worker_signature_data: signatureData,
+        status: 'completed',
+        worker_phone: workerInfo.phone,
+        worker_address: workerInfo.address,
+        worker_account: workerInfo.account,
+        worker_user_key: workerInfo.userKey,
+        worker_name: workerInfo.name || contract?.worker_name || '이름 없음',
+        worker_ci: workerInfo.ci,
+        worker_signature_data: workerInfo.signatureData,
         worker_signed_at: new Date().toISOString(),
+        employer_signed_at: new Date().toISOString(),
+        contract_html: html,
       });
     }
     const { data, error } = await supabase.functions.invoke('contracts-sign', {
-      body: { contractId: id, signatureData },
+      body: { contractId: id, workerInfo },
     });
     if (error) throw error;
     await fetchContracts();
     return data;
   };
 
+  // Task 8 + 11: completeContract — employer_signed_at + contract_html + contract_pdf_url
   const completeContract = async (id: string) => {
     if (IS_MOCK) {
-      return updateContract(id, { status: 'completed' });
+      const contract = mockContractStore.find(c => c.id === id);
+      if (!contract) throw new Error('계약서를 찾을 수 없습니다.');
+      const html = generateContractHtml(contract);
+      return updateContract(id, {
+        status: 'completed',
+        employer_signed_at: new Date().toISOString(),
+        contract_html: html,
+      });
     }
+    // Real: contracts-complete Edge Function이 서버 측에서 employer_signed_at, HTML/PDF 생성 처리
     const { data, error } = await supabase.functions.invoke('contracts-complete', {
       body: { contractId: id },
     });
@@ -334,50 +487,54 @@ export function useContracts() {
     return data;
   };
 
+  // Task 14: cancelContract → contracts-cancel Edge Function
   const cancelContract = async (id: string) => {
     if (IS_MOCK) {
       return updateContract(id, { status: 'cancelled' });
     }
-    const { data, error } = await supabase
-      .from('contracts')
-      .update({ status: 'cancelled' })
-      .eq('id', id)
-      .in('status', ['draft', 'signed'])
-      .select()
-      .single();
+    const { data, error } = await supabase.functions.invoke('contracts-cancel', {
+      body: { contractId: id },
+    });
     if (error) throw error;
     await fetchContracts();
     return data;
   };
 
+  // Task 14: expireContract → contracts-expire Edge Function
   const expireContract = async (id: string) => {
     if (IS_MOCK) {
       return updateContract(id, { status: 'expired' });
     }
-    const { data, error } = await supabase
-      .from('contracts')
-      .update({ status: 'expired' })
-      .eq('id', id)
-      .in('status', ['sent', 'viewed'])
-      .select()
-      .single();
+    const { data, error } = await supabase.functions.invoke('contracts-expire', {
+      body: { contractId: id },
+    });
     if (error) throw error;
     await fetchContracts();
     return data;
   };
 
+  // Task 13: viewContract → contracts-view Edge Function
   const viewContract = async (id: string) => {
     if (IS_MOCK) {
       return updateContract(id, { status: 'viewed' });
     }
-    const { data, error } = await supabase
-      .from('contracts')
-      .update({ status: 'viewed' })
-      .eq('id', id)
-      .eq('status', 'sent')
-      .select()
-      .single();
+    const { data, error } = await supabase.functions.invoke('contracts-view', {
+      body: { contractId: id },
+    });
     if (error) throw error;
+    return data;
+  };
+
+  // Task 21: rejectContract → contracts-reject Edge Function
+  const rejectContract = async (id: string, reason?: string) => {
+    if (IS_MOCK) {
+      return updateContract(id, { status: 'rejected' });
+    }
+    const { data, error } = await supabase.functions.invoke('contracts-reject', {
+      body: { contractId: id, rejection_reason: reason },
+    });
+    if (error) throw error;
+    await fetchContracts();
     return data;
   };
 
@@ -394,6 +551,7 @@ export function useContracts() {
     expireContract,
     getHistory,
     viewContract,
+    rejectContract,
     refetch: fetchContracts,
   };
 }
