@@ -168,9 +168,16 @@ export default function ContractFormPage() {
         if (form.work_days.length === 0) e.work_days = `${josa('근무 요일', '을/를')} 선택해주세요`;
         if (!form.start_time) e.start_time = `${josa('시작 시간', '을/를')} 입력해주세요`;
         if (!form.end_time) e.end_time = `${josa('종료 시간', '을/를')} 입력해주세요`;
+        // 시작 시간이 종료 시간보다 늦으면 오류
+        if (form.start_time && form.end_time && form.start_time >= form.end_time) {
+          e.end_time = '종료 시간은 시작 시간보다 늦어야 합니다';
+        }
+        break;
+      case 4:
+        // 산재보험은 법정 의무가입
+        if (!form.accident_insurance) e.accident_insurance = '산재보험은 전 사업장 의무가입입니다';
         break;
       case 5: {
-        if (businesses.length === 0) { alert('먼저 사업장을 등록해주세요.'); return false; }
         const business = businesses[0];
         const laborContract = {
           worker: { name: form.worker_name, phone: form.worker_phone, address: form.worker_address || undefined },
