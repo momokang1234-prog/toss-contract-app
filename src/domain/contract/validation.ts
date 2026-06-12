@@ -3,7 +3,6 @@
  * 순수 함수 기반: Zod 스키마 파싱 + 법정 규칙 커스텀 검증
  */
 import type { LaborContract } from "./schema";
-import { josa } from 'es-hangul';
 import { LaborContractSchema } from "./schema";
 import {
   MINIMUM_HOURLY_WAGE_2026,

@@ -7,7 +7,7 @@ import styles from './ContractSignPage.module.css';
 export default function ContractSignPage() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { getContract, signContract } = useContracts();
+  const { signContract } = useContracts();
   const [contract, setContract] = useState<Contract | null>(null);
   const [drawing, setDrawing] = useState(false);
   const [hasSignature, setHasSignature] = useState(false);

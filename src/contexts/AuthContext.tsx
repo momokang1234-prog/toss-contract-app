@@ -1,5 +1,5 @@
 
-import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from 'react';
+import { createContext, useContext, useState, useCallback, type ReactNode } from 'react';
 import { IS_MOCK } from '../api/supabase';
 import { tossLogin } from '../api/toss-auth';
 const MOCK_AUTH_DELAY_MS = 500;
