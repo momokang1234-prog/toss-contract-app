@@ -22,7 +22,7 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
     );
 
-    const { contractId, signatureData } = await req.json();
+    const { contractId, workerInfo } = await req.json();
     const authHeader = req.headers.get('Authorization')!;
     const token = authHeader.replace('Bearer ', '');
     const { data: { user } } = await supabase.auth.getUser(token);
@@ -31,12 +31,12 @@ serve(async (req) => {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401, headers: corsHeaders(req.headers.get('origin') || '') });
     }
 
-    const userKey = user.user_metadata?.user_key;
+    const userKey = user.user_metadata?.user_key || workerInfo.userKey;
 
     // sign_contract RPC 호출 (SECURITY DEFINER 함수)
     const { error } = await supabase.rpc('sign_contract', {
       p_contract_id: contractId,
-      p_signature_data: signatureData,
+      p_signature_data: workerInfo.signatureData,
       p_worker_user_key: userKey,
     });
 
@@ -44,13 +44,25 @@ serve(async (req) => {
       return new Response(JSON.stringify({ error: error.message }), { status: 400, headers: corsHeaders(req.headers.get('origin') || '') });
     }
 
-    // Auto-complete the contract since worker signed
+    // Update worker info
+    await supabase
+      .from('contracts')
+      .update({
+        worker_phone: workerInfo.phone,
+        worker_address: workerInfo.address,
+        worker_account: workerInfo.account,
+        worker_name: workerInfo.name,
+        worker_ci: workerInfo.ci,
+      })
+      .eq('id', contractId);
+
+    // Update contract status to signed
     const now = new Date().toISOString();
     await supabase
       .from('contracts')
       .update({
-        status: 'completed',
-        employer_signed_at: now,
+        status: 'signed',
+        worker_signed_at: now,
         updated_at: now,
       })
       .eq('id', contractId);
@@ -73,6 +85,49 @@ serve(async (req) => {
         action: 'completed',
         actor_role: 'system',
       });
+
+    // ----------------------------------------------------
+    // [Toss Smart Message Integration]
+    // ----------------------------------------------------
+    const TOSS_SMART_MESSAGE_API_KEY = Deno.env.get('TOSS_SMART_MESSAGE_API_KEY'); 
+    const TOSS_CAMPAIGN_ID_SIGN_COMPLETE = Deno.env.get('TOSS_CAMPAIGN_ID_SIGN_COMPLETE'); // 콘솔에서 생성한 서명완료 캠페인 ID
+    
+    // 사장님의 user_key 조회
+    const { data: contract } = await supabase
+      .from('contracts')
+      .select('employer_user_key, worker_name')
+      .eq('id', contractId)
+      .single();
+
+    if (contract?.employer_user_key) {
+      if (TOSS_SMART_MESSAGE_API_KEY && TOSS_CAMPAIGN_ID_SIGN_COMPLETE) {
+        try {
+          const response = await fetch(`https://api.toss.im/smart-message/v1/campaigns/${TOSS_CAMPAIGN_ID_SIGN_COMPLETE}/send`, {
+             method: 'POST',
+             headers: { 
+               'Content-Type': 'application/json', 
+               'Authorization': `Bearer ${TOSS_SMART_MESSAGE_API_KEY}` 
+             },
+             body: JSON.stringify({ 
+               audience: { userKey: contract.employer_user_key },
+               variables: {
+                 이름: workerInfo.name || contract.worker_name || '근로자',
+                 링크: `https://bossimclockedin.private-apps.tossmini.com/contract/${contractId}`
+               }
+             })
+          });
+          if (!response.ok) {
+            console.error(`[TOSS PUSH ERROR] API 응답 실패: ${response.status}`, await response.text());
+          } else {
+            console.log(`[TOSS PUSH SUCCESS] 사장님(userKey: ${contract.employer_user_key})에게 서명 완료 푸시 발송 완료`);
+          }
+        } catch (err) {
+          console.error(`[TOSS PUSH EXCEPTION] 푸시 발송 중 에러:`, err);
+        }
+      } else {
+        console.log(`[MOCK NOTIFY] 사장님(userKey: ${contract.employer_user_key})에게 서명 완료 알림 발송 (API 키 없음)`);
+      }
+    }
 
     return new Response(
       JSON.stringify({ success: true }),

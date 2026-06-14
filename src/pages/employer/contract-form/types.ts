@@ -25,6 +25,8 @@ export interface ContractFormData {
   employment_insurance: boolean;
   accident_insurance: boolean;
   severance_clause: boolean;
+  checklist_agreed: boolean;
+  employer_signature_data?: string;
 }
 
 export type ContractFormStep =
@@ -32,16 +34,18 @@ export type ContractFormStep =
   | 'workConditions'
   | 'workSchedule'
   | 'wageInsurance'
-  | 'legalValidation'
-  | 'preview';
+  | 'finalChecklist'
+  | 'preview'
+  | 'employerSignature';
 
 export const STEP_LABELS: Record<ContractFormStep, string> = {
   basicInfo: '근로자 정보',
   workConditions: '계약 조건',
   workSchedule: '근무 시간',
   wageInsurance: '임금 및 보험',
-  legalValidation: '법정 검증',
+  finalChecklist: '알아두면 좋은 정보',
   preview: '최종 확인',
+  employerSignature: '사장님 서명',
 };
 
 export const STEP_ORDER: ContractFormStep[] = [
@@ -49,8 +53,9 @@ export const STEP_ORDER: ContractFormStep[] = [
   'workConditions',
   'workSchedule',
   'wageInsurance',
-  'legalValidation',
+  'finalChecklist',
   'preview',
+  'employerSignature',
 ];
 
 export const TOTAL_STEPS = STEP_ORDER.length;
@@ -85,6 +90,7 @@ export const DEFAULT_FORM: ContractFormData = {
   employment_insurance: true,
   accident_insurance: true,
   severance_clause: true,
+  checklist_agreed: false,
 };
 
 export interface ValidationResultData {

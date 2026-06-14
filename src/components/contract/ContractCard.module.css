@@ -1,7 +1,17 @@
 .card {
-  padding: 16px;
+  padding: 20px;
+  background: #ffffff;
+  border-radius: 16px;
+  border: 1px solid #E5E8EB;
+  margin-bottom: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+  cursor: pointer;
+  transition: background-color 0.2s ease;
 }
 
+.card:active {
+  background: #F9FAFB;
+}
 .row {
   display: flex;
   justify-content: space-between;

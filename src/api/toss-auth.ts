@@ -1,4 +1,5 @@
 import { appLogin } from '@apps-in-toss/web-framework';
+import { supabase } from './supabase';
 
 const API_BASE = import.meta.env.VITE_API_BASE || 'https://bossimclockedin-api.fly.dev';
 
@@ -28,38 +29,24 @@ interface TokenResponse {
 
 /**
  * 전체 토스 로그인 흐름
- * appLogin() → 인가코드 → Fly.io /api/auth/token → AccessToken → /api/user/me → 사용자 정보
+ * appLogin() → 인가코드 → Node.js 백엔드(/auth/toss) → Custom JWT + UserInfo
  */
-export async function tossLogin(): Promise<TossUserInfo> {
+export async function tossLogin(): Promise<{ customToken: string, user: TossUserInfo }> {
   // 1. 클라이언트에서 인가코드 획득
   const { authorizationCode, referrer } = await appLogin();
 
-  // 2. 서버에서 AccessToken 교환
-  const tokenRes = await fetch(`${API_BASE}/api/auth/token`, {
+  // 2. Node.js 백엔드 호출 (mTLS 인증서가 세팅된 서버)
+  const response = await fetch(`${API_BASE}/auth/toss`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ authorizationCode, referrer }),
   });
 
-  if (!tokenRes.ok) {
-    const err = await tokenRes.json().catch(() => ({}));
-    throw new Error(`Token exchange failed: ${tokenRes.status} ${JSON.stringify(err)}`);
+  const data = await response.json();
+
+  if (!response.ok || !data.success) {
+    throw new Error(`Token exchange failed: ${data.error || 'Unknown error'} (Status: ${response.status})`);
   }
 
-  const tokenData: TokenResponse = await tokenRes.json();
-  if (tokenData.resultType !== 'SUCCESS') {
-    throw new Error(`Token exchange failed: ${JSON.stringify(tokenData)}`);
-  }
-
-  // 3. AccessToken으로 사용자 정보 조회 (서버에서 복호화까지 처리)
-  const userRes = await fetch(`${API_BASE}/api/user/me`, {
-    headers: { Authorization: `Bearer ${tokenData.success.accessToken}` },
-  });
-
-  if (!userRes.ok) {
-    throw new Error(`User info failed: ${userRes.status}`);
-  }
-
-  const userData: TossUserInfo = await userRes.json();
-  return userData;
+  return { customToken: data.customToken, user: data.user as TossUserInfo };
 }

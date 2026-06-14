@@ -79,7 +79,7 @@ CREATE POLICY "contracts_select_worker" ON public.contracts
 
 -- 서명 전용 함수
 CREATE OR REPLACE FUNCTION sign_contract(
-  p_contract_id UUID,
+  p_contract_id TEXT,
   p_signature_data TEXT,
   p_worker_user_key TEXT
 ) RETURNS VOID AS $$
@@ -99,6 +99,46 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 CREATE POLICY "contracts_update_worker_sign" ON public.contracts
   FOR UPDATE USING (false);
+
+-- 열람 상태 전용 함수
+CREATE OR REPLACE FUNCTION view_contract(
+  p_contract_id TEXT,
+  p_worker_user_key TEXT,
+  p_worker_phone TEXT
+) RETURNS VOID AS $$
+BEGIN
+  UPDATE public.contracts
+  SET status = 'viewed',
+      updated_at = now()
+  WHERE id = p_contract_id
+    AND status = 'sent'
+    AND (worker_user_key = p_worker_user_key OR worker_phone = p_worker_phone);
+
+  INSERT INTO public.contract_history (contract_id, action, actor_role, actor_user_key)
+  VALUES (p_contract_id, 'viewed', 'worker', p_worker_user_key);
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- 거절 상태 전용 함수
+CREATE OR REPLACE FUNCTION reject_contract(
+  p_contract_id TEXT,
+  p_reason TEXT,
+  p_worker_user_key TEXT,
+  p_worker_phone TEXT
+) RETURNS VOID AS $$
+BEGIN
+  UPDATE public.contracts
+  SET status = 'rejected',
+      rejection_reason = p_reason,
+      updated_at = now()
+  WHERE id = p_contract_id
+    AND status IN ('sent', 'viewed')
+    AND (worker_user_key = p_worker_user_key OR worker_phone = p_worker_phone);
+
+  INSERT INTO public.contract_history (contract_id, action, actor_role, actor_user_key)
+  VALUES (p_contract_id, 'rejected', 'worker', p_worker_user_key);
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- contract_history
 CREATE POLICY "history_select" ON public.contract_history

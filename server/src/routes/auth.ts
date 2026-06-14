@@ -84,10 +84,17 @@
 import { Router, Request, Response } from "express";
 import bcrypt from "bcryptjs";
 import jwt, { type SignOptions } from "jsonwebtoken";
+import { v5 as uuidv5 } from "uuid";
+import { createClient } from "@supabase/supabase-js";
 import { query } from "../db/client.js";
 import { config } from "../config/index.js";
 import { validate, registerSchema, loginSchema } from "../middleware/validation.js";
 import type { RegisterBody, LoginBody, JwtPayload } from "../models/index.js";
+import axios from "axios";
+import https from "https";
+import fs from "fs";
+import crypto from "crypto";
+import path from "path";
 
 const router = Router();
 
@@ -232,5 +239,169 @@ router.post(
     }
   },
 );
+
+function decryptAesGcm(encryptedTextBase64: string, keyBase64: string, aadStr: string) {
+  if (!encryptedTextBase64) return null;
+  try {
+    const IV_LENGTH = 12;
+    const decoded = Buffer.from(encryptedTextBase64, "base64");
+    const key = Buffer.from(keyBase64, "base64");
+
+    const iv = decoded.subarray(0, IV_LENGTH);
+    const ciphertext = decoded.subarray(IV_LENGTH, decoded.length - 16);
+    const authTag = decoded.subarray(decoded.length - 16);
+
+    const decipher = crypto.createDecipheriv("aes-256-gcm", key, iv);
+    decipher.setAuthTag(authTag);
+    decipher.setAAD(Buffer.from(aadStr));
+
+    let decrypted = decipher.update(ciphertext);
+    decrypted = Buffer.concat([decrypted, decipher.final()]);
+    return decrypted.toString("utf8");
+  } catch (e) {
+    console.error("Decryption failed:", e);
+    return encryptedTextBase64;
+  }
+}
+
+/**
+ * @swagger
+ * /auth/toss:
+ *   post:
+ *     summary: Toss OAuth Login (mTLS)
+ *     tags: [Auth]
+ *     security: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [authorizationCode]
+ *             properties:
+ *               authorizationCode:
+ *                 type: string
+ *               referrer:
+ *                 type: string
+ */
+router.post("/toss", async (req: Request, res: Response): Promise<void> => {
+  const { authorizationCode, referrer } = req.body;
+
+  if (!authorizationCode) {
+    res.status(400).json({ error: "Missing authorizationCode" });
+    return;
+  }
+
+  try {
+    const certPath = process.env.TOSS_CERT_PATH || path.resolve(process.cwd(), "certs", "toss_cert.pem");
+    const keyPath = process.env.TOSS_KEY_PATH || path.resolve(process.cwd(), "certs", "toss_key.pem");
+
+    let httpsAgent;
+    if (fs.existsSync(certPath) && fs.existsSync(keyPath)) {
+      httpsAgent = new https.Agent({
+        cert: fs.readFileSync(certPath),
+        key: fs.readFileSync(keyPath),
+      });
+    } else {
+      console.warn("mTLS certificates not found. API calls to Toss will likely fail with CertificateRequired.");
+    }
+
+    const TOSS_API_BASE = "https://apps-in-toss-api.toss.im";
+
+    // 1. Get Toss Access Token
+    const tokenRes = await axios.post(
+      `${TOSS_API_BASE}/api-partner/v1/apps-in-toss/user/oauth2/generate-token`,
+      { authorizationCode, referrer },
+      { httpsAgent }
+    );
+
+    if (tokenRes.data.resultType !== "SUCCESS") {
+      res.status(400).json({ error: "Token exchange failed", details: tokenRes.data });
+      return;
+    }
+
+    const accessToken = tokenRes.data.success.accessToken;
+
+    // 2. Get User Info
+    const userRes = await axios.get(
+      `${TOSS_API_BASE}/api-partner/v1/apps-in-toss/user/oauth2/login-me`,
+      {
+        headers: { Authorization: `Bearer ${accessToken}` },
+        httpsAgent,
+      }
+    );
+
+    if (userRes.data.resultType !== "SUCCESS") {
+      res.status(400).json({ error: "User fetch failed", details: userRes.data });
+      return;
+    }
+
+    const userProfile = userRes.data.success;
+
+    // 3. Decrypt User Info
+    const aesKey = process.env.TOSS_AES_KEY || "/QpO9bBSmn/11AQ601gb0NNOIU9Cws61pB2rrJCTcYI=";
+    const aad = process.env.TOSS_AAD || "TOSS";
+
+    if (userProfile.name) userProfile.name = decryptAesGcm(userProfile.name, aesKey, aad);
+    if (userProfile.phone) userProfile.phone = decryptAesGcm(userProfile.phone, aesKey, aad);
+    if (userProfile.birthday) userProfile.birthday = decryptAesGcm(userProfile.birthday, aesKey, aad);
+    if (userProfile.ci) userProfile.ci = decryptAesGcm(userProfile.ci, aesKey, aad);
+    if (userProfile.gender) userProfile.gender = decryptAesGcm(userProfile.gender, aesKey, aad);
+    if (userProfile.nationality) userProfile.nationality = decryptAesGcm(userProfile.nationality, aesKey, aad);
+
+    // 4. Generate custom JWT (same format as Edge Function)
+    const jwtSecret = process.env.CUSTOM_JWT_SECRET || process.env.SUPABASE_JWT_SECRET || config.jwt.secret;
+    
+    // Convert Toss userKey to a deterministic UUID
+    const NAMESPACE_UUID = "1b671a64-40d5-491e-99b0-da01ff1f3341";
+    const userUuid = uuidv5(String(userProfile.userKey), NAMESPACE_UUID);
+
+    // 5. Upsert User into Supabase DB (Registration/Login)
+    const supabaseUrl = process.env.SUPABASE_URL;
+    const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY;
+    
+    if (supabaseUrl && supabaseServiceKey) {
+      // .trim()을 추가하여 대시보드 복사 시 발생할 수 있는 공백 및 줄바꿈 문자를 제거합니다.
+      const supabase = createClient(supabaseUrl.trim(), supabaseServiceKey.trim());
+      const { error: upsertError } = await supabase.from('profiles').upsert({
+        id: userUuid,
+        toss_user_key: String(userProfile.userKey),
+        name: userProfile.name || 'Unknown',
+        phone: userProfile.phone || null,
+        ci: userProfile.ci || null,
+        updated_at: new Date().toISOString()
+      }, { onConflict: 'id' });
+      
+      if (upsertError) {
+        console.error("[Supabase Upsert Error]:", upsertError);
+      } else {
+        console.log(`[Supabase] Successfully upserted profile for ${userUuid}`);
+      }
+    } else {
+      console.warn("[Supabase] SUPABASE_URL or SUPABASE_SERVICE_KEY not provided. Skipping profile upsert.");
+    }
+
+
+    const token = jwt.sign(
+      {
+        aud: "authenticated",
+        sub: userUuid,
+        email: userProfile.email || `${userProfile.userKey}@toss.im`,
+        phone: userProfile.phone || "",
+        role: "authenticated",
+        user_key: String(userProfile.userKey),
+      },
+      jwtSecret,
+      { expiresIn: "24h" }
+    );
+
+    res.json({ success: true, customToken: token, user: userProfile });
+  } catch (error: any) {
+    console.error("Toss login error:", error?.response?.data || error.message);
+    res.status(error?.response?.status || 500).json({
+      error: error?.response?.data || error.message,
+    });
+  }
+});
 
 export default router;

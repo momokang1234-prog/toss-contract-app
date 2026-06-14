@@ -18,11 +18,11 @@ export function ContractResult() {
         />
       </div>
       <Spacing size={20} />
-      <Paragraph typography="st1" fontWeight="bold">
+      <Paragraph typography="t3" fontWeight="bold">
         계약서 제출 완료
       </Paragraph>
       <Spacing size={8} />
-      <Paragraph typography="st4" color="grey-600">
+      <Paragraph typography="t5" color="grey-600">
         근로계약서가 성공적으로 제출되었습니다.
         <br />
         확인 후 서명 요청이 발송됩니다.
@@ -30,7 +30,7 @@ export function ContractResult() {
       <Spacing size={24} />
 
       <div>
-        <Paragraph typography="st4" fontWeight="bold">
+        <Paragraph typography="t5" fontWeight="bold">
           진행 상태
         </Paragraph>
         <Spacing size={12} />
@@ -42,7 +42,7 @@ export function ContractResult() {
               variant={step.done ? "fill" : "weak"}
             />
             <Paragraph
-              typography="st7"
+              typography="t6"
               color={step.done ? "primary" : "grey-500"}
             >
               {step.label}

@@ -26,12 +26,14 @@ export function ContractCard({ contract }: ContractCardProps) {
   return (
     <div className={styles.card}>
       <div className={styles.row}>
-        <Paragraph typography="st5" fontWeight="bold">{contract.worker_name}</Paragraph>
+        <Paragraph typography="t5" fontWeight="bold">{contract.worker_name}</Paragraph>
         <Badge size="small" variant="fill" color={badge.color}>{badge.label}</Badge>
       </div>
-      <Paragraph typography="st7" color="grey-500">
-        {typeLabel} · {contract.workplace} · {contract.start_date}
-      </Paragraph>
+      <div style={{ marginTop: 8 }}>
+        <Paragraph typography="t7" color="grey-500">
+          {typeLabel} · {contract.workplace} · {contract.start_date}
+        </Paragraph>
+      </div>
     </div>
   );
 }

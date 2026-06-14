@@ -38,9 +38,11 @@ export function ContractPreview({ contract }: ContractPreviewProps) {
 
   return (
     <div>
-      <Top title="근로계약서">
-        <Paragraph typography="st1" fontWeight="bold">근로계약서</Paragraph>
-      </Top>
+      <Top title="근로계약서" />
+      <Spacing size={16} />
+      <div style={{ padding: '0 24px' }}>
+        <Paragraph typography="t3" fontWeight="bold">근로계약서 미리보기</Paragraph>
+      </div>
 
       <Spacing size={16} />
 
@@ -73,59 +75,67 @@ export function ContractPreview({ contract }: ContractPreviewProps) {
 
       {contract.worker_signature_data && (
         <>
-          <Spacing size={16} />
-          <Border />
-          <Spacing size={16} />
-          <Paragraph typography="st4" fontWeight="bold">근로자 서명</Paragraph>
-          <Spacing size={8} />
-          <img src={contract.worker_signature_data} alt="근로자 서명" />
-          {contract.worker_signed_at && (
-            <>
-              <Spacing size={8} />
-              <Paragraph typography="st6" color="grey-500">
-                {new Date(contract.worker_signed_at).toLocaleString('ko-KR')}
-              </Paragraph>
-            </>
-          )}
+          <Spacing size={24} />
+          <div style={{ height: 1, backgroundColor: '#e5e5ec', margin: '0 24px' }} />
+          <Spacing size={20} />
+          <div style={{ padding: '0 24px' }}>
+            <Paragraph typography="t5" fontWeight="bold">근로자 서명</Paragraph>
+            <Spacing size={16} />
+            <div style={{ textAlign: 'center' }}>
+              <img src={contract.worker_signature_data} alt="근로자 서명" style={{ maxHeight: 100, border: '1px solid #E5E8EB', borderRadius: 8, padding: 8 }} />
+              {contract.worker_signed_at && (
+                <>
+                  <Spacing size={8} />
+                  <Paragraph typography="t7" color="grey-500">
+                    {new Date(contract.worker_signed_at).toLocaleString('ko-KR')} 서명 완료
+                  </Paragraph>
+                </>
+              )}
+            </div>
+          </div>
         </>
       )}
 
-      <Spacing size={16} />
-      <Button
-        color="light"
-        variant="weak"
-        display="full"
-        size="large"
-        onClick={handleDownload}
-        disabled={downloading}
-      >
-        📄 {downloading ? 'PDF 생성 중...' : 'PDF 다운로드'}
-      </Button>
+      <Spacing size={24} />
+      <div style={{ padding: '0 24px 40px' }}>
+        <Button
+          color="primary"
+          variant="weak"
+          display="full"
+          size="large"
+          onClick={handleDownload}
+          disabled={downloading}
+        >
+          📄 {downloading ? 'PDF 생성 중...' : 'PDF 다운로드'}
+        </Button>
+      </div>
     </div>
   );
 }
 
 function SectionTitle({ children }: { children: React.ReactNode }) {
   return (
-    <>
-      <Spacing size={20} />
-      <Paragraph typography="st3" fontWeight="bold">{children}</Paragraph>
-      <Spacing size={12} />
-    </>
+    <div style={{ padding: '0 24px' }}>
+      <Spacing size={32} />
+      <Paragraph typography="t5" fontWeight="bold">{children}</Paragraph>
+      <Spacing size={16} />
+    </div>
   );
 }
 
 function InfoRow({ label, value }: { label: string; value: string }) {
   return (
     <div style={{
-      padding: '12px 0',
-      borderBottom: '1px solid #e5e5ec',
+      padding: '0 24px',
+      marginBottom: 16,
       display: 'flex',
       justifyContent: 'space-between',
-      alignItems: 'center',
+      alignItems: 'flex-start',
     }}>
-      <Paragraph typography="st6" color="grey-500">{label}</Paragraph>
-      <Paragraph typography="st5">{value}</Paragraph>
+      <Paragraph typography="t6" color="grey-500">{label}</Paragraph>
+      <div style={{ textAlign: 'right', maxWidth: '60%' }}>
+        <Paragraph typography="t5">{value}</Paragraph>
+      </div>
     </div>
   );
 }

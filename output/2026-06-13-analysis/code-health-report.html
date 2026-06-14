@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>toss-contract-app 코드 건강 진단 보고서</title>
+    <link rel="stylesheet" as="style" crossorigin
+          href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+    <style>
+        :root {
+            --accent:       #1A365D;
+            --sub-color:    #2B6CB0;
+            --teal-color:   #2C5282;
+            --border-soft:  #E5E8EB;
+            --text-primary: #000000;
+            --text-dark:    #333333;
+            --text-gray:    #777777;
+            --label-gray:   #7e848a;
+            --caption:      #E0E0E0;
+            --bg-paper:     #FFFFFF;
+            --success:      #10B981;
+            --danger:       #EF4444;
+            --warning:      #F59E0B;
+            --info:         #3B82F6;
+            --font-main:    'Pretendard Variable', Pretendard, sans-serif;
+        }
+        *, *::before, *::after { box-sizing: border-box; }
+        body {
+            margin: 0; padding: 0;
+            background: var(--bg-paper);
+            font-family: var(--font-main);
+            color: var(--text-primary);
+            -webkit-print-color-adjust: exact;
+            word-break: keep-all;
+            overflow-wrap: break-word;
+        }
+        .page {
+            width: 210mm; height: 297mm;
+            margin: 10mm auto;
+            padding: 10mm 12mm 18mm 12mm;
+            background: var(--bg-paper);
+            position: relative;
+            display: flex; flex-direction: column;
+            overflow: hidden;
+            page-break-after: always;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+        }
+        .content-area {
+            flex: 1; overflow: hidden;
+            max-height: 264mm;
+        }
+        @media print {
+            body { background: white; }
+            .page { margin: 0 !important; box-shadow: none; padding: 10mm 12mm 18mm 12mm !important; }
+            .no-print { display: none !important; }
+            @page { margin: 0; }
+        }
+
+        h1 {
+            font-size: 2.4rem; font-weight: 900;
+            letter-spacing: -0.05em; color: var(--text-primary);
+            border-bottom: 4px solid var(--accent);
+            padding-bottom: 12px; margin-bottom: 24px;
+            line-height: 1.1; word-break: keep-all;
+        }
+        h2 {
+            font-size: 1.5rem; font-weight: 800; color: var(--accent);
+            margin: 36px 0 18px 0; padding-top: 24px;
+            border-top: 2px solid var(--border-soft);
+            display: flex; align-items: center; word-break: keep-all;
+        }
+        h2:first-of-type { border-top: none; padding-top: 0; margin-top: 0; }
+        h2::before {
+            content: ''; display: block;
+            width: 6px; height: 26px; background: var(--accent);
+            margin-right: 14px; border-radius: 2px; flex-shrink: 0;
+        }
+        h3 {
+            font-size: 1.05rem; font-weight: 700; color: #000;
+            margin: 28px 0 12px 0; padding: 0;
+            display: flex; align-items: center; gap: 8px; word-break: keep-all;
+        }
+        h3::before {
+            content: '\25B8'; color: var(--accent);
+            font-size: 1rem; font-weight: 900; flex-shrink: 0;
+        }
+        p + h3 { margin-top: 45px !important; }
+        p {
+            font-size: 0.88rem; line-height: 1.7;
+            color: #000; text-align: justify;
+            margin-bottom: 14px; word-break: keep-all;
+        }
+
+        .header-section {
+            width: 100%; margin-bottom: 30px; page-break-inside: avoid;
+        }
+        .header-eyebrow {
+            font-size: 11px; font-weight: 500; letter-spacing: 3px;
+            color: var(--teal-color); margin-bottom: 15px; text-transform: uppercase;
+        }
+        .header-title {
+            font-size: 24px; font-weight: 600; color: var(--text-dark);
+            line-height: 1.4; margin: 0 0 20px 0; word-break: keep-all;
+            border-bottom: none; padding-bottom: 0;
+        }
+        .header-meta {
+            font-size: 14px; color: var(--text-gray); line-height: 1.6;
+        }
+        .meta-row { display: flex; align-items: flex-start; margin-bottom: 2px; }
+        .meta-label { font-weight: 700; color: var(--label-gray); width: 65px; flex-shrink: 0; }
+        .meta-value { font-weight: 400; }
+        .header-divider {
+            border: 0; border-top: 1px solid #eee;
+            margin-top: 30px; margin-bottom: 20px;
+        }
+
+        .stat-grid {
+            display: grid; grid-template-columns: repeat(3, 1fr);
+            gap: 12px; margin: 20px 0; page-break-inside: avoid;
+        }
+        .stat-item {
+            text-align: center; padding: 16px;
+            background: #F8FAFB; border-radius: 8px;
+        }
+        .stat-value {
+            font-size: 1.8rem; font-weight: 900; color: var(--accent);
+        }
+        .stat-label {
+            font-size: 0.75rem; color: var(--text-dark);
+            margin-top: 4px; word-break: keep-all;
+        }
+        .stat-value.danger { color: var(--danger); }
+        .stat-value.success { color: var(--success); }
+
+        .list-table {
+            width: 100%; border-collapse: collapse;
+            font-size: 0.85rem; margin: 20px 0;
+            page-break-inside: avoid; word-break: keep-all;
+        }
+        .list-table th {
+            background: var(--accent); color: white;
+            padding: 10px; font-weight: 600; text-align: left;
+        }
+        .list-table td {
+            border-bottom: 1px solid var(--border-soft);
+            padding: 10px; color: #000;
+        }
+        .list-table tr:last-child td { border-bottom: none; }
+        .list-table tr:nth-child(even) td { background: #FAFBFC; }
+
+        .highlight-box {
+            background: linear-gradient(135deg, rgba(26,54,93,0.08) 0%, rgba(26,54,93,0.02) 100%);
+            border-left: 4px solid var(--accent);
+            padding: 16px 20px; margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+            font-size: 0.88rem; line-height: 1.6; word-break: keep-all;
+        }
+
+        .phase-list {
+            margin: 20px 0; border-left: 3px solid var(--accent); padding-left: 0;
+        }
+        .phase-item {
+            position: relative; padding: 16px 20px;
+            margin-left: 20px; background: #FAFBFC;
+            border-radius: 0 8px 8px 0; margin-bottom: 12px;
+            page-break-inside: avoid; word-break: keep-all;
+        }
+        .phase-item::before {
+            content: ''; position: absolute;
+            left: -32px; top: 50%; transform: translateY(-50%);
+            width: 12px; height: 12px;
+            background: var(--accent); border-radius: 50%;
+            border: 3px solid white;
+            box-shadow: 0 0 0 2px var(--accent);
+        }
+        .phase-title {
+            font-size: 1rem; font-weight: 700; color: #000; margin-bottom: 6px;
+        }
+        .phase-desc {
+            font-size: 0.85rem; color: var(--text-dark); line-height: 1.5;
+        }
+
+        .verdict-box {
+            border: 2px solid var(--info); border-radius: 8px;
+            padding: 20px; margin: 20px 0;
+            background: rgba(59,130,246,0.05);
+            page-break-inside: avoid; word-break: keep-all;
+        }
+        .verdict-box h4 {
+            font-size: 1rem; font-weight: 700; color: var(--info);
+            border-bottom: none; margin-top: 0;
+        }
+
+        .dep-graph {
+            width: 100%; max-height: 180mm;
+            margin: 16px 0; text-align: center;
+            page-break-inside: avoid;
+        }
+        .dep-graph img {
+            max-width: 100%; max-height: 175mm;
+            object-fit: contain;
+        }
+
+        .footer {
+            position: absolute;
+            bottom: 6mm; left: 12mm; right: 12mm;
+            border-top: 1px solid var(--border-soft);
+            padding-top: 8px;
+            display: flex; justify-content: space-between;
+            font-size: 0.75rem; color: #9CA3AF;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ======================== PAGE 1 — 개요 ======================== -->
+    <div class="page">
+        <div class="header-section">
+            <div class="header-eyebrow">CODE HEALTH REPORT</div>
+            <h1 class="header-title">
+                toss-contract-app<br>
+                <span style="font-size: 16px; font-weight: 400; color: var(--text-gray);">코드베이스 건강 진단 — 정량·정성 분석</span>
+            </h1>
+            <div class="header-meta">
+                <div class="meta-row">
+                    <span class="meta-label">Doc No:</span>
+                    <span class="meta-value">THC-2026-015</span>
+                </div>
+                <div class="meta-row">
+                    <span class="meta-label">Date:</span>
+                    <span class="meta-value">2026-06-13</span>
+                </div>
+                <div class="meta-row">
+                    <span class="meta-label">Lead:</span>
+                    <span class="meta-value">강현욱</span>
+                </div>
+            </div>
+        </div>
+        <hr class="header-divider">
+
+        <div class="content-area">
+
+            <p><strong>toss-contract-app</strong>은 Toss 플랫폼 기반 근로계약서 작성·관리 미니앱입니다. React + TypeScript 프론트엔드와 Express + TypeScript 백엔드로 구성되어 있으며, Supabase를 데이터베이스로 활용합니다. 본 보고서는 <strong>tre</strong>, <strong>tokei</strong>, <strong>madge</strong>, <strong>lizard</strong> 도구를 활용하여 코드베이스의 구조, 규모, 의존성, 복잡도를 정량·정성 분석한 결과입니다.</p>
+
+            <div class="stat-grid">
+                <div class="stat-item">
+                    <div class="stat-value">180</div>
+                    <div class="stat-label">총 파일 수</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value success">0</div>
+                    <div class="stat-label">순환 의존성</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value danger">49</div>
+                    <div class="stat-label">최고 CCN</div>
+                </div>
+            </div>
+
+            <h2>1. 프로젝트 개요</h2>
+
+            <p>프로젝트는 크게 세 계층으로 구성됩니다. <strong>프론트엔드</strong>(<code>src/</code>)는 React + TypeScript 기반으로 계약서 작성 폼, 미리보기, PDF 출력을 담당합니다. <strong>백엔드</strong>(<code>server/src/</code>)는 Express + TypeScript로 인증, 계좌, 거래내역, 이체 API를 제공합니다. <strong>데이터 계층</strong>(<code>supabase/</code>)은 Edge Functions와 마이그레이션으로 구성됩니다.</p>
+
+            <table class="list-table">
+                <thead>
+                    <tr><th>계층</th><th>주요 기술</th><th>파일 수</th><th>핵심 역할</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>프론트엔드</td><td>React, TypeScript, Vite</td><td>34개 (TSX)</td><td>계약서 작성·미리보기·PDF</td></tr>
+                    <tr><td>백엔드</td><td>Express, TypeScript, Supabase</td><td>53개 (TS)</td><td>인증·계좌·거래·이체 API</td></tr>
+                    <tr><td>데이터</td><td>Supabase Edge Functions, SQL</td><td>7개 (SQL)</td><td>마이그레이션·Edge Functions</td></tr>
+                    <tr><td>문서</td><td>Markdown, 감사 보고서</td><td>13개 (MD)</td><td>보안 감사·인증 문서</td></tr>
+                </tbody>
+            </table>
+
+        </div>
+
+        <div class="footer">
+            <span>THC-2026-015</span>
+            <span>Page 1 / 5</span>
+        </div>
+    </div>
+
+    <!-- ======================== PAGE 2 — 코드 통계 + 순환 의존성 ======================== -->
+    <div class="page">
+        <div class="content-area">
+
+            <h2>2. 코드 통계</h2>
+
+            <p>tokei 분석 결과, 전체 180개 파일에서 44,597라인의 순수 코드가 작성되었습니다. TypeScript(TS + TSX)가 전체 비-JSON 코드의 <strong>80.5%</strong>를 차지합니다.</p>
+
+            <table class="list-table">
+                <thead>
+                    <tr><th>언어</th><th>파일</th><th>코드 라인</th><th>주석</th><th>공백</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>TypeScript</strong></td><td>53</td><td>4,755</td><td>572</td><td>673</td></tr>
+                    <tr><td><strong>TSX</strong></td><td>34</td><td>3,265</td><td>31</td><td>278</td></tr>
+                    <tr><td>JSON</td><td>8</td><td>30,439</td><td>0</td><td>0</td></tr>
+                    <tr><td>SVG</td><td>33</td><td>944</td><td>183</td><td>0</td></tr>
+                    <tr><td>SQL</td><td>7</td><td>436</td><td>99</td><td>52</td></tr>
+                    <tr><td>CSS</td><td>16</td><td>377</td><td>6</td><td>53</td></tr>
+                    <tr><td>기타 (JS, YAML, Python 등)</td><td>5</td><td>261</td><td>23</td><td>36</td></tr>
+                    <tr style="font-weight: 700; background: #F0F4F8;"><td><strong>합계 (코드)</strong></td><td>156</td><td>44,597</td><td>914</td><td>1,092</td></tr>
+                </tbody>
+            </table>
+
+            <p>JSON 30,439라인은 대부분 <code>package-lock.json</code> 등 자동 생성물입니다. 주석률은 TypeScript <strong>10.7%</strong>, SQL <strong>18.5%</strong>로 양호한 수준입니다.</p>
+
+            <h2>3. 의존성 분석 — 순환 참조</h2>
+
+            <div class="highlight-box">
+                <strong>순환 의존성: 0건</strong> — madge 분석 결과, 73개 모듈 간 순환 참조가 전혀 발견되지 않았습니다. 계층 분리와 단방향 의존성 원칙이 잘 지켜지고 있습니다.
+            </div>
+
+        </div>
+
+        <div class="footer">
+            <span>THC-2026-015</span>
+            <span>Page 2 / 5</span>
+        </div>
+    </div>
+
+    <!-- ======================== PAGE 3 — 의존성 그래프 + 고아 파일 ======================== -->
+    <div class="page">
+        <div class="content-area">
+
+            <h2>3. 의존성 분석 — 그래프</h2>
+
+            <div class="dep-graph">
+                <img src="05-dep-graph.svg" alt="모듈 의존성 그래프 (madge + graphviz)">
+            </div>
+
+            <h3>3.1 고아 파일 (Orphan Modules)</h3>
+
+            <p>총 <strong>21개 파일</strong>이 다른 모듈에서 import되지 않았습니다. 진입점(<code>main.tsx</code>), 환경 파일(<code>vite-env.d.ts</code>), 테스트 파일을 제외하면 <strong>약 14개</strong>가 검토 대상입니다.</p>
+
+            <table class="list-table">
+                <thead>
+                    <tr><th>카테고리</th><th>파일</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>진입점</td><td><code>main.tsx</code>, <code>vite-env.d.ts</code></td></tr>
+                    <tr><td>타입 정의</td><td><code>types/roles.ts</code></td></tr>
+                    <tr><td>API</td><td><code>api/smart-messenger.ts</code></td></tr>
+                    <tr><td>도메인</td><td><code>domain/contract/converter.ts</code>, <code>domain/contract/index.ts</code></td></tr>
+                    <tr><td>컴포넌트</td><td><code>AuthScreen.tsx</code>, <code>BusinessVerify.tsx</code>, <code>ContractResult.tsx</code></td></tr>
+                    <tr><td>컴포넌트 (계속)</td><td><code>auth/RoleGuard.tsx</code>, <code>contract/ContractPreview.tsx</code>, <code>contract/ContractStatusBadge.tsx</code>, <code>shared/ContentContainer.tsx</code></td></tr>
+                    <tr><td>Contract Form Steps</td><td><code>Step1BasicInfo.tsx</code>, <code>Step2WorkConditions.tsx</code>, <code>Step3WorkSchedule.tsx</code>, <code>Step4WageInsurance.tsx</code></td></tr>
+                    <tr><td>테스트</td><td><code>hooks/__tests__/useContracts.test.ts</code>, <code>domain/contract/__tests__/schema.test.ts</code>, <code>domain/contract/__tests__/validation.test.ts</code></td></tr>
+                </tbody>
+            </table>
+
+            <p><strong>참고</strong>: Contract Form Step 컴포넌트들은 동적 import로 사용될 가능성이 높습니다. <code>converter.ts</code>와 <code>RoleGuard.tsx</code>는 미사용 코드일 수 있어 확인을 권장합니다.</p>
+
+        </div>
+
+        <div class="footer">
+            <span>THC-2026-015</span>
+            <span>Page 3 / 5</span>
+        </div>
+    </div>
+
+    <!-- ======================== PAGE 4 — 복잡도 분석 ======================== -->
+    <div class="page">
+        <div class="content-area">
+
+            <h2>4. 복잡도 분석</h2>
+
+            <p>lizard 분석 결과, 총 <strong>15건</strong>의 경고가 발생했습니다 (CCN ≥ 10 또는 길이 ≥ 50 라인).</p>
+
+            <h3>4.1 순환 복잡도 상위 (CCN ≥ 15)</h3>
+
+            <table class="list-table">
+                <thead>
+                    <tr><th>함수</th><th>파일</th><th>CCN</th><th>길이</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>createContract</code></td>
+                        <td>src/hooks/useContracts.ts:347</td>
+                        <td style="color: var(--danger); font-weight: 700;">49</td>
+                        <td>60</td>
+                    </tr>
+                    <tr>
+                        <td><code>validateStep</code></td>
+                        <td>src/.../useContractForm.ts:138</td>
+                        <td style="color: var(--danger); font-weight: 700;">44</td>
+                        <td>85</td>
+                    </tr>
+                    <tr>
+                        <td><code>(auth route)</code></td>
+                        <td>server/src/routes/auth.ts:287</td>
+                        <td style="color: var(--danger); font-weight: 700;">30</td>
+                        <td>119</td>
+                    </tr>
+                    <tr>
+                        <td><code>validateLaborContract</code></td>
+                        <td>src/domain/contract/validation.ts:83</td>
+                        <td style="color: var(--danger); font-weight: 700;">25</td>
+                        <td>174</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>4.2 함수 길이 상위 (≥ 100 라인)</h3>
+
+            <table class="list-table">
+                <thead>
+                    <tr><th>함수</th><th>파일</th><th>길이</th><th>CCN</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>useContractForm</code></td>
+                        <td>src/.../useContractForm.ts:37</td>
+                        <td style="color: var(--danger); font-weight: 700;">258</td>
+                        <td>1</td>
+                    </tr>
+                    <tr>
+                        <td><code>(validation test)</code></td>
+                        <td>src/domain/.../validation.test.ts:49</td>
+                        <td style="color: var(--danger); font-weight: 700;">231</td>
+                        <td>1</td>
+                    </tr>
+                    <tr>
+                        <td><code>validateLaborContract</code></td>
+                        <td>src/domain/contract/validation.ts:83</td>
+                        <td style="color: var(--warning); font-weight: 700;">174</td>
+                        <td>25</td>
+                    </tr>
+                    <tr>
+                        <td><code>(auth route)</code></td>
+                        <td>server/src/routes/auth.ts:287</td>
+                        <td style="color: var(--warning); font-weight: 700;">119</td>
+                        <td>30</td>
+                    </tr>
+                    <tr>
+                        <td><code>baseCSS</code></td>
+                        <td>src/utils/pdf.ts:26</td>
+                        <td style="color: var(--warning); font-weight: 700;">107</td>
+                        <td>1</td>
+                    </tr>
+                </tbody>
+            </table>
+
+        </div>
+
+        <div class="footer">
+            <span>THC-2026-015</span>
+            <span>Page 4 / 5</span>
+        </div>
+    </div>
+
+    <!-- ======================== PAGE 5 — 리팩터링 + 종합 평가 ======================== -->
+    <div class="page">
+        <div class="content-area">
+
+            <h2>5. 리팩터링 권장사항</h2>
+
+            <p>분석 결과를 바탕으로 우선순위가 높은 리팩터링 대상을 선정했습니다.</p>
+
+            <div class="phase-list">
+                <div class="phase-item">
+                    <div class="phase-title">Priority 1 — createContract (CCN 49)</div>
+                    <div class="phase-desc">극도로 높은 분기 복잡도. 계약 생성 로직을 Validation → Build → Save 3단계로 분해하고 각 단계를 별도 모듈로 추출하십시오.</div>
+                </div>
+                <div class="phase-item">
+                    <div class="phase-title">Priority 2 — validateStep (CCN 44)</div>
+                    <div class="phase-desc">4개 Step의 검증이 하나의 함수에 집중. Step별 검증 함수를 개별 파일로 분리하고 공통 검증은 유틸리티로 추출하십시오.</div>
+                </div>
+                <div class="phase-item">
+                    <div class="phase-title">Priority 3 — useContractForm (258 라인)</div>
+                    <div class="phase-desc">Hook이 지나치게 비대합니다. useFormNavigation, useFormValidation, useFormSubmission 등 하위 hook으로 분리하십시오.</div>
+                </div>
+                <div class="phase-item">
+                    <div class="phase-title">Priority 4 — validateLaborContract (CCN 25, 174 라인)</div>
+                    <div class="phase-desc">검증 규칙이 하나의 함수에 밀집. 필수 필드, 급여, 근로시간, 보험 등 도메인별 검증기를 개별 파일로 분리하십시오.</div>
+                </div>
+                <div class="phase-item">
+                    <div class="phase-title">Priority 5 — auth route (CCN 30, 119 라인)</div>
+                    <div class="phase-desc">라우터 핸들러가 인증, 토큰 검증, 세션 관리까지 과도한 책임. 미들웨어 체인으로 분리하십시오.</div>
+                </div>
+            </div>
+
+            <h2>6. 종합 평가</h2>
+
+            <table class="list-table">
+                <thead>
+                    <tr><th>지표</th><th>상태</th><th>비고</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>순환 의존성</td><td style="color: var(--success);">✅ 양호</td><td>0건 — 단방향 의존성 원칙 준수</td></tr>
+                    <tr><td>코드 규모</td><td style="color: var(--info);">중소형</td><td>TS+TSX 8,020라인 — 관리 가능 범위</td></tr>
+                    <tr><td>고아 파일</td><td style="color: var(--warning);">⚠️ 주의</td><td>21개 (진입점·테스트 제외 약 14개 검토 필요)</td></tr>
+                    <tr><td>복잡도</td><td style="color: var(--danger);">🔴 개선 필요</td><td>CCN 25 이상 4건, 100라인 초과 5건</td></tr>
+                </tbody>
+            </table>
+
+            <div class="verdict-box">
+                <h4>종합 소견</h4>
+                <p>순환 의존성이 전무하고 계층 분리가 잘 되어 있다는 점은 <strong>매우 긍정적</strong>입니다. 다만 <code>createContract</code>와 <code>validateStep</code> 함수의 순환 복잡도가 임계치를 크게 초과하고 있어, 버그 발생 위험과 유지보수 비용이 높은 상태입니다. <strong>5개 우선순위 항목의 리팩터링을 순차적으로 적용</strong>하면 코드 품질이 크게 개선될 것으로 판단됩니다. 상세 대시보드는 <code>dashboard.html</code>을 참조하십시오.</p>
+            </div>
+
+        </div>
+
+        <div class="footer">
+            <span>THC-2026-015</span>
+            <span>Page 5 / 5</span>
+        </div>
+    </div>
+
+    <!-- ======================== JSON-LD ======================== -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "DigitalDocument",
+        "identifier": "THC-2026-015",
+        "name": "toss-contract-app 코드 건강 진단 보고서",
+        "description": "toss-contract-app 코드베이스의 정량·정성 분석 보고서. tre, tokei, madge, lizard 도구로 파일 구조, 코드 통계, 의존성 그래프, 고아 파일, 복잡도를 진단하고 리팩터링 권장사항을 제시합니다.",
+        "dateCreated": "2026-06-13",
+        "dateModified": "2026-06-13",
+        "version": "1.0",
+        "inLanguage": "ko",
+        "author": {
+            "@type": "Person",
+            "name": "강현욱",
+            "email": "daviidkang@gmail.com"
+        },
+        "publisher": {
+            "@type": "Organization",
+            "name": "Theeca"
+        },
+        "documentType": "Report",
+        "keywords": ["코드 분석", "복잡도", "의존성 그래프", "고아 파일", "리팩터링", "TypeScript"],
+        "pageCount": 5,
+        "encodingFormat": "text/html"
+    }
+    </script>
+
+</body>
+</html>

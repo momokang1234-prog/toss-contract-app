@@ -1,22 +1,30 @@
 .page {
+  max-width: 480px;
+  margin: 0 auto;
   min-height: 100vh;
   background: #fff;
-  padding-bottom: 160px;
+  padding: 0;
+  position: relative;
+  padding-bottom: 180px;
 }
 
 .hero {
-  padding: 48px 24px 0;
+  padding: 60px 24px 0;
+}
+
+.marqueeContainer {
+  margin: 0 -24px;
 }
 
 .bottomCta {
   position: fixed;
   bottom: 0;
-  left: 0;
-  right: 0;
-  padding: 20px 24px 32px;
-  background: #fff;
-  border-top: 1px solid #e5e5ec;
-  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.04);
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 480px;
+  padding: 16px 24px 32px;
+  background: linear-gradient(180deg, rgba(255,255,255,0) 0%, #fff 20%);
 }
 
 .buttonGroup {

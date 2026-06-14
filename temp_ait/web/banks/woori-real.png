@@ -1,0 +1,281 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+ 
+ 
+ 
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ko" lang="ko">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />	
+	<title>고객님 불편을 드려 죄송합니다.</title>
+	
+<link  rel="stylesheet" href="https://simg.wooribank.com/css/login.css?1364179352000" type="text/css" />
+ 
+	
+	<!--[if gt IE 8]><!-->
+	<link  rel="stylesheet" href="https://simg.wooribank.com/css/css3.css?1363699858000" type="text/css" />
+ 	<!--<![endif]-->
+ 
+ 
+	<script  type="text/javascript" src="https://simg.wooribank.com/js/com/jquery-1.7.1.min.js?1363353990000"></script>
+ 
+	<script  type="text/javascript" src="https://simg.wooribank.com/js/com/jquery-ui-1.8.24.custom.min.js?1363353990000"></script>
+ 
+	<script  type="text/javascript" src="https://simg.wooribank.com/js/com/jquery.bgpos.min.js?1363353990000"></script>
+ 
+	<script  type="text/javascript" src="https://simg.wooribank.com/js/com/wbui.min.js?1364552382000"></script>
+ 
+</head>
+<!--[if lt IE 7]><body class="msie ie6 lt-ie9 lt-ie8 lt-ie7 lt-css3"><![endif]-->
+<!--[if IE 7]>   <body class="msie ie7 lt-ie9 lt-ie8 lt-css3"><![endif]-->
+<!--[if IE 8]>   <body class="msie ie8 lt-ie9 lt-css3"><![endif]-->
+<!--[if IE 9]>   <body class="msie ie9 css3"><![endif]-->
+<!--[if gt IE 9]><!-->
+<body class="css3">
+<!--<![endif]-->
+<div id="wrap">
+<div id="container">
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+    <div id="gnb">
+    <h1><a href="https://www.wooribank.com" class="woori"><img  alt="우리은행" src="https://simg.wooribank.com/img/common/header/woori_s.png" /></a>
+    <a 
+    	class='site' ><img src='https://simg.wooribank.com/img/common/header/tit_h1/cm.png' 
+    	alt='공통' /></a>
+    </h1>
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+<dl class="my-svc">
+<dt>회원관련 서비스</dt>
+ 
+	
+	<dd class="btn">
+		<div class="js-display-hover btn-login">
+			<a href="#none" class="gnb-member-bt  js-display-hover-trigger" onclick="return false;"><span>로그인</span></a>
+			<div class="js-display-hover-area select-banking-type">
+				<a  href="https://spot.wooribank.com/pot/Dream?withyou=CMLGN0001&amp;target=https://spot.wooribank.com/pot/Dream?withyou=ps">개인뱅킹</a>
+				|
+				<a  href="https://spot.wooribank.com/pot/Dream?withyou=CMLGN0002&amp;target=https://spot.wooribank.com/pot/Dream?withyou=bz">기업뱅킹</a>
+			</div>
+			<span class="select-banking-type-arrow js-display-hover-area" data-ui-animation="false"></span>
+		</div>
+	</dd>
+	<dd class="txt">
+		<div class="js-display-hover btn-certificate-center">
+			<a href="#none" class="js-display-hover-trigger" onclick="return false;">공인인증센터</a>
+			<div class="js-display-hover-area select-banking-type">
+				<a  href="https://spot.wooribank.com/pot/Dream?withyou=ct&amp;fromSite=pib" >개인</a>
+				|
+				<a  href="https://spot.wooribank.com/pot/Dream?withyou=ct&amp;fromSite=biz">기업</a>
+			</div>
+			<span class="select-banking-type-arrow js-display-hover-area" data-ui-animation="false"></span>
+		</div>
+	</dd>
+	
+ 
+</dl>
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+<script type="text/javascript">//<![CDATA[
+String.prototype.cut = function(len) { var str = this; var s = 0; for (var i=0; i<str.length; i++) { s += (str.charCodeAt  > 128) ? 2 : 1; if (s > len){ return str.substring(0,i); } } return str; }
+$(function(){ $('.login-name',$('.my-svc')).text( $('.login-name',$('.my-svc')).text().cut(7) ); });	// 이름: 한글기준7자출력
+//]]></script>
+ 
+ 
+	
+	<dl class="rel-svc">
+		<dt>우리은행 관련 서비스 링크 및 검색</dt>
+		<dd><a  href="https://spib.wooribank.com/pib/Dream?withyou=ps"><img src="https://simg.wooribank.com/img/common/header/tit_ps.png" alt="개인" /></a></dd>
+		<dd><a  href="https://sbiz.wooribank.com/biz/Dream?withyou=bz"><img src="https://simg.wooribank.com/img/common/header/tit_bz.png" alt="기업" /></a></dd>
+		<dd><a  href="https://spot.wooribank.com/pot/Dream?withyou=po"><img src="https://simg.wooribank.com/img/common/header/tit_po.png" alt="금융상품" /></a></dd>
+		
+		<dd><a  href="https://sccd.wooribank.com/ccd/Dream?withyou=cd"><img src="https://simg.wooribank.com/img/common/header/tit_cd.png" alt="우리카드" /></a></dd>
+				
+		<dd class="svc"><a href="#" id="btnGlobalSearch">우리은행 사이트 전체 검색</a></dd>
+	</dl>
+	<form method="post" action="https://spot.wooribank.com/pot/Dream?withyou=CMCOM0007">
+		<div class="search-box clearfix">
+			<div class="left">검색</div>
+			<div class="center"><input type="text" name="query" id="globalSearchWord" title="검색어 입력" /></div>
+			<div class="right"><input type="image" src="https://simg.wooribank.com/img/common/header/search_box/submit.gif" alt="검색"/></div>
+		</div>
+	</form>
+</div>
+ 
+ 
+ 
+ 
+<div id="content">
+ 
+<dl class="error-area type2 pos">
+<dt class="mb5">
+죄송합니다! 요청하신 페이지에서 오류가 발생했습니다.
+</dt>
+<dd class="mb10 md">고객님께서 요청하신 페이지를 표시할 수 없습니다.</dd>
+ 
+<dd class="mt10 dd-end">
+		잘못 검색하셨거나 종료된 화면, 또는 해당 화면에서 에러가 발생해서<br />
+		표시할 수가 없습니다.<br />
+		<strong>[확인]</strong> 버튼을 클릭하시면 우리은행 초기화면으로 이동합니다.
+	</dd>
+ 
+ 
+</dl>
+<div class="end-box ptn">
+	<div class="fleft ml20"><span>고객상담센터 ☎ 1588-5000, 1599-5000 ㅣ <a  href="https://spot.wooribank.com/pot/Dream?withyou=CQCCS0009">이메일상담</a> ㅣ <a  href="https://spot.wooribank.com/pot/Dream?withyou=CQCCS0002">FAQ</a></span></div>
+</div>
+ 
+ 
+<div class="btn-area mt20">
+<a href="https://www.wooribank.com" title="인트로로 이동" class="btn-pack btn-type-3c">확인</a>
+</div>
+</div>
+</div>
+<div id="footer">
+ 
+ 
+ 
+<div class="footer-global">
+	<span class="hidden">우리은행정보 및 우리은행관련사이트</span>
+	<div class="footer-content snb-padding">
+		<div class="logo">
+			<a href="/"><img  alt="우리은행" src="https://simg.wooribank.com/img/common/footer/icon_woori.gif" /></a>
+		</div>
+		<div class="content">
+			<div class="info">			 
+				<p class="phone">은행상담 1599-5000 1588-5000 (해외 82-2-2006-5000)&nbsp;&nbsp;|&nbsp;고객의 말씀 080-365-5000 (휴대폰 02-2008-5000)</p>			 
+				<p class="quick">
+					<a  href="https://spot.wooribank.com/pot/Dream?withyou=bp">은행소개</a>&nbsp;&nbsp;|&nbsp;
+					<a  title="새창열림" href="#none" onclick='jsOpenWindow("Dream?withyou=FXCNT0005","branch",894,710,1,1);return false'>영업점안내</a>&nbsp;&nbsp;|&nbsp;
+					<a  href="https://spot.wooribank.com/pot/Dream?withyou=cq">고객광장</a>&nbsp;&nbsp;|&nbsp;
+					<a  href="https://spot.wooribank.com/pot/Dream?withyou=CQACR0001">사고신고</a>&nbsp;&nbsp;|&nbsp;
+					<a  href="https://spot.wooribank.com/pot/Dream?withyou=CQFNS0030">ARS안내</a>&nbsp;&nbsp;|&nbsp;
+					<a  href="https://spot.wooribank.com/pot/Dream?withyou=CQIBG0050">웹접근성 이용안내</a>&nbsp;&nbsp;|&nbsp;
+					<a  href="https://spot.wooribank.com/pot/Dream?withyou=CQSCT0001">보안센터</a>
+				</p>
+				<p class="copyright">COPYRIGHTS WOORI BANK. ALL RIGHTS RESERVED. </p>
+                                     			</div>
+			
+<div class="links">
+				<div class="more">
+					<dl class="js-display-hover language" data-ui-animation="true">
+						<dt><a href="#none" class="js-display-hover-trigger">LANGUAGE</a></dt>
+						<dd class="country-box js-display-hover-area">
+							<ul>
+								<li class="first"><a  href="https://spot.wooribank.com/pot/Dream?withyou=en&amp;LCL=EN" class="flag-us">English</a><a  href="https://svc.wooribank.com/svc/Dream?withyou=ml&amp;LCL=ZH-CHS" class="flag-china">中國語</a><a  href="https://svc.wooribank.com/svc/Dream?withyou=ml&amp;LCL=JA" class="flag-japan">日本語</a></li>
+								<li><a  href="https://svc.wooribank.com/svc/Dream?withyou=ml&amp;LCL=TL" class="flag-philippines">Tagalog</a><a  href="https://svc.wooribank.com/svc/Dream?withyou=ml&amp;LCL=VI" class="flag-vietnam">ti?ng Vi?t</a><a  href="https://svc.wooribank.com/svc/Dream?withyou=ml&amp;LCL=MN" class="flag-mongolia">Монгол хэл</a></li>
+							</ul>
+							<span class="country-arrow"></span>
+						</dd>
+					</dl>
+					<dl class="js-display-hover family" data-ui-animation="true">
+						<dt><a href="#none" class="js-display-hover-trigger">패밀리사이트</a></dt>
+						<dd class="family-box re-position js-display-hover-area">
+							<ul>
+								<li><a title="새창열림" href="https://www.woorifg.com/" target="_blank">우리금융지주</a></li>
+								<li><a title="새창열림" href="http://www.woorifs.co.kr/" target="_blank">우리펀드서비스</a></li>
+								<li><a title="새창열림" href="https://www.wooricard.com/" target="_blank">우리카드</a></li>
+								<li><a title="새창열림" href="http://www.wooripe.com/" target="_blank">우리PE</a></li>											
+								<li><a title="새창열림" href="https://www.woorifcapital.com/" target="_blank">우리금융캐피탈</a></li>
+								<li><a title="새창열림" href="http://www.wooriglobal.com/" target="_blank">우리글로벌자산운용</a></li>
+								<li><a title="새창열림" href="https://www.wooriib.com/" target="_blank">우리종합금융</a></li>
+								<li><a title="새창열림" href="http://www.woorifis.com/" target="_blank">우리FIS</a></li>
+								<li><a title="새창열림" href="http://www.wooriat.com/" target="_blank">우리자산신탁</a></li>
+								<li><a title="새창열림" href="http://www.wfri.re.kr/" target="_blank">우리금융경영연구소</a></li>
+								<li><a title="새창열림" href="http://www.wooriam.kr/" target="_blank">우리자산운용</a></li>
+								<li><a title="새창열림" href="https://www.woorifoundation.or.kr/" target="_blank">우리다문화장학재단</a></li>
+								<li><a title="새창열림" href="https://www.woorisavingsbank.com/" target="_blank">우리금융저축은행</a></li>
+								<li><a title="새창열림" href="http://www.woorimiso.or.kr/" target="_blank">우리미소금융재단</a></li>
+								<li><a title="새창열림" href="https://www.wooricredit.com/" target="_blank">우리신용정보</a></li>
+							</ul>
+							<span class="family-arrow"></span>
+						</dd>
+					</dl>
+				</div>
+				<div class="js-display-hover icon icon-1" data-ui-animation="true">
+					<a href="#none" class="js-display-hover-trigger"><img  alt="2012 한국서비스품질지수 2년 연속 1위 달성" src="https://simg.wooribank.com/img/common/footer/icon_1.gif" /></a>
+					<div class="icon-box js-display-hover-area">
+						2012 한국서비스품질지수<br />2년 연속 1위 달성
+						<span class="arrow"></span>
+					</div>
+				</div>
+				<div class="js-display-hover icon icon-2" data-ui-animation="true">
+					<a href="#none" class="js-display-hover-trigger"><img  alt="2011 The Banker社 한국최우수거래은행 수상" src="https://simg.wooribank.com/img/common/footer/icon_2.gif" /></a>
+					<div class="icon-box js-display-hover-area">
+						2011 The Banker社<br />한국최우수거래은행 수상
+						<span class="arrow"></span>
+					</div>
+				</div>
+				<div class="js-display-hover icon icon-3" data-ui-animation="true">
+					<a href="#none" class="js-display-hover-trigger"><img  alt="2012 고객사랑 브랜드대상 수상" src="https://simg.wooribank.com/img/common/footer/icon_3.gif" /></a>
+					<div class="icon-box js-display-hover-area">
+						2012 고객사랑<br />브랜드대상 수상
+						<span class="arrow"></span>
+					</div>
+				</div>
+				<div class="js-display-hover icon icon-4" data-ui-animation="true">
+					<a href="#none" class="js-display-hover-trigger"><img  alt="2012 대한민국 명품브랜드 대상 수상" src="https://simg.wooribank.com/img/common/footer/icon_4.gif" /></a>
+					<div class="icon-box js-display-hover-area">
+						2012 대한민국<br />명품브랜드 대상 수상
+						<span class="arrow"></span>
+					</div>
+				</div>
+				<div class="js-display-hover icon icon-5" data-ui-animation="true">
+					<a href="#none" class="js-display-hover-trigger"><img  alt="2012 모바일브랜드 대상 은행부문 대상 수상" src="https://simg.wooribank.com/img/common/footer/icon_5.gif" /></a>
+					<div class="icon-box js-display-hover-area">
+						2012 모바일브랜드 대상<br />은행부문 대상 수상
+						<span class="arrow"></span>
+					</div>
+				</div>
+				<!-- <div class="icon twitter"><a href="https://www.twitter.com/wooricard" target="_blank" title="새창열림"><img  alt="우리카드 twitter(트위터) 이동" src="https://simg.wooribank.com/img/common/footer/icon_twitter.gif" /></a></div>
+				<div class="icon facebook"><a href="https://www.facebook.com/wooricard" target="_blank" title="새창열림"><img  alt="우리카드 facebook(페이스북) 이동" src="https://simg.wooribank.com/img/common/footer/icon_facebook.gif" /></a></div>
+				 -->
+			</div>
+		</div>
+	</div>
+</div>
+</div> 
+</div>
+ 
+</body>
+</html>
+ 
+  

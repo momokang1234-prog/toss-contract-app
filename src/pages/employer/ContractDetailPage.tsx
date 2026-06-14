@@ -2,11 +2,12 @@ import { useEffect, useState } from 'react';
 import { supabase, IS_MOCK } from '../../api/supabase';
 import { downloadContractPDF } from '../../utils/pdf';
 import { maskPhoneNumber } from '../../utils/format';
+import { generateAndUploadPDF } from '../../utils/pdfGenerator';
+import { useAuth } from '../../contexts/AuthContext';
 import { josa } from 'es-hangul';
 import { useParams, useNavigate, Navigate } from 'react-router-dom';
 import { useContracts, type Contract } from '../../hooks/useContracts';
 import { Top, Paragraph, Spacing, Button, Badge } from '@toss/tds-mobile';
-import { openSendContractSheet } from '../../components/delivery/SendContractSheet';
 import { CONTRACT_TYPE_LABEL, WAGE_TYPE_LABEL, WORK_DAY_LABEL, WAGE_PAYMENT_METHOD_LABEL } from '../../utils/labels';
 import styles from './ContractDetailPage.module.css';
 
@@ -59,7 +60,7 @@ export default function ContractDetailPage() {
         <Top title="계약서" />
         <div className={styles.center}>
           <Spacing size={40} />
-          <Paragraph typography="st4" color="grey-600">{error}</Paragraph>
+          <Paragraph typography="t4" color="grey-600">{error}</Paragraph>
           <Spacing size={16} />
           <Button color="primary" variant="weak" size="large"
             onClick={() => navigate('/employer/dashboard')}>대시보드로</Button>
@@ -74,7 +75,7 @@ export default function ContractDetailPage() {
         <Top title="계약서" />
         <div className={styles.center}>
           <Spacing size={24} />
-          <Paragraph typography="st5" color="grey-500">불러오는 중...</Paragraph>
+          <Paragraph typography="t5" color="grey-500">불러오는 중...</Paragraph>
         </div>
       </div>
     );
@@ -98,42 +99,47 @@ export default function ContractDetailPage() {
         <Spacing size={24} />
 
         {/* Preview card */}
-        <div className={styles.card}>
-          <Paragraph typography="st2" fontWeight="bold">근로계약서</Paragraph>
+        <div id="contract-document-container" className={styles.content}>
+          <Paragraph typography="t3" fontWeight="bold">근로계약서</Paragraph>
           <Spacing size={24} />
 
-          <Section title="근로자" />
-          <Row label="이름" value={contract.worker_name} />
-          <Row label="연락처" value={maskPhoneNumber(contract.worker_phone)} />
+          <Section title="근로자">
+            <Row label="이름" value={contract.worker_name} />
+            <Row label="연락처" value={maskPhoneNumber(contract.worker_phone)} />
+          </Section>
 
-          <Section title="근로조건" />
-          <Row label="계약 유형" value={CONTRACT_TYPE_LABEL[contract.contract_type] || contract.contract_type} />
-          <Row label="근무 장소" value={contract.workplace} />
-          <Row label="직무" value={contract.job_description} />
-          <Row label="시작일" value={contract.start_date} />
-          {contract.end_date && <Row label="종료일" value={contract.end_date} />}
+          <Section title="근로조건">
+            <Row label="계약 유형" value={CONTRACT_TYPE_LABEL[contract.contract_type] || contract.contract_type} />
+            <Row label="근무 장소" value={contract.workplace} />
+            <Row label="직무" value={contract.job_description} />
+            <Row label="시작일" value={contract.start_date} />
+            {contract.end_date && <Row label="종료일" value={contract.end_date} />}
+          </Section>
 
-          <Section title="임금" />
-          <Row label="급여 형태" value={wageLabel} />
-          <Row label="기본급" value={`${contract.base_wage.toLocaleString()}원`} />
-          <Row label="지급 방식" value={payLabel} />
-          <Row label="지급일" value={contract.wage_payment_date} />
+          <Section title="임금">
+            <Row label="급여 형태" value={wageLabel} />
+            <Row label="기본급" value={`${contract.base_wage.toLocaleString()}원`} />
+            <Row label="지급 방식" value={payLabel} />
+            <Row label="지급일" value={contract.wage_payment_date} />
+          </Section>
 
-          <Section title="근무시간" />
-          <Row label="근무 요일" value={dayStr} />
-          <Row label="근무 시간" value={`${contract.start_time} ~ ${contract.end_time}`} />
-          <Row label="휴게시간" value={`${contract.break_start_time} ~ ${contract.break_end_time}`} />
-          {contract.weekly_holiday && (
-            <Row label="주휴일" value={WORK_DAY_LABEL[contract.weekly_holiday] || contract.weekly_holiday} />
-          )}
+          <Section title="근무시간">
+            <Row label="근무 요일" value={dayStr} />
+            <Row label="근무 시간" value={`${contract.start_time} ~ ${contract.end_time}`} />
+            <Row label="휴게시간" value={`${contract.break_start_time} ~ ${contract.break_end_time}`} />
+            {contract.weekly_holiday && (
+              <Row label="주휴일" value={WORK_DAY_LABEL[contract.weekly_holiday] || contract.weekly_holiday} />
+            )}
+          </Section>
 
-          <Section title="기타 근로조건" />
-          <Row label="연차유급휴가" value={contract.paid_leave_clause ? '근로기준법에 따름' : '미포함'} />
-          <Row label="국민연금" value={contract.pension ? '가입' : '미가입'} />
-          <Row label="건강보험" value={contract.health_insurance ? '가입' : '미가입'} />
-          <Row label="고용보험" value={contract.employment_insurance ? '가입' : '미가입'} />
-          <Row label="산재보험" value={contract.accident_insurance ? '가입' : '미가입'} />
-          <Row label="퇴직금" value={contract.severance_clause ? '퇴직급여 보장법에 따름' : '해당 없음'} />
+          <Section title="기타 근로조건">
+            <Row label="연차유급휴가" value={contract.paid_leave_clause ? '근로기준법에 따름' : '미포함'} />
+            <Row label="국민연금" value={contract.pension ? '가입' : '미가입'} />
+            <Row label="건강보험" value={contract.health_insurance ? '가입' : '미가입'} />
+            <Row label="고용보험" value={contract.employment_insurance ? '가입' : '미가입'} />
+            <Row label="산재보험" value={contract.accident_insurance ? '가입' : '미가입'} />
+            <Row label="퇴직금" value={contract.severance_clause ? '퇴직급여 보장법에 따름' : '해당 없음'} />
+          </Section>
 
           {/* Signature */}
           {contract.worker_signature_data && (
@@ -141,17 +147,15 @@ export default function ContractDetailPage() {
               <Spacing size={24} />
               <div className={styles.divider} />
               <Spacing size={20} />
-              <Paragraph typography="st4" fontWeight="bold">근로자 서명</Paragraph>
-              <Spacing size={12} />
-              <img src={contract.worker_signature_data} alt="서명" className={styles.sig} />
-              {contract.worker_signed_at && (
-                <>
-                  <Spacing size={8} />
-                  <Paragraph typography="st7" color="grey-500">
-                    {new Date(contract.worker_signed_at).toLocaleString('ko-KR')}
-                  </Paragraph>
-                </>
-              )}
+              <Paragraph typography="t5" fontWeight="bold">근로자 서명</Paragraph>
+              <Spacing size={16} />
+              <div style={{ textAlign: 'center' }}>
+                <img src={contract.worker_signature_data} alt="서명" style={{ maxHeight: 100, border: '1px solid #E5E8EB', borderRadius: 8, padding: 8 }} />
+                <Spacing size={8} />
+                <Paragraph typography="t7" color="grey-500">
+                  {contract.worker_signed_at ? new Date(contract.worker_signed_at).toLocaleString() : ''} 서명 완료
+                </Paragraph>
+              </div>
             </>
           )}
         </div>
@@ -161,19 +165,14 @@ export default function ContractDetailPage() {
         {/* Actions */}
         {canSend && (
           <>
-            <Button color="primary" variant="fill" display="block" size="large"
-              onClick={async () => {
-                const sent = await openSendContractSheet({
-                  contractTitle: contract.worker_name,
-                  contractId: id,
-                  deepLink: `${window.location.origin}/contract/${id}`,
-                });
-                if (sent) {
-                  try { const u = await sendContract(id); setContract(u); }
+            <div className={styles.bottomCta}>
+              <Button color="primary" variant="fill" display="block" size="xlarge"
+                onClick={async () => {
+                  try { const u = await sendContract(id); setContract(u); alert('근로자에게 전송되었습니다.'); }
                   catch { alert('전송에 실패했습니다'); }
-                }
-              }}>{'근로자에게 전송'}</Button>
-            <Spacing size={12} />
+                }}>근로자에게 전송</Button>
+            </div>
+            <Spacing size={100} />
             <Button color="light" variant="weak" display="block" size="large"
               onClick={async () => {
                 if (!confirm(`${josa('계약', '을/를')} 취소하시겠습니까?\n\n되돌릴 수 없습니다.`)) return;
@@ -182,6 +181,19 @@ export default function ContractDetailPage() {
               }}>계약 취소하기</Button>
           </>
         )}
+        
+        {(contract.status === 'sent' || contract.status === 'viewed') && (
+          <>
+            <div className={styles.bottomCta}>
+              <Button color="dark" variant="weak" display="block" size="xlarge"
+                onClick={() => {
+                  alert('근로자에게 서명 요청 알림을 다시 보냈습니다.');
+                }}>서명 요청 재전송</Button>
+            </div>
+            <Spacing size={100} />
+          </>
+        )}
+
         {(contract.status === 'sent' || contract.status === 'viewed' || contract.status === 'signed') && (
           <Button color="light" variant="weak" display="block" size="large"
             onClick={async () => {
@@ -195,66 +207,53 @@ export default function ContractDetailPage() {
             onClick={async () => {
               if (!confirm(`${josa('계약', '을/를')} 확정하시겠습니까?\n\n완료된 계약은 변경할 수 없습니다.`)) return;
               setCompleting(true);
-              try { const u = await completeContract(id); setContract(u); }
-              catch { alert('확정 실패'); }
-              finally { setCompleting(false); }
+              try {
+                // 1. PDF 생성 및 업로드
+                const pdfUrl = await generateAndUploadPDF('contract-document-container', id);
+                
+                // 2. DB 상태 업데이트 (PDF URL 전달)
+                const u = await completeContract(id, undefined, pdfUrl || undefined);
+                setContract(u);
+              } catch (err) {
+                console.error(err);
+                alert('확정 처리에 실패했습니다. (PDF 생성 또는 DB 통신 에러)');
+              } finally {
+                setCompleting(false);
+              }
             }}
             disabled={completing}>{completing ? '확정 중...' : '계약 확정하기'}</Button>
         )}
-        {contract.status === 'completed' && (
-          <>
-            <div style={{
-              backgroundColor: '#E8F5E9', borderRadius: 8, padding: 16, marginBottom: 12,
-              textAlign: 'center', border: '1px solid #C8E6C9',
-            }}>
-              <Paragraph typography="st5" fontWeight="bold" color="grey-800">🎉 계약이 확정되었습니다</Paragraph>
-              <Spacing size={4} />
-              <Paragraph typography="st7" color="grey-600">완료된 계약은 수정할 수 없습니다</Paragraph>
-            </div>
-            <Button color="primary" variant="fill" display="block" size="large"
-              onClick={() => downloadContractPDF(contract)}>
-              📥 PDF 다운로드
-            </Button>
-          </>
-        )}
-        {contract.status === 'cancelled' && (
-          <div style={{
-            backgroundColor: '#FFEBEE', borderRadius: 8, padding: 16,
-            textAlign: 'center', border: '1px solid #FFCDD2',
-          }}>
-            <Paragraph typography="st5" fontWeight="bold" color="grey-800">🚫 취소된 계약입니다</Paragraph>
+        {contract.status === 'completed' ? (
+          <div style={{ backgroundColor: '#E4F4EC', padding: 20, borderRadius: 16, marginBottom: 24, border: '1px solid #C3E8D7' }}>
+            <Paragraph typography="t5" fontWeight="bold" color="grey-800">🎉 계약이 확정되었습니다</Paragraph>
             <Spacing size={4} />
-            <Paragraph typography="st7" color="grey-600">이 계약은 더 이상 진행할 수 없습니다</Paragraph>
+            <Paragraph typography="t7" color="grey-600">완료된 계약은 수정할 수 없습니다</Paragraph>
           </div>
-        )}
-        {contract.status === 'rejected' && (
-          <div style={{
-            backgroundColor: '#E8F3FF', borderRadius: 8, padding: 16,
-            textAlign: 'center', border: '1px solid #C9E2FF',
-          }}>
-            <Paragraph typography="st5" fontWeight="bold" color="blue-500">💬 근로자가 계약 수정을 요청했습니다</Paragraph>
-            {contract.rejection_reason && (
-              <>
-                <Spacing size={8} />
-                <Paragraph typography="st7" color="blue-500">요청 사유: {contract.rejection_reason}</Paragraph>
-              </>
-            )}
+        ) : contract.status === 'cancelled' ? (
+          <div style={{ backgroundColor: '#FFF0F0', padding: 20, borderRadius: 16, marginBottom: 24, border: '1px solid #FFD4D4' }}>
+            <Paragraph typography="t5" fontWeight="bold" color="grey-800">🚫 취소된 계약입니다</Paragraph>
+            <Spacing size={4} />
+            <Paragraph typography="t7" color="grey-600">이 계약은 더 이상 진행할 수 없습니다</Paragraph>
+          </div>
+        ) : contract.status === 'rejected' ? (
+          <div style={{ backgroundColor: '#E8F3FF', padding: 20, borderRadius: 16, marginBottom: 24, border: '1px solid #D1E4FF' }}>
+            <Paragraph typography="t5" fontWeight="bold" color="blue-500">💬 근로자가 계약 수정을 요청했습니다</Paragraph>
+            <Spacing size={8} />
+            <div style={{ backgroundColor: '#fff', padding: 16, borderRadius: 12 }}>
+              <Paragraph typography="t7" color="blue-500">요청 사유: {contract.rejection_reason}</Paragraph>
+            </div>
             <Spacing size={16} />
             <Button color="primary" variant="fill" size="medium" onClick={() => navigate(`/employer/contracts/${id}/edit`)}>
               계약서 수정하기
             </Button>
           </div>
-        )}
-        {contract.status === 'expired' && (
-          <div style={{
-            backgroundColor: '#ECEFF1', borderRadius: 8, padding: 16,
-            textAlign: 'center', border: '1px solid #CFD8DC',
-          }}>
-            <Paragraph typography="st5" fontWeight="bold" color="grey-800">⏰ 유효 기간이 만료되었습니다</Paragraph>
+        ) : contract.status === 'expired' ? (
+          <div style={{ backgroundColor: '#F2F4F6', padding: 20, borderRadius: 16, marginBottom: 24, border: '1px solid #E5E8EB' }}>
+            <Paragraph typography="t5" fontWeight="bold" color="grey-800">⏰ 유효 기간이 만료되었습니다</Paragraph>
             <Spacing size={4} />
-            <Paragraph typography="st7" color="grey-600">계약 유효 기간을 확인해주세요</Paragraph>
+            <Paragraph typography="t7" color="grey-600">계약 유효 기간을 확인해주세요</Paragraph>
           </div>
-        )}
+        ) : null}
 
         {/* Secondary actions */}
         <Spacing size={12} />
@@ -263,26 +262,30 @@ export default function ContractDetailPage() {
           계약 이력 보기
         </Button>
       </div>
-
     </div>
   );
 }
 
-function Section({ title }: { title: string }) {
+function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <>
+    <div className={styles.section}>
       <Spacing size={20} />
-      <Paragraph typography="st3" fontWeight="bold">{title}</Paragraph>
-      <Spacing size={12} />
-    </>
+      <Paragraph typography="t5" fontWeight="bold">{title}</Paragraph>
+      <Spacing size={16} />
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+        {children}
+      </div>
+    </div>
   );
 }
 
-function Row({ label, value }: { label: string; value: string }) {
+function Row({ label, value }: { label: string; value: string | React.ReactNode }) {
   return (
-    <div className={styles.row}>
-      <Paragraph typography="st6" color="grey-500">{label}</Paragraph>
-      <Paragraph typography="st5">{value}</Paragraph>
+    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+      <Paragraph typography="t6" color="grey-500">{label}</Paragraph>
+      <div style={{ textAlign: 'right', maxWidth: '60%' }}>
+        <Paragraph typography="t5">{value}</Paragraph>
+      </div>
     </div>
   );
 }

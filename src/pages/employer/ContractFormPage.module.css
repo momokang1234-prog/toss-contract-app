@@ -3,16 +3,24 @@
   margin: 0 auto;
   min-height: 100vh;
   background: #fff;
-  padding-bottom: 100px;
+  padding-bottom: 120px;
+  position: relative;
+}
+
+.progressTrack {
+  height: 3px;
+  background: #E5E8EB;
+  width: 100%;
+}
+
+.progressBar {
+  height: 100%;
+  background: #3182F6;
+  transition: width 0.3s ease;
 }
 
 .content {
-  padding: 0 20px;
-}
-
-.progress {
-  height: 3px;
-  background: #f2f4f6;
+  padding: 40px 24px 0;
 }
 
 .progressBar {
@@ -82,8 +90,8 @@
   transform: translateX(-50%);
   width: 100%;
   max-width: 480px;
-  padding: 16px 20px 32px;
-  background: linear-gradient(to top, #fff 60%, transparent);
+  padding: 16px 24px 32px;
+  background: linear-gradient(180deg, rgba(255,255,255,0) 0%, #fff 20%);
 }
 
 .section {

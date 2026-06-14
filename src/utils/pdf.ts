@@ -216,7 +216,11 @@ export function generatePrintableHTML(contract: Contract): string {
       <div class="sign-box">
         <p style="font-weight: 600;">사용자</p>
         <p style="font-size: 10pt;">(인)</p>
-        <div class="sign-line"></div>
+        <div class="sign-line">
+          ${contract.employer_signature_data
+            ? `<img src="${contract.employer_signature_data}" class="sign-img" alt="사용자 서명" />`
+            : ''}
+        </div>
         <p style="font-size: 8pt; color: #6B7684;">서명 / 날인</p>
       </div>
     </div>

@@ -9,7 +9,9 @@
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "build:ait": "ait build",
+    "deploy:ait": "ait deploy"
   },
   "dependencies": {
     "@apps-in-toss/web-framework": "2.6.1",
@@ -34,6 +36,7 @@
     "@types/react": "^18.3.0",
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.3.0",
+    "puppeteer": "^25.1.0",
     "typescript": "^5.5.0",
     "vite": "^6.0.0",
     "vitest": "^4.1.8"

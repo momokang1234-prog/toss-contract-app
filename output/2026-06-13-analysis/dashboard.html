@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>toss-contract-app · 코드 구조 분석</title>
+<style>
+:root {
+  --bg: #0d1117;
+  --surface: #161b22;
+  --border: #30363d;
+  --text: #c9d1d9;
+  --muted: #8b949e;
+  --accent: #58a6ff;
+  --green: #3fb950;
+  --yellow: #d29922;
+  --red: #f85149;
+  --purple: #a371f7;
+  --radius: 8px;
+  --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  min-height: 100vh;
+}
+header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 20px 32px;
+  position: sticky; top: 0; z-index: 10;
+}
+header h1 { font-size: 22px; font-weight: 700; }
+header .sub { font-size: 13px; color: var(--muted); margin-top: 4px; }
+.badges { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+.badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;
+}
+.badge.ok { background: #1a3a1a; color: var(--green); }
+.badge.warn { background: #3a2e0a; color: var(--yellow); }
+.badge.err { background: #3a0a0a; color: var(--red); }
+nav {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  display: flex; padding: 0 32px; overflow-x: auto;
+}
+nav button {
+  background: none; border: none; color: var(--muted); padding: 14px 20px;
+  font-size: 14px; font-weight: 500; cursor: pointer; white-space: nowrap;
+  border-bottom: 2px solid transparent; transition: .15s;
+}
+nav button:hover { color: var(--text); }
+nav button.active { color: var(--accent); border-bottom-color: var(--accent); }
+main { padding: 32px; max-width: 1200px; }
+.tab { display: none; }
+.tab.active { display: block; }
+.card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 24px; margin-bottom: 20px;
+}
+.card h2 { font-size: 18px; margin-bottom: 16px; color: var(--accent); }
+.card h3 { font-size: 14px; color: var(--muted); margin: 12px 0 8px; }
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px; margin-bottom: 20px;
+}
+.metric {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 20px; text-align: center;
+}
+.metric .value { font-size: 32px; font-weight: 800; }
+.metric .label { font-size: 12px; color: var(--muted); margin-top: 4px; }
+.metric.ok .value { color: var(--green); }
+.metric.warn .value { color: var(--yellow); }
+.metric.err .value { color: var(--red); }
+.metric.info .value { color: var(--accent); }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th, td { padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--border); }
+th { font-weight: 600; color: var(--muted); font-size: 12px; text-transform: uppercase; }
+tr:hover { background: rgba(255,255,255,0.03); }
+.bar-wrap { height: 8px; background: var(--surface); border-radius: 4px; overflow: hidden; }
+.bar-fill { height: 100%; border-radius: 4px; }
+.bar-fill.ts { background: var(--accent); }
+.bar-fill.tsx { background: var(--purple); }
+.bar-fill.other { background: var(--muted); }
+.tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; }
+.tag.entry { color: var(--green); background: #1a3a1a; }
+.tag.type { color: var(--accent); background: #1a2a3a; }
+.tag.test { color: var(--muted); background: #1a1a1a; }
+.tag.unused { color: var(--yellow); background: #3a2e0a; }
+.tag.api { color: var(--purple); background: #2a1a3a; }
+.tree { font-family: 'SF Mono', 'Fira Code', monospace; font-size: 13px; white-space: pre; overflow-x: auto; padding: 16px; background: #0d1117; border-radius: var(--radius); color: var(--muted); }
+footer { text-align: center; padding: 24px; color: var(--muted); font-size: 12px; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🔬 toss-contract-app</h1>
+  <div class="sub">코드 구조 분석 리포트 · 2026-06-13 · tre / tokei / madge / lizard</div>
+  <div class="badges">
+    <span class="badge ok">✓ 순환 의존성 0</span>
+    <span class="badge warn">⚠ 고아 모듈 21</span>
+    <span class="badge err">🔥 복잡도 경고 15</span>
+    <span class="badge ok">180개 파일 · 44.6K 코드</span>
+  </div>
+</header>
+
+<nav>
+  <button class="active" onclick="showTab('overview')">📊 개요</button>
+  <button onclick="showTab('tokei')">📈 코드 통계</button>
+  <button onclick="showTab('madge')">🔗 의존성</button>
+  <button onclick="showTab('lizard')">⚠️ 복잡도</button>
+  <button onclick="showTab('tree')">🗂 디렉토리</button>
+</nav>
+
+<main>
+  <!-- OVERVIEW -->
+  <section id="tab-overview" class="tab active">
+    <div class="metrics">
+      <div class="metric ok"><div class="value">0</div><div class="label">순환 의존성</div></div>
+      <div class="metric info"><div class="value">180</div><div class="label">총 파일</div></div>
+      <div class="metric info"><div class="value">44.6K</div><div class="label">코드 라인</div></div>
+      <div class="metric warn"><div class="value">21</div><div class="label">고아 모듈</div></div>
+      <div class="metric err"><div class="value">15</div><div class="label">복잡도 경고</div></div>
+      <div class="metric info"><div class="value">5.7K</div><div class="label">주석 라인</div></div>
+    </div>
+
+    <div class="card">
+      <h2>프로젝트 구조</h2>
+      <table>
+        <tr><td>프론트엔드</td><td><code>src/</code> — React + TypeScript (Toss 미니앱), 53 TS + 34 TSX</td></tr>
+        <tr><td>백엔드</td><td><code>server/src/</code> — Express + TypeScript, 15 TS</td></tr>
+        <tr><td>Edge Functions</td><td><code>supabase/functions/</code> — 8개 함수</td></tr>
+        <tr><td>정적 에셋</td><td><code>public/</code> — 스크린샷, 은행 아이콘 (33 SVG)</td></tr>
+        <tr><td>문서</td><td><code>docs/</code> — 감사 보고서, 인증 문서</td></tr>
+      </table>
+    </div>
+
+    <div class="card">
+      <h2>주요 언어 분포</h2>
+      <div style="margin-bottom:8px;font-size:12px;color:var(--muted)">TypeScript 53.3% · TSX 36.6% · CSS 4.2% · SQL 4.9% · 기타 1.0%</div>
+      <div class="bar-wrap"><div class="bar-fill ts" style="width:53.3%"></div></div>
+      <div style="margin:4px 0"></div>
+      <div class="bar-wrap"><div class="bar-fill tsx" style="width:36.6%"></div></div>
+    </div>
+
+    <div class="card">
+      <h2>🔴 리팩터링 우선순위</h2>
+      <table>
+        <tr><th>순위</th><th>함수</th><th>파일</th><th>CCN</th><th>길이</th><th>조치</th></tr>
+        <tr><td>1</td><td><code>createContract</code></td><td>src/hooks/useContracts.ts</td><td style="color:var(--red)">49</td><td>60</td><td>분기/로직 분해</td></tr>
+        <tr><td>2</td><td><code>validateStep</code></td><td>.../hooks/useContractForm.ts</td><td style="color:var(--red)">44</td><td>85</td><td>Step별 검증 분리</td></tr>
+        <tr><td>3</td><td><code>useContractForm</code></td><td>.../hooks/useContractForm.ts</td><td>1</td><td style="color:var(--red)">258</td><td>하위 hook 분리</td></tr>
+        <tr><td>4</td><td><code>validateLaborContract</code></td><td>src/domain/contract/validation.ts</td><td>25</td><td>174</td><td>규칙 개별 추출</td></tr>
+        <tr><td>5</td><td>auth route</td><td>server/src/routes/auth.ts</td><td>30</td><td>119</td><td>핸들러 분할</td></tr>
+      </table>
+    </div>
+  </section>
+
+  <!-- TOKEI -->
+  <section id="tab-tokei" class="tab">
+    <div class="card">
+      <h2>언어별 코드 통계</h2>
+      <table>
+        <tr><th>언어</th><th>파일</th><th>전체 라인</th><th>코드</th><th>주석</th><th>공백</th><th>주석률</th></tr>
+        <tr><td><strong>TypeScript</strong></td><td>53</td><td>6,000</td><td>4,755</td><td>572</td><td>673</td><td>10.7%</td></tr>
+        <tr><td><strong>TSX</strong></td><td>34</td><td>3,574</td><td>3,265</td><td>31</td><td>278</td><td>0.9%</td></tr>
+        <tr><td>SVG</td><td>33</td><td>1,127</td><td>944</td><td>183</td><td>0</td><td>—</td></tr>
+        <tr><td>CSS</td><td>16</td><td>436</td><td>377</td><td>6</td><td>53</td><td>1.6%</td></tr>
+        <tr><td>SQL</td><td>7</td><td>587</td><td>436</td><td>99</td><td>52</td><td>18.5%</td></tr>
+        <tr><td>JavaScript</td><td>2</td><td>156</td><td>120</td><td>16</td><td>20</td><td>11.8%</td></tr>
+        <tr><td>YAML</td><td>2</td><td>99</td><td>89</td><td>0</td><td>10</td><td>—</td></tr>
+        <tr><td>Python</td><td>1</td><td>59</td><td>52</td><td>1</td><td>6</td><td>—</td></tr>
+        <tr><td>Dockerfile</td><td>1</td><td>28</td><td>16</td><td>2</td><td>10</td><td>—</td></tr>
+        <tr><td>TOML</td><td>1</td><td>23</td><td>15</td><td>4</td><td>4</td><td>—</td></tr>
+        <tr><td>JSON</td><td>8</td><td>30,439</td><td>30,439</td><td>0</td><td>0</td><td>—</td></tr>
+        <tr style="font-weight:700;border-top:2px solid var(--border)">
+          <td>합계</td><td>180</td><td>53,708</td><td>44,597</td><td>5,734</td><td>3,377</td><td>—</td>
+        </tr>
+      </table>
+    </div>
+    <div class="card">
+      <h2>인라인 코드 포함 통계</h2>
+      <table>
+        <tr><th>컨테이너</th><th>인라인 언어</th><th>전체 라인</th><th>코드</th></tr>
+        <tr><td>HTML</td><td>CSS + JS</td><td>4,222</td><td>3,786</td></tr>
+        <tr><td>Markdown</td><td>BASH, SQL, TSX, TypeScript</td><td>6,612</td><td>303</td></tr>
+      </table>
+    </div>
+  </section>
+
+  <!-- MADGE -->
+  <section id="tab-madge" class="tab">
+    <div class="metrics">
+      <div class="metric ok"><div class="value">0</div><div class="label">순환 의존성</div></div>
+      <div class="metric info"><div class="value">73</div><div class="label">분석된 모듈</div></div>
+      <div class="metric warn"><div class="value">21</div><div class="label">고아 모듈</div></div>
+    </div>
+
+    <div class="card">
+      <h2>의존성 그래프</h2>
+      <p style="color:var(--muted);margin-bottom:16px">73개 모듈, 노란색: 의존성 있음, 초록색: leaf 모듈 (의존성 없음)</p>
+      <img src="05-dep-graph.svg" style="width:100%;max-height:600px;object-fit:contain;background:#0d1117;border-radius:var(--radius)" alt="Dependency Graph">
+    </div>
+
+    <div class="card">
+      <h2>고아 모듈 (어디서도 import 되지 않음)</h2>
+      <table>
+        <tr><th>파일</th><th>카테고리</th><th>상태</th></tr>
+        <tr><td><code>api/smart-messenger.ts</code></td><td><span class="tag api">API</span></td><td><span class="tag unused">미사용 의심</span></td></tr>
+        <tr><td><code>components/AuthScreen.tsx</code></td><td><span class="tag type">컴포넌트</span></td><td><span class="tag unused">미사용 의심</span></td></tr>
+        <tr><td><code>components/BusinessVerify.tsx</code></td><td><span class="tag type">컴포넌트</span></td><td><span class="tag unused">미사용 의심</span></td></tr>
+        <tr><td><code>components/ContractResult.tsx</code></td><td><span class="tag type">컴포넌트</span></td><td><span class="tag unused">미사용 의심</span></td></tr>
+        <tr><td><code>components/auth/RoleGuard.tsx</code></td><td><span class="tag type">컴포넌트</span></td><td><span class="tag unused">미사용 의심</span></td></tr>
+        <tr><td><code>components/contract/ContractPreview.tsx</code></td><td><span class="tag type">컴포넌트</span></td><td><span class="tag unused">미사용 의심</span></td></tr>
+        <tr><td><code>components/contract/ContractStatusBadge.tsx</code></td><td><span class="tag type">컴포넌트</span></td><td><span class="tag unused">미사용 의심</span></td></tr>
+        <tr><td><code>components/shared/ContentContainer.tsx</code></td><td><span class="tag type">컴포넌트</span></td><td><span class="tag unused">미사용 의심</span></td></tr>
+        <tr><td><code>domain/contract/converter.ts</code></td><td><span class="tag type">도메인</span></td><td><span class="tag unused">미사용 의심</span></td></tr>
+        <tr><td><code>domain/contract/index.ts</code></td><td><span class="tag type">도메인</span></td><td><span class="tag unused">배럴 파일?</span></td></tr>
+        <tr><td><code>pages/employer/.../Step1BasicInfo.tsx</code></td><td><span class="tag type">컴포넌트</span></td><td><span class="tag entry">동적 import?</span></td></tr>
+        <tr><td><code>pages/employer/.../Step2WorkConditions.tsx</code></td><td><span class="tag type">컴포넌트</span></td><td><span class="tag entry">동적 import?</span></td></tr>
+        <tr><td><code>pages/employer/.../Step3WorkSchedule.tsx</code></td><td><span class="tag type">컴포넌트</span></td><td><span class="tag entry">동적 import?</span></td></tr>
+        <tr><td><code>pages/employer/.../Step4WageInsurance.tsx</code></td><td><span class="tag type">컴포넌트</span></td><td><span class="tag entry">동적 import?</span></td></tr>
+        <tr><td><code>domain/contract/__tests__/schema.test.ts</code></td><td><span class="tag test">테스트</span></td><td><span class="tag test">정상</span></td></tr>
+        <tr><td><code>domain/contract/__tests__/validation.test.ts</code></td><td><span class="tag test">테스트</span></td><td><span class="tag test">정상</span></td></tr>
+        <tr><td><code>hooks/__tests__/useContracts.test.ts</code></td><td><span class="tag test">테스트</span></td><td><span class="tag test">정상</span></td></tr>
+        <tr><td><code>main.tsx</code></td><td><span class="tag entry">진입점</span></td><td><span class="tag entry">정상</span></td></tr>
+        <tr><td><code>types/roles.ts</code></td><td><span class="tag type">타입</span></td><td><span class="tag type">정상</span></td></tr>
+        <tr><td><code>vite-env.d.ts</code></td><td><span class="tag entry">환경</span></td><td><span class="tag entry">정상</span></td></tr>
+      </table>
+    </div>
+  </section>
+
+  <!-- LIZARD -->
+  <section id="tab-lizard" class="tab">
+    <div class="card">
+      <h2>복잡도 경고 — CCN ≥ 10, 길이 ≥ 50</h2>
+      <table>
+        <tr><th>#</th><th>함수</th><th>파일</th><th>NLOC</th><th>CCN</th><th>길이</th><th>파라미터</th></tr>
+        <tr style="background:rgba(248,81,73,0.1)">
+          <td>1</td><td><code>createContract</code></td>
+          <td>src/hooks/useContracts.ts:347</td><td>56</td><td style="color:var(--red);font-weight:800">49</td><td>60</td><td>1</td>
+        </tr>
+        <tr style="background:rgba(248,81,73,0.1)">
+          <td>2</td><td><code>validateStep</code></td>
+          <td>.../hooks/useContractForm.ts:138</td><td>85</td><td style="color:var(--red);font-weight:800">44</td><td>85</td><td>1</td>
+        </tr>
+        <tr style="background:rgba(248,81,73,0.07)">
+          <td>3</td><td><code>(anonymous) auth</code></td>
+          <td>server/src/routes/auth.ts:287</td><td>92</td><td style="color:var(--red);font-weight:800">30</td><td>119</td><td>0</td>
+        </tr>
+        <tr style="background:rgba(248,81,73,0.07)">
+          <td>4</td><td><code>validateLaborContract</code></td>
+          <td>src/domain/contract/validation.ts:83</td><td>141</td><td style="color:var(--red);font-weight:800">25</td><td style="color:var(--red)">174</td><td>1</td>
+        </tr>
+        <tr>
+          <td>5</td><td><code>handleSubmit</code></td>
+          <td>.../hooks/useContractForm.ts:224</td><td>48</td><td>12</td><td>49</td><td>0</td>
+        </tr>
+        <tr>
+          <td>6</td><td><code>(anonymous) transfers</code></td>
+          <td>server/src/routes/transfers.ts:51</td><td>63</td><td>6</td><td>76</td><td>0</td>
+        </tr>
+        <tr>
+          <td>7</td><td><code>useContractForm</code></td>
+          <td>.../hooks/useContractForm.ts:37</td><td>42</td><td>1</td><td style="color:var(--red)">258</td><td>0</td>
+        </tr>
+        <tr>
+          <td>8</td><td><code>(anonymous) test</code></td>
+          <td>.../validation.test.ts:49</td><td>25</td><td>1</td><td style="color:var(--red)">231</td><td>0</td>
+        </tr>
+        <tr>
+          <td>9</td><td><code>useContracts</code></td>
+          <td>src/hooks/useContracts.ts:267</td><td>11</td><td>1</td><td>79</td><td>0</td>
+        </tr>
+        <tr>
+          <td>10</td><td><code>useBusiness</code></td>
+          <td>src/hooks/useBusiness.ts:84</td><td>10</td><td>1</td><td>78</td><td>0</td>
+        </tr>
+        <tr>
+          <td>11</td><td><code>baseCSS</code></td>
+          <td>src/utils/pdf.ts:26</td><td>105</td><td>1</td><td>107</td><td>0</td>
+        </tr>
+        <tr>
+          <td>12</td><td><code>generatePrintableHTML</code></td>
+          <td>src/utils/pdf.ts:132</td><td>64</td><td>4</td><td>65</td><td>1</td>
+        </tr>
+        <tr>
+          <td>13</td><td><code>(anonymous) txns</code></td>
+          <td>server/src/routes/transactions.ts:43</td><td>22</td><td>4</td><td>56</td><td>0</td>
+        </tr>
+        <tr>
+          <td>14</td><td><code>generateContractHtml</code></td>
+          <td>src/hooks/useContracts.ts:213</td><td>51</td><td>3</td><td>53</td><td>1</td>
+        </tr>
+        <tr>
+          <td>15</td><td><code>downloadContractPDF</code></td>
+          <td>src/utils/pdf.ts:352</td><td>45</td><td>3</td><td>56</td><td>1</td>
+        </tr>
+      </table>
+    </div>
+
+    <div class="card">
+      <h2>파일별 집계</h2>
+      <table>
+        <tr><th>파일</th><th>경고 수</th><th>주요 이슈</th></tr>
+        <tr style="background:rgba(248,81,73,0.05)"><td><code>useContractForm.ts</code></td><td>3</td><td>CCN 44 + 길이 258 + CCN 12</td></tr>
+        <tr style="background:rgba(248,81,73,0.05)"><td><code>useContracts.ts</code></td><td>3</td><td>CCN 49 + 길이 79 + CCN 3</td></tr>
+        <tr style="background:rgba(248,81,73,0.05)"><td><code>pdf.ts</code></td><td>3</td><td>길이 107 + 길이 65 + 길이 56</td></tr>
+        <tr><td><code>validation.ts</code></td><td>1</td><td>CCN 25 + 길이 174</td></tr>
+        <tr><td><code>auth.ts</code></td><td>1</td><td>CCN 30 + 길이 119</td></tr>
+        <tr><td><code>transfers.ts</code></td><td>1</td><td>길이 76</td></tr>
+        <tr><td><code>useBusiness.ts</code></td><td>1</td><td>길이 78</td></tr>
+        <tr><td><code>transactions.ts</code></td><td>1</td><td>길이 56</td></tr>
+        <tr><td><code>validation.test.ts</code></td><td>1</td><td>길이 231</td></tr>
+      </table>
+    </div>
+  </section>
+
+  <!-- TREE -->
+  <section id="tab-tree" class="tab">
+    <div class="card">
+      <h2>디렉토리 구조 요약</h2>
+      <div style="font-family:'SF Mono',monospace;font-size:12px;line-height:1.8;color:var(--muted)">
+        toss-contract-app<br>
+        ├── <strong style="color:var(--accent)">src/</strong> — React + TypeScript 프론트엔드<br>
+        │   ├── <strong style="color:var(--accent)">pages/</strong> — 15개 페이지 컴포넌트<br>
+        │   │   ├── auth/ — 로그인<br>
+        │   │   ├── employer/ — 사업주 대시보드·계약·계약폼<br>
+        │   │   │   └── <strong>contract-form/</strong> — 6단계 위자드<br>
+        │   │   ├── shared/ — NotFound, Deeplink<br>
+        │   │   └── worker/ — 근로자 계약·서명<br>
+        │   ├── <strong>components/</strong> — 15개 공통 컴포넌트<br>
+        │   ├── <strong>hooks/</strong> — useContracts, useBusiness<br>
+        │   ├── <strong>domain/contract/</strong> — schema, validation, laborRules, converter<br>
+        │   ├── <strong>api/</strong> — supabase, toss-auth, smart-messenger<br>
+        │   ├── contexts/ — AuthContext<br>
+        │   └── utils/ — pdfGenerator, errorHandler, format, labels<br>
+        ├── <strong style="color:var(--purple)">server/src/</strong> — Express 백엔드<br>
+        │   ├── routes/ — auth, accounts, transactions, transfers<br>
+        │   ├── middleware/ — auth, validation<br>
+        │   ├── db/ — migrations (4개), client<br>
+        │   └── models/ — 타입 정의<br>
+        ├── <strong>supabase/functions/</strong> — 8개 Edge Functions<br>
+        ├── docs/ — 감사·인증 문서<br>
+        └── public/ — 정적 에셋<br>
+      </div>
+    </div>
+    <div class="card">
+      <h2>전체 트리 (tre)</h2>
+      <div class="tree" id="tree-content">로딩 중...</div>
+    </div>
+  </section>
+</main>
+
+<footer>toss-contract-app · 코드 구조 분석 · 2026-06-13 · tre / tokei / madge / lizard</footer>
+
+<script>
+function showTab(id) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  event.target.classList.add('active');
+}
+
+// Load tree file
+document.getElementById('tree-content').textContent = `.
+├── .omp
+│   ├── agents
+│   │   ├── code-structure-analyzer.md
+│   │   ├── functional-qa.md
+│   │   ├── robustness-auditor.md
+│   │   └── ux-auditor.md
+│   └── rules
+│       └── verification-gate.md
+├── app.ait
+├── app.json
+├── base-directory-tree
+│   ├── .babelrc
+│   ├── .gitignore
+│   ├── .postcssrc
+│   ├── LICENSE
+│   ├── README.md
+│   ├── package-lock.json
+│   ├── package.json
+│   ├── public
+│   │   ├── favicon.ico
+│   │   └── index.html
+│   └── src
+│       ├── App.vue
+│       ├── assets
+│       │   └── logo.png
+│       ├── components
+│       │   ├── AppArrow.vue
+│       │   ├── AppDarkmode.vue
+│       │   ├── AppItem.vue
+│       │   ├── AppLightmode.vue
+│       │   ├── AppMoreinfo.vue
+│       │   ├── AppNav.vue
+│       │   ├── AppNote.vue
+│       │   └── AppToggle.vue
+│       ├── main.js
+│       ├── name.js
+│       ├── store.js
+│       └── tree.js
+├── docs
+│   ├── auth_docs
+│   │   ├── supabase.md
+│   │   ├── toss_mini_app.md
+│   │   └── vite.md
+│   ├── audit
+│   │   ├── 2026-06-05-toss-contract-app-assessment-and-roadmap.md
+│   │   └── screenshots
+│   │       ├── 01-auth.png
+│   │       ├── 02-business.png
+│   │       ├── 03-business-empty-error.png
+│   │       ├── 04-business-verified.png
+│   │       ├── 05-contract-form.png
+│   │       ├── 06-contract-empty-errors.png
+│   │       ├── 07-result.png
+│   │       └── 08-result-valid.png
+│   └── plans
+│       └── 2026-06-05-toss-contract-app-audit-plan.md
+├── output
+│   └── 2026-06-13-analysis
+│       └── 01-tree.txt
+├── public
+│   ├── app.json
+│   ├── screenshots
+│   │   ├── madge-dep-graph.svg
+│   │   ├── project-explorer-full.png
+│   │   ├── business-new.png
+│   │   ├── contract-detail.png
+│   │   ├── contract-history.png
+│   │   ├── contracts-list.png
+│   │   ├── contracts-new.png
+│   │   ├── dashboard.png
+│   │   ├── deeplink.png
+│   │   ├── login.png
+│   │   ├── role-select.png
+│   │   ├── root.png
+│   │   ├── showcase-business.png
+│   │   ├── showcase-dashboard.png
+│   │   ├── showcase-detail.png
+│   │   ├── showcase-list.png
+│   │   ├── showcase-login.png
+│   │   ├── showcase-new.png
+│   │   ├── showcase-sign.png
+│   │   ├── showcase-worker-detail.png
+│   │   ├── showcase-worker-list.png
+│   │   ├── worker-detail.png
+│   │   ├── worker-list.png
+│   │   └── worker-sign.png
+│   ├── banks
+│   │   ├── busan.png
+│   │   ├── busan.svg
+│   │   ├── daegu.png
+│   │   ├── daegu.svg
+│   │   ├── gwangju.png
+│   │   ├── gwangju.svg
+│   │   ├── hana-real.png
+│   │   ├── hana.png
+│   │   ├── hana.svg
+│   │   ├── ibk-real.png
+│   │   ├── ibk.png
+│   │   ├── ibk.svg
+│   │   ├── icon-bank.svg
+│   │   ├── jeonbuk.png
+│   │   ├── jeonbuk.svg
+│   │   ├── kakao-gh.png
+│   │   ├── kakao-real.png
+│   │   ├── kakao.png
+│   │   ├── kakao.svg
+│   │   ├── kb-real.png
+│   │   ├── kb-test.png
+│   │   ├── kb.png
+│   │   ├── kb.svg
+│   │   ├── kbank-real.png
+│   │   ├── kbank.png
+│   │   ├── kbank.svg
+│   │   ├── nh-real.png
+│   │   ├── nh.png
+│   │   ├── nh.svg
+│   │   ├── sc.png
+│   │   ├── sc.svg
+│   │   ├── sh.png
+│   │   ├── sh.svg
+│   │   ├── shinhan-real.png
+│   │   ├── shinhan.png
+│   │   ├── shinhan.svg
+│   │   ├── toss-logo.svg
+│   │   ├── toss-real.svg
+│   │   ├── tossbank-real.png
+│   │   ├── tossbank.png
+│   │   ├── tossbank.svg
+│   │   ├── woori-real.png
+│   │   ├── woori.png
+│   │   └── woori.svg
+│   ├── icons
+│   │   └── banks
+│   │       ├── hana.svg
+│   │       ├── ibk.svg
+│   │       ├── kakao.svg
+│   │       ├── kb.svg
+│   │       ├── kbank.svg
+│   │       ├── kfcc.svg
+│   │       ├── nh.svg
+│   │       ├── post.svg
+│   │       ├── sc.svg
+│   │       ├── shinhan.svg
+│   │       ├── shinhyup.svg
+│   │       ├── suhyup.svg
+│   │       ├── toss.svg
+│   │       └── woori.svg
+│   ├── preview-test.html
+│   ├── showcase.html
+│   ├── tds-minimal.html
+│   └── workspace.html
+├── server
+│   ├── fly.toml
+│   ├── src
+│   │   ├── db
+│   │   │   ├── migrations
+│   │   │   │   ├── 002_create_profiles.sql
+│   │   │   │   ├── 003_businesses_and_contracts.sql
+│   │   │   │   ├── 004_fix_contracts.sql
+│   │   │   │   └── 001_initial.sql
+│   │   │   └── client.ts
+│   │   ├── app.ts
+│   │   ├── config
+│   │   │   └── index.ts
+│   │   ├── middleware
+│   │   │   ├── auth.ts
+│   │   │   └── validation.ts
+│   │   ├── models
+│   │   │   └── index.ts
+│   │   ├── routes
+│   │   │   ├── accounts.ts
+│   │   │   ├── auth.ts
+│   │   │   ├── transactions.ts
+│   │   │   └── transfers.ts
+│   │   ├── server.ts
+│   │   └── swagger.ts
+│   ├── .env.example
+│   ├── Dockerfile
+│   ├── README.md
+│   ├── docker-compose.yml
+│   ├── package-lock.json
+│   ├── package.json
+│   ├── tests
+│   │   ├── accounts.test.ts
+│   │   ├── auth.test.ts
+│   │   ├── setup.ts
+│   │   ├── transactions.test.ts
+│   │   └── transfers.test.ts
+│   ├── tsconfig.json
+│   └── vitest.config.ts
+├── src
+│   ├── components
+│   │   ├── SignaturePad.tsx
+│   │   ├── funnel
+│   │   │   ├── FunnelQuestion.module.css
+│   │   │   └── FunnelQuestion.tsx
+│   │   ├── AuthScreen.tsx
+│   │   ├── BusinessVerify.tsx
+│   │   ├── ContractResult.tsx
+│   │   ├── ErrorBoundary.tsx
+│   │   ├── auth
+│   │   │   └── RoleGuard.tsx
+│   │   ├── contract
+│   │   │   ├── ContractCard.module.css
+│   │   │   ├── ContractCard.tsx
+│   │   │   ├── ContractPreview.tsx
+│   │   │   └── ContractStatusBadge.tsx
+│   │   ├── delivery
+│   │   │   └── SendContractSheet.tsx
+│   │   └── shared
+│   │       ├── ContentContainer.module.css
+│   │       └── ContentContainer.tsx
+│   ├── utils
+│   │   ├── pdfGenerator.ts
+│   │   ├── errorHandler.ts
+│   │   ├── format.ts
+│   │   ├── labels.ts
+│   │   ├── pdf.ts
+│   │   └── sanitize.ts
+│   ├── App.tsx
+│   ├── api
+│   │   ├── smart-messenger.ts
+│   │   ├── supabase.ts
+│   │   └── toss-auth.ts
+│   ├── contexts
+│   │   └── AuthContext.tsx
+│   ├── domain
+│   │   └── contract
+│   │       ├── __tests__
+│   │       │   ├── schema.test.ts
+│   │       │   └── validation.test.ts
+│   │       ├── converter.ts
+│   │       ├── index.ts
+│   │       ├── laborRules.ts
+│   │       ├── schema.ts
+│   │       └── validation.ts
+│   ├── hooks
+│   │   ├── __tests__
+│   │   │   └── useContracts.test.ts
+│   │   ├── useBusiness.ts
+│   │   └── useContracts.ts
+│   ├── index.css
+│   ├── main.tsx
+│   ├── pages
+│   │   ├── auth
+│   │   │   ├── LoginPage.module.css
+│   │   │   └── LoginPage.tsx
+│   │   ├── employer
+│   │   │   ├── BusinessFormPage.module.css
+│   │   │   ├── BusinessFormPage.tsx
+│   │   │   ├── ContractDetailPage.module.css
+│   │   │   ├── ContractDetailPage.tsx
+│   │   │   ├── ContractFormPage.module.css
+│   │   │   ├── ContractFormPage.tsx
+│   │   │   ├── ContractHistoryPage.module.css
+│   │   │   ├── ContractHistoryPage.tsx
+│   │   │   ├── ContractListPage.module.css
+│   │   │   ├── ContractListPage.tsx
+│   │   │   ├── DashboardPage.module.css
+│   │   │   ├── DashboardPage.tsx
+│   │   │   └── contract-form
+│   │   │       ├── hooks
+│   │   │       │   └── useContractForm.ts
+│   │   │       ├── steps
+│   │   │       │   ├── FieldLabel.tsx
+│   │   │       │   ├── Step1BasicInfo.tsx
+│   │   │       │   ├── Step2WorkConditions.tsx
+│   │   │       │   ├── Step3WorkSchedule.tsx
+│   │   │       │   ├── Step4WageInsurance.tsx
+│   │   │       │   ├── Step5LegalValidation.tsx
+│   │   │       │   └── Step6Preview.tsx
+│   │   │       └── types.ts
+│   │   ├── shared
+│   │   │   ├── DeeplinkHandler.module.css
+│   │   │   ├── DeeplinkHandler.tsx
+│   │   │   ├── NotFoundPage.module.css
+│   │   │   └── NotFoundPage.tsx
+│   │   └── worker
+│   │       ├── ContractDetailPage.module.css
+│   │       ├── ContractDetailPage.tsx
+│   │       ├── ContractListPage.module.css
+│   │       ├── ContractListPage.tsx
+│   │       ├── ContractSignPage.module.css
+│   │       └── ContractSignPage.tsx
+│   ├── types
+│   │   └── roles.ts
+│   └── vite-env.d.ts
+├── supabase
+│   ├── .temp
+│   │   ├── cli-latest
+│   │   └── linked-project.json
+│   ├── functions
+│   │   ├── auth-token
+│   │   │   └── index.ts
+│   │   ├── contracts-cancel
+│   │   │   └── index.ts
+│   │   ├── contracts-complete
+│   │   │   └── index.ts
+│   │   ├── contracts-expire
+│   │   │   └── index.ts
+│   │   ├── contracts-reject
+│   │   │   └── index.ts
+│   │   ├── contracts-send
+│   │   │   └── index.ts
+│   │   ├── contracts-sign
+│   │   │   └── index.ts
+│   │   └── contracts-view
+│   │       └── index.ts
+│   └── migrations
+│       ├── 001_initial_schema.sql
+│       ├── 002_rls_policies.sql
+│       └── 004_expire_cron.sql
+├── test_supabase.ts
+├── .env.example
+├── .gitignore
+├── .granite
+│   └── app.json
+├── .hermes
+│   ├── AGENTS.md
+│   └── plans
+│       └── 2026-06-10-tds-inline-cleanup.md
+├── MEMORY.md
+├── PRD.md
+├── README.md
+├── bossimclockedin.ait
+├── code_review_report.md
+├── granite.config.ts
+├── index.html
+├── legal_risk_analysis.md
+├── log-server.py
+├── package-lock.json
+├── package.json
+├── plan.md
+├── scripts
+│   ├── capture-screenshots.cjs
+│   └── capture-screenshots.js
+├── tds-minimal.html
+├── toss-contract-app
+├── toss-contract-app.ait
+├── tsconfig.json
+├── vite.config.ts
+├── vitest.config.ts
+├── workflow
+│   └── seed.yaml
+└── workspace.html
+`;
+</script>
+</body>
+</html>

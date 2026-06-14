@@ -1,0 +1,170 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="ko" xml:lang="ko">
+<head>
+	<title>페이지 요청 오류</title>
+	<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Cache-control" content="No-cache" />
+	<meta http-equiv="Pragma" content="No-cache" />
+	<meta name="Description" content="" />
+	<meta name="Keywords" content="" />
+	<link rel="stylesheet" type="text/css" href="https://image.kebhana.com/pbk/resource/css/base.css" />
+	<link rel="stylesheet" type="text/css" href="https://image.kebhana.com/pbk/resource/css/common.css" />
+	<link rel="stylesheet" type="text/css" href="https://image.kebhana.com/pbk/resource/css/contents.css" />
+	<link rel="stylesheet" type="text/css" href="https://image.kebhana.com/pbk/resource/css/binWide.css" />
+	<link rel="stylesheet" type="text/css" href="https://image.kebhana.com/pbk/resource/css/hn.css" />
+	
+	
+	<script type="text/javascript">
+
+        if (document.getElementById('HANA_CONTENTS_DIV')) {
+            document.location.href = "/common/construct.html";
+        }
+	
+		function getCookie(name) {
+	
+		    var nameOfCookie = name + "=";
+		    var x = 0;
+		    while(x <= document.cookie.length)
+		    {
+		            var y = (x + nameOfCookie.length);
+		            if(document.cookie.substring(x,y) == nameOfCookie)
+		            {
+		                    if((endOfCookie = document.cookie.indexOf(";",y)) == -1)
+		                            endOfCookie = document.cookie.length;
+		                    return unescape(document.cookie.substring(y,endOfCookie));
+		            }
+		            x = document.cookie.indexOf(" ",x) + 1;
+		            if(x == 0)
+		                    break;
+		    }
+		    return "";
+	
+		}
+		
+		// 다국어지원을 위한 번역데이터
+		function dataManager()
+		{
+			var dataObj = new Object();
+			
+			dataObj["KO"] = {};	
+			dataObj["EN"] = {};	
+			dataObj["JA"] = {};	
+			dataObj["ZH"] = {};	
+			dataObj["VI"] = {};	
+
+			// 한국어
+			dataObj["KO"].view_00 = "죄송합니다. 요청하신 페이지를 찾을 수 없습니다.";
+			dataObj["KO"].view_01 = "보고자 하는 페이지가 없어졌거나 일시적으로 장애일수 있습니다.";
+			dataObj["KO"].view_02 = "하나은행 개인뱅킹 바로가기";		
+			// 영어
+			dataObj["EN"].view_00 = "We are sorry. The requested page can’t be found.";
+			dataObj["EN"].view_01 = "The page you’re looking for may have disappeared or is temporarily out of service.";
+			dataObj["EN"].view_02 = "Go to Hana Bank Personal Banking";
+			// 일본어
+			dataObj["JA"].view_00 = "申し訳ございません。ご要請のページを見つけることができません。";
+			dataObj["JA"].view_01 = "閲覧したいページがなくなったか、一時的な障害の可能性があります。";
+			dataObj["JA"].view_02 = " ハナ銀行個人バンキングショートカット";
+			// 중국어
+			dataObj["ZH"].view_00 = "我们深表歉意。无法找到请求的页面。";
+			dataObj["ZH"].view_01 = "您正在查找的页面可能已不存在或服务暂停。";
+			dataObj["ZH"].view_02 = "转到 韩亚银行个人银行";
+			// 베트남어
+			dataObj["VI"].view_00 = "Chúng tôi rất tiếc. Không tìm thấy trang yêu cầu.";
+			dataObj["VI"].view_01 = "Trang bạn đang tìm kiếm có thể đã biến mất hoặc tạm thời không hoạt động.";
+			dataObj["VI"].view_02 = "Truy cập Dịch Vụ Ngân Hàng Cá Nhân Ngân hàng Hana";
+
+			return dataObj;
+		}
+		
+	
+
+		// 각언어 별로 보여주는 부분이 다름
+		function viewContent()
+		{
+			var lang = getCookie("_COOKIE_MULTI_LANGUAGE_CODE_KEY_");
+			try
+			{
+				var dataObj = dataManager();
+				// 언어셋이 없을 때 한국어 선택
+				if(lang== null || lang =="" || lang =="undefined")
+					lang = "KO";
+				
+				
+				if(lang!="KO")
+				{
+					document.getElementById("logoImg").src = "https://image.kebhana.com/pbk/easyone/resource/img/common/logo_hana1q.png";
+
+					document.getElementById("view_00").innerHTML = dataObj[lang].view_00;
+					document.getElementById("view_01").innerHTML = dataObj[lang].view_01;
+					document.getElementById("view_02").innerHTML = dataObj[lang].view_02;
+				}
+				else
+				{
+					document.getElementById("logoImg").src = "https://image.kebhana.com/pbk/resource/simple/img/common/logo_sub.png";
+
+				}
+			}
+			catch(e)
+			{
+				
+			}
+
+			document.getElementById("HANA_WRAP_DIV").style.display = "";
+
+
+		}
+
+		function goMain()
+		{
+			var lang = getCookie("_COOKIE_MULTI_LANGUAGE_CODE_KEY_");
+			if(lang== null || lang =="" || lang =="undefined")
+				lang = "KO";
+			
+				if(lang!="KO")
+					location.href='/easyone_index.html';
+				else
+					location.href='/';
+		}
+
+	</script>
+	
+</head>
+
+<body onload="viewContent();">
+	
+	<div id="HANA_SKIP_NAVI_DIV">
+		<h2>SKIP HANA_CONTENTS_DIV</h2>
+		<ul>
+			<li><a href="#HANA_CONTENTS_DIV">본문 바로가기</a></li>
+		</ul>
+	</div>
+	<div id="HANA_WRAP_DIV" style="display:none">
+		<div id="HANA_HEAD_DIV">
+			<div class="top_gnb">
+				<h1 class="logo" style="border:none;"><a href="#//HanaBank" onclick="goMain(); return false;" id="logo_link"><img id="logoImg" alt="하나은행 개인뱅킹" src="https://image.kebhana.com/pbk/resource/simple/img/common/logo_sub.png"></a></h1>
+			</div>
+		</div>
+		<div class="pop_ty01 pop_ty09 top70px" style="width:630px">
+			<!-- pop_cont -->
+			<div class="error_cont">
+				<h4 id="view_00">죄송합니다. 요청하신 페이지를 찾을 수 없습니다.</h4>
+				<div class="info03 info07">	
+					<ul class="lst_01">
+						<li id="view_01">보고자 하는 페이지가 없어졌거나 일시적으로 장애일수 있습니다.</li>
+					</ul>
+				</div>
+				<div class="btn_ex01">
+					<span><a href="#//HanaBank" onclick="goMain(); return false;" id="view_02">하나은행 개인뱅킹 바로가기</a></span>
+				</div>
+			</div>
+			<div class="pop_footer">
+				<p>COPYRIGHT(C) 2015 HANABANK. ALL RIGHTS RESERVED.</p>
+			</div>
+		</div>	
+	</div>
+</body>
+
+</html>
+
+										
+

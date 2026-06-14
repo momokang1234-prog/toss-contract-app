@@ -23,16 +23,16 @@ export default function ContractHistoryPage() {
       <Top title="계약 이력" />
       <div className={styles.content}>
         <Spacing size={24} />
-        <Paragraph typography="st2" fontWeight="bold">계약 이력</Paragraph>
-        <Spacing size={8} />
-        <Paragraph typography="st5" color="grey-500">
+        <Paragraph typography="t3" fontWeight="bold">계약 이력</Paragraph>
+        <Spacing size={12} />
+        <Paragraph typography="t5" color="grey-500">
           {loading
             ? '불러오는 중...'
             : historyContracts.length > 0
               ? `완료·취소·만료된 계약 ${historyContracts.length}건`
               : '완료·취소·만료된 계약이 없어요'}
         </Paragraph>
-        <Spacing size={24} />
+        <Spacing size={32} />
 
         {historyContracts.length > 0 && (
           <List>
@@ -49,8 +49,9 @@ export default function ContractHistoryPage() {
                   aria-label={`${c.worker_name} 계약 상세`}
                   contents={
                     <div className={styles.contractRow}>
-                      <Paragraph typography="st5" fontWeight="bold">{c.worker_name}</Paragraph>
-                      <Paragraph typography="st7" color="grey-500">
+                      <Paragraph typography="t5" fontWeight="bold" color="grey-800">{c.worker_name}</Paragraph>
+                      <Spacing size={4} />
+                      <Paragraph typography="t7" color="grey-500">
                         {c.workplace} · {dateLabel}
                       </Paragraph>
                     </div>

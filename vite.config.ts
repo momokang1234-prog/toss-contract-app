@@ -14,7 +14,7 @@ export default defineConfig({
     port: 5173,
     host: '0.0.0.0',
     cors: true,
-    allowedHosts: ['bossimclockedin.private-apps.tossmini.com', 'localhost'],
+    allowedHosts: true,
     headers: {
       'Content-Security-Policy': "frame-ancestors *;",
     },
@@ -26,6 +26,13 @@ export default defineConfig({
         target: "https://cert.toss.im",
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, "/api/v2"),
+      },
+    },
+  },
+  build: {
+    rollupOptions: {
+      output: {
+        inlineDynamicImports: true,
       },
     },
   },

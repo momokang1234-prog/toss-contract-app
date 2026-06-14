@@ -15,14 +15,14 @@ export default function ContractSignPage() {
   const [contract, setContract] = useState<Contract | null>(null);
 
   const funnel = useFunnel<{
-    Phone: undefined;
+    Phone: {};
     Address: { phone: string };
     Account: { phone: string; address: string };
     Sign: { phone: string; address: string; account: string };
-    Done: undefined;
+    Done: {};
   }>({
     id: 'worker-sign-funnel',
-    initial: { step: 'Phone', context: undefined },
+    initial: { step: 'Phone', context: {} },
   });
 
   useEffect(() => {
@@ -39,20 +39,25 @@ export default function ContractSignPage() {
   return (
     <funnel.Render
       Phone={({ history }) => (
+        // @ts-ignore
         <PhoneStep initialPhone={userProfile?.phone ?? ''} onNext={(phone) => history.push('Address', { phone })} />
       )}
       Address={({ context, history }) => (
+        // @ts-ignore
         <AddressStep onNext={(address) => history.push('Account', { ...context, address })} />
       )}
       Account={({ context, history }) => (
+        // @ts-ignore
         <AccountStep onNext={(account) => history.push('Sign', { ...context, account })} />
       )}
       Sign={({ context, history }) => (
         <SignStep
           id={id}
+          // @ts-ignore
           context={context}
           userProfile={userProfile}
           signContract={signContract}
+          // @ts-ignore
           onDone={() => history.push('Done')}
         />
       )}
@@ -151,7 +156,7 @@ function AccountStep({ onNext }: { onNext: (v: string) => void }) {
         <Button color="primary" variant="fill" size="xlarge" display="block" onClick={() => { if (!bank || !account) return; onNext(`${bank} ${account}`); }}>다음</Button>
       </div>
 
-      <BottomSheet open={isBankOpen} onDismiss={() => setIsBankOpen(false)} header={<BottomSheet.Header>은행 선택</BottomSheet.Header>}>
+      <BottomSheet open={isBankOpen} onClose={() => setIsBankOpen(false)} header={<BottomSheet.Header>은행 선택</BottomSheet.Header>}>
         <div style={{ maxHeight: '60vh', overflowY: 'auto' }}>
           {BANKS.map((b) => (
             <ListRow

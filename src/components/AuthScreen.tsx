@@ -90,10 +90,10 @@ export function AuthScreen({ onAuthComplete }: AuthScreenProps) {
   return (
     <Top
       title={
-        <Paragraph typography="st1" fontWeight="bold">근로계약</Paragraph>
+        <Paragraph typography="t3" fontWeight="bold">근로계약 본인인증</Paragraph>
       }
       subtitleTop={
-        <Paragraph typography="st4" color="grey-600">
+        <Paragraph typography="t5" color="grey-600">
           토스 인증으로 간편하게 본인 확인 후 계약을 진행합니다
         </Paragraph>
       }
@@ -102,7 +102,7 @@ export function AuthScreen({ onAuthComplete }: AuthScreenProps) {
           {DEV_MODE && (
             <>
               <Spacing size={40} />
-              <Paragraph typography="st6" color="yellow700">
+              <Paragraph typography="t6" color="yellow700">
                 개발 모드 — mock 인증으로 테스트 중
               </Paragraph>
             </>
@@ -110,7 +110,7 @@ export function AuthScreen({ onAuthComplete }: AuthScreenProps) {
           {error && (
             <>
               <Spacing size={40} />
-              <Paragraph typography="st5" color="danger500">
+              <Paragraph typography="t5" color="danger500">
                 {error}
               </Paragraph>
             </>
@@ -118,7 +118,7 @@ export function AuthScreen({ onAuthComplete }: AuthScreenProps) {
           {status && !error && (
             <>
               <Spacing size={40} />
-              <Paragraph typography="st5" color="primary500">
+              <Paragraph typography="t5" color="primary500">
                 {status}
               </Paragraph>
             </>
@@ -130,7 +130,7 @@ export function AuthScreen({ onAuthComplete }: AuthScreenProps) {
           color="primary"
           variant="fill"
           display="block"
-          size="large"
+          size="xlarge"
           onClick={handleOneTouchAuth}
           disabled={loading}
         >

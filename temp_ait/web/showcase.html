@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Toss 근로계약서 — 페이지 쇼케이스</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Pretendard',-apple-system,sans-serif; background:#F9FAFB; color:#333D4B; }
+header { background:#fff; border-bottom:1px solid #E5E8EB; padding:24px; position:sticky; top:0; z-index:10; }
+header h1 { font-size:22px; font-weight:800; }
+header p { font-size:13px; color:#8B95A1; margin-top:4px; }
+.stats { display:flex; gap:24px; margin-top:12px; }
+.stat { text-align:center; }
+.stat-num { font-size:28px; font-weight:800; color:#3182F6; }
+.stat-label { font-size:11px; color:#8B95A1; }
+.section { padding:24px; max-width:800px; margin:0 auto; }
+.section-title { font-size:18px; font-weight:700; margin-bottom:16px; padding-bottom:8px; border-bottom:2px solid #3182F6; display:flex; align-items:center; gap:8px; }
+.grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(240px, 1fr)); gap:16px; }
+.card { background:#fff; border-radius:16px; overflow:hidden; border:1px solid #E5E8EB; transition:box-shadow .2s; }
+.card:hover { box-shadow:0 4px 20px rgba(0,0,0,.08); }
+.card-img { width:100%; aspect-ratio:9/16; object-fit:cover; object-position:top; background:#F5F6F8; }
+.card-body { padding:12px 16px 16px; }
+.card-title { font-size:14px; font-weight:700; display:flex; align-items:center; gap:6px; }
+.card-route { font-size:11px; color:#8B95A1; font-family:monospace; margin-top:4px; }
+.card-desc { font-size:12px; color:#6B7684; margin-top:8px; line-height:1.5; }
+.badge { display:inline-block; padding:2px 8px; border-radius:6px; font-size:10px; font-weight:600; }
+.badge-done { background:#E8F5E9; color:#1B5E20; }
+.badge-new { background:#E3F2FD; color:#1565C0; }
+.badge-wip { background:#FFF3E0; color:#E65100; }
+footer { text-align:center; padding:32px; color:#8B95A1; font-size:12px; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>📋 Toss 근로계약서 — 페이지 쇼케이스</h1>
+  <p>2026-06-11 기준 · 10개 페이지 · 7스텝 위자드</p>
+  <div class="stats">
+    <div class="stat"><div class="stat-num">10</div><div class="stat-label">전체 페이지</div></div>
+    <div class="stat"><div class="stat-num">7</div><div class="stat-label">위자드 스텝</div></div>
+    <div class="stat"><div class="stat-num">5</div><div class="stat-label">3D 일러스트</div></div>
+    <div class="stat"><div class="stat-num">3</div><div class="stat-label">상태 머신</div></div>
+  </div>
+</header>
+
+<div class="section">
+  <div class="section-title">🔐 인증 / 공통</div>
+  <div class="grid">
+    <div class="card">
+      <img class="card-img" src="screenshots/showcase-login.png" alt="로그인">
+      <div class="card-body">
+        <div class="card-title">🔐 로그인 <span class="badge badge-done">완료</span></div>
+        <div class="card-route">/login</div>
+        <div class="card-desc">'근로계약서' 타이틀 + '토스에서 간편하게' 브랜드. Mock 인증 통합.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-title">🏢 사장님 페이지</div>
+  <div class="grid">
+    <div class="card">
+      <img class="card-img" src="screenshots/showcase-dashboard.png" alt="대시보드">
+      <div class="card-body">
+        <div class="card-title">📊 대시보드 <span class="badge badge-done">완료</span></div>
+        <div class="card-route">/employer/dashboard</div>
+        <div class="card-desc">통계 카드(전체·작성중·전송됨·서명완료) + 3D point-blue2/point-purple2 배경</div>
+      </div>
+    </div>
+    <div class="card">
+      <img class="card-img" src="screenshots/showcase-business.png" alt="사업장 등록">
+      <div class="card-body">
+        <div class="card-title">🏪 사업장 등록 <span class="badge badge-done">완료</span></div>
+        <div class="card-route">/employer/business/new</div>
+        <div class="card-desc">사업자등록번호, 상호, 대표자, 소재지 입력</div>
+      </div>
+    </div>
+    <div class="card">
+      <img class="card-img" src="screenshots/showcase-new.png" alt="계약서 작성 위자드">
+      <div class="card-body">
+        <div class="card-title">📝 계약서 작성 <span class="badge badge-new">7-Step</span></div>
+        <div class="card-route">/employer/contracts/new</div>
+        <div class="card-desc">근로자 정보 → 계약조건 → 임금 → 근무시간 → 근로조건 → 법정검증 → 최종확인. 3D point-blue2/green2 헤더.</div>
+      </div>
+    </div>
+    <div class="card">
+      <img class="card-img" src="screenshots/showcase-list.png" alt="계약 목록">
+      <div class="card-body">
+        <div class="card-title">📋 계약 목록 <span class="badge badge-done">완료</span></div>
+        <div class="card-route">/employer/contracts</div>
+        <div class="card-desc">ContractCard 리스트 + 상태 배지. 빈 상태 클립보드 일러스트</div>
+      </div>
+    </div>
+    <div class="card">
+      <img class="card-img" src="screenshots/showcase-detail.png" alt="계약서 상세">
+      <div class="card-body">
+        <div class="card-title">🔍 계약서 상세 <span class="badge badge-done">완료</span></div>
+        <div class="card-route">/employer/contracts/:id</div>
+        <div class="card-desc">미리보기 카드 + 상태별 액션(전송·취소·확정·PDF). 서명 이미지 표시.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-title">👤 근로자 페이지</div>
+  <div class="grid">
+    <div class="card">
+      <img class="card-img" src="screenshots/showcase-worker-list.png" alt="근로자 계약 목록">
+      <div class="card-body">
+        <div class="card-title">📋 내 계약 목록 <span class="badge badge-done">완료</span></div>
+        <div class="card-route">/worker/contracts</div>
+        <div class="card-desc">받은 계약서 리스트. sent→viewed 자동 전환</div>
+      </div>
+    </div>
+    <div class="card">
+      <img class="card-img" src="screenshots/showcase-worker-detail.png" alt="근로자 계약 상세">
+      <div class="card-body">
+        <div class="card-title">📄 계약서 검토 <span class="badge badge-done">완료</span></div>
+        <div class="card-route">/worker/contracts/:id</div>
+        <div class="card-desc">계약 내용 검토 + 서명하기 액션</div>
+      </div>
+    </div>
+    <div class="card">
+      <img class="card-img" src="screenshots/showcase-sign.png" alt="전자서명">
+      <div class="card-body">
+        <div class="card-title">✍️ 전자서명 <span class="badge badge-done">완료</span></div>
+        <div class="card-route">/worker/contracts/:id/sign</div>
+        <div class="card-desc">Canvas 서명 + 3D check 완료 애니메이션. 2초 후 자동 이동</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-title">🔄 상태 머신</div>
+  <div class="grid">
+    <div class="card" style="grid-column:1/-1; border-left:4px solid #E65100;">
+      <div class="card-body">
+        <div class="card-title" style="font-size:14px;">draft → sent → viewed → signed → completed</div>
+        <div class="card-desc">
+          <strong>draft</strong>: 작성완료 → [전송] 버튼<br>
+          <strong>sent</strong>: 근로자에게 발송 → 근로자가 열람 시 자동 <strong>viewed</strong><br>
+          <strong>viewed</strong>: 근로자 검토 완료 → 서명 시 <strong>signed</strong><br>
+          <strong>signed</strong>: 서명 완료 → 사장님 [확정] → <strong>completed</strong><br>
+          <strong>completed</strong>: 계약 완료 배지 + PDF 다운로드<br>
+          <em>취소 경로</em>: draft/sent/viewed → [취소] → <strong>cancelled</strong>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  Toss 근로계약서 · Tailscale: 100.109.112.102:5173 · <a href="http://100.109.112.102:5173/employer/contracts/new" style="color:#3182F6;">모바일에서 열기</a>
+</footer>
+
+</body>
+</html>

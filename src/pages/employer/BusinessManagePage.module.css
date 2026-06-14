@@ -1,0 +1,35 @@
+.page {
+  padding: 0 0 40px;
+  max-width: 480px;
+  margin: 0 auto;
+  background-color: #ffffff;
+  min-height: 100vh;
+}
+
+.section {
+  padding-top: 20px;
+}
+
+.row {
+  padding: 12px 0;
+  border-bottom: 1px solid #e5e5ec;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.row:last-child {
+  border-bottom: none;
+}
+
+.bottomCta {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 480px;
+  padding: 16px 24px 32px;
+  background: linear-gradient(180deg, rgba(255,255,255,0) 0%, #FFFFFF 20%);
+  z-index: 10;
+}

@@ -20,7 +20,7 @@ CREATE INDEX idx_users_phone ON public.users(phone);
 -- 2. 사업장 테이블
 -- =========================================
 CREATE TABLE public.businesses (
-  id                UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  id                TEXT PRIMARY KEY,
   owner_user_key    TEXT NOT NULL REFERENCES public.users(user_key),
   business_number   TEXT NOT NULL,
   business_name     TEXT NOT NULL,
@@ -38,19 +38,20 @@ CREATE INDEX idx_businesses_owner ON public.businesses(owner_user_key);
 -- 3. 근로계약 테이블
 -- =========================================
 CREATE TABLE public.contracts (
-  id                UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  business_id       UUID NOT NULL REFERENCES public.businesses(id),
+  id                TEXT PRIMARY KEY,
+  business_id       TEXT NOT NULL REFERENCES public.businesses(id),
   employer_user_key TEXT NOT NULL REFERENCES public.users(user_key),
   worker_name       TEXT NOT NULL,
   worker_phone      TEXT NOT NULL,
   worker_user_key   TEXT REFERENCES public.users(user_key),
   worker_address    TEXT,
+  worker_account    TEXT,
+  worker_ci         TEXT,
   contract_type     TEXT NOT NULL CHECK (contract_type IN ('fullTime', 'partTime', 'fixedTerm')),
   status            TEXT NOT NULL DEFAULT 'draft'
-                    CHECK (status IN ('draft','sent','viewed','signed','completed','cancelled','expired')),
-  template_version  TEXT DEFAULT '1.0.0',
-  start_date        DATE NOT NULL,
-  end_date          DATE,
+                    CHECK (status IN ('draft','sent','viewed','signed','completed','cancelled','expired','rejected')),
+  start_date        TEXT NOT NULL,
+  end_date          TEXT,
   workplace         TEXT NOT NULL,
   job_description   TEXT NOT NULL,
   wage_type         TEXT NOT NULL CHECK (wage_type IN ('hourly','daily','weekly','monthly')),
@@ -60,16 +61,22 @@ CREATE TABLE public.contracts (
   work_days         TEXT[] NOT NULL,
   start_time        TEXT NOT NULL,
   end_time          TEXT NOT NULL,
-  break_minutes     INTEGER NOT NULL DEFAULT 0,
+  break_start_time  TEXT NOT NULL,
+  break_end_time    TEXT NOT NULL,
   weekly_holiday    TEXT,
-  paid_leave_clause     BOOLEAN DEFAULT true,
+  paid_leave_clause       BOOLEAN DEFAULT true,
+  pension                 BOOLEAN DEFAULT true,
+  health_insurance        BOOLEAN DEFAULT true,
+  employment_insurance    BOOLEAN DEFAULT true,
+  accident_insurance      BOOLEAN DEFAULT true,
   social_insurance_clause BOOLEAN DEFAULT true,
-  severance_clause      BOOLEAN DEFAULT true,
-  employer_signed_at    TIMESTAMPTZ,
-  worker_signed_at      TIMESTAMPTZ,
-  worker_signature_data TEXT,
-  contract_html         TEXT,
-  contract_pdf_url      TEXT,
+  severance_clause        BOOLEAN DEFAULT true,
+  employer_signed_at      TIMESTAMPTZ,
+  worker_signed_at        TIMESTAMPTZ,
+  worker_signature_data   TEXT,
+  contract_html           TEXT,
+  contract_pdf_url        TEXT,
+  rejection_reason        TEXT,
   created_at        TIMESTAMPTZ DEFAULT now(),
   updated_at        TIMESTAMPTZ DEFAULT now()
 );
@@ -84,8 +91,8 @@ CREATE INDEX idx_contracts_status ON public.contracts(status);
 -- 4. 계약 이력 테이블
 -- =========================================
 CREATE TABLE public.contract_history (
-  id            UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  contract_id   UUID NOT NULL REFERENCES public.contracts(id),
+  id            TEXT PRIMARY KEY,
+  contract_id   TEXT NOT NULL REFERENCES public.contracts(id),
   action        TEXT NOT NULL,
   actor_role    TEXT NOT NULL,
   actor_user_key TEXT,
@@ -99,8 +106,8 @@ CREATE INDEX idx_contract_history_contract ON public.contract_history(contract_i
 -- 5. 전달 이력 테이블
 -- =========================================
 CREATE TABLE public.deliveries (
-  id              UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  contract_id     UUID NOT NULL REFERENCES public.contracts(id),
+  id              TEXT PRIMARY KEY,
+  contract_id     TEXT NOT NULL REFERENCES public.contracts(id),
   method          TEXT NOT NULL CHECK (method IN ('sms','push','inbox','share','link')),
   recipient_phone TEXT NOT NULL,
   recipient_user_key TEXT,

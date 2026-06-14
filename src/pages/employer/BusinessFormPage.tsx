@@ -44,7 +44,10 @@ export default function BusinessFormPage() {
         phone: form.phone,
       });
       navigate('/employer/dashboard', { replace: true });
-    } catch { alert('등록에 실패했어요.'); }
+    } catch (err: any) { 
+      alert('등록 실패: ' + (err.message || JSON.stringify(err))); 
+      console.error(err);
+    }
     finally { setSubmitting(false); }
   };
 
@@ -54,20 +57,20 @@ export default function BusinessFormPage() {
         <Top title="사업장 등록" />
         <div className={styles.content}>
           <Spacing size={40} />
-          <Paragraph typography="st2" fontWeight="bold">사업장 정보를</Paragraph>
+          <Paragraph typography="t3" fontWeight="bold">사업장 정보를</Paragraph>
           <Spacing size={4} />
-          <Paragraph typography="st2" fontWeight="bold">입력해주세요</Paragraph>
+          <Paragraph typography="t3" fontWeight="bold">입력해주세요</Paragraph>
           <Spacing size={32} />
-          <TextField variant="box" labelOption="sustain" label="상호" placeholder="사업장 이름"
+          <TextField variant="line" labelOption="sustain" label="상호" placeholder="사업장 이름"
             value={form.business_name} onChange={e => setForm(p => ({ ...p, business_name: e.target.value }))} />
-          <Spacing size={16} />
-          <TextField variant="box" labelOption="sustain" label="대표자" placeholder="대표자 이름"
+          <Spacing size={24} />
+          <TextField variant="line" labelOption="sustain" label="대표자" placeholder="대표자 이름"
             value={form.representative} onChange={e => setForm(p => ({ ...p, representative: e.target.value }))} />
-          <Spacing size={16} />
-          <TextField variant="box" labelOption="sustain" label="사업장 소재지" placeholder="주소"
+          <Spacing size={24} />
+          <TextField variant="line" labelOption="sustain" label="사업장 소재지" placeholder="주소"
             value={form.address} onChange={e => setForm(p => ({ ...p, address: e.target.value }))} />
-          <Spacing size={16} />
-          <TextField variant="box" labelOption="sustain" label="전화번호 (선택)" placeholder="02-1234-5678"
+          <Spacing size={24} />
+          <TextField variant="line" labelOption="sustain" label="전화번호 (선택)" placeholder="02-1234-5678"
             value={form.phone} onChange={e => setForm(p => ({ ...p, phone: e.target.value }))} />
           <Spacing size={40} />
           <Button color="primary" variant="fill" display="block" size="xlarge"
@@ -83,9 +86,16 @@ export default function BusinessFormPage() {
     <div className={styles.page}>
       <Top title="사업장 등록" />
       <div className={styles.content}>
-        <Paragraph typography="st1" fontWeight="bold">사업자등록번호를</Paragraph>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <Paragraph typography="t3" fontWeight="bold">사업자등록번호를</Paragraph>
+          <button 
+            onClick={() => { sessionStorage.removeItem('toss_token'); window.location.href='/'; }}
+            style={{ fontSize: '12px', color: '#888', background: 'none', border: 'none', textDecoration: 'underline' }}>
+            로그아웃(초기화)
+          </button>
+        </div>
         <Spacing size={4} />
-        <Paragraph typography="st1" fontWeight="bold">입력해주세요</Paragraph>
+        <Paragraph typography="t3" fontWeight="bold">입력해주세요</Paragraph>
         <Spacing size={32} />
         <TextField variant="line" labelOption="sustain" label="사업자등록번호"
           placeholder="000-00-00000" value={businessNumber} readOnly />

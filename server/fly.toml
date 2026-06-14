@@ -1,0 +1,23 @@
+# fly.toml app configuration file generated for bossimclockedin-api on 2026-06-13T03:41:28+09:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = 'bossimclockedin-api'
+primary_region = 'nrt'
+
+[http_service]
+  internal_port = 3000
+  force_https = true
+  auto_stop_machines = 'off'
+  auto_start_machines = true
+  min_machines_running = 1
+
+[[vm]]
+  memory = '256mb'
+  cpus = 1
+
+[env]
+  TOSS_CERT_PATH = "/app/certs/contract_public.crt"
+  TOSS_KEY_PATH = "/app/certs/contract_private.key"
+  TOSS_AAD = "TOSS"

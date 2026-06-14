@@ -75,10 +75,47 @@ serve(async (req) => {
         details: { method, delivery_id: delivery?.id },
       });
 
-    // TODO: 실제 SMS/Push 발송 로직
-    // Track A: SMS 게이트웨이 호출
-    // Track B: 스마트 발송 API 호출
-    // 현재는 mock
+    // ----------------------------------------------------
+    // [Toss Smart Message Integration]
+    // ----------------------------------------------------
+    const TOSS_SMART_MESSAGE_API_KEY = Deno.env.get('TOSS_SMART_MESSAGE_API_KEY'); // 토스 디벨로퍼스에서 발급받은 API Key
+    const TOSS_CAMPAIGN_ID_SEND = Deno.env.get('TOSS_CAMPAIGN_ID_SEND'); // 콘솔에서 생성한 캠페인 ID (계약서 전송 알림)
+
+    if (TOSS_SMART_MESSAGE_API_KEY && TOSS_CAMPAIGN_ID_SEND) {
+      try {
+        // [참고] 스마트 발송 직접 API 연동 예시
+        // 토스에게 발송을 직접 요청하여, 즉각적이고 확실한 실시간 알림을 보냅니다.
+        const response = await fetch(`https://api.toss.im/smart-message/v1/campaigns/${TOSS_CAMPAIGN_ID_SEND}/send`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${TOSS_SMART_MESSAGE_API_KEY}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            // 대상자 지정 (전화번호 또는 토스 userKey)
+            // 토스 앱인토스에서는 주로 userKey나 phone을 지원합니다 (실제 API 스펙 문서 참조)
+            audience: { 
+              phone: contract.worker_phone 
+            },
+            // 변수 처리 (콘솔에서 #{이름} 이라고 설정했다면 아래와 같이 매핑)
+            variables: {
+              이름: contract.worker_name || '근로자',
+              링크: `https://bossimclockedin.private-apps.tossmini.com/contract/${contractId}`
+            }
+          })
+        });
+
+        if (!response.ok) {
+          console.error(`[TOSS PUSH ERROR] API 응답 실패: ${response.status}`, await response.text());
+        } else {
+          console.log(`[TOSS PUSH SUCCESS] ${contract.worker_phone} 에게 계약서 전송 푸시 발송 완료`);
+        }
+      } catch (err) {
+        console.error(`[TOSS PUSH EXCEPTION] 푸시 발송 중 에러:`, err);
+      }
+    } else {
+      console.log(`[MOCK NOTIFY] ${contract.worker_phone} 번호로 계약서 도착 알림 발송 (API 키 없음)`);
+    }
 
     return new Response(
       JSON.stringify({ success: true, deliveryId: delivery?.id }),

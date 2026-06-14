@@ -7,8 +7,9 @@ import Step1BasicInfo from './contract-form/steps/Step1BasicInfo';
 import Step2WorkConditions from './contract-form/steps/Step2WorkConditions';
 import Step3WorkSchedule from './contract-form/steps/Step3WorkSchedule';
 import Step4WageInsurance from './contract-form/steps/Step4WageInsurance';
-import Step5LegalValidation from './contract-form/steps/Step5LegalValidation';
+import { FinalChecklistStep } from './contract-form/steps/FinalChecklistStep';
 import Step6Preview from './contract-form/steps/Step6Preview';
+import SignaturePad from '../../components/SignaturePad';
 
 export default function ContractFormPage() {
   const {
@@ -32,8 +33,9 @@ export default function ContractFormPage() {
     workConditions: NonNullable<unknown>;
     workSchedule: NonNullable<unknown>;
     wageInsurance: NonNullable<unknown>;
-    legalValidation: NonNullable<unknown>;
+    finalChecklist: NonNullable<unknown>;
     preview: NonNullable<unknown>;
+    employerSignature: NonNullable<unknown>;
   }>({
     id: 'contract-form-wizard',
     initial: { step: 'basicInfo', context: {} },
@@ -43,7 +45,7 @@ export default function ContractFormPage() {
   const currentIndex = STEP_ORDER.indexOf(currentStep);
   const progressPct = ((currentIndex + 1) / TOTAL_STEPS) * 100;
   const isLastStep = currentIndex === TOTAL_STEPS - 1;
-  const isValidationStep = currentStep === 'legalValidation';
+  const isValidationStep = currentStep === 'finalChecklist';
 
   const goNext = (nextStep: ContractFormStep) => {
     if (!validateStep(currentStep)) return;
@@ -55,7 +57,7 @@ export default function ContractFormPage() {
   };
 
   const onValidationRun = () => {
-    if (validateStep('legalValidation')) {
+    if (validateStep('finalChecklist')) {
       funnel.history.push('preview');
     }
   };
@@ -67,7 +69,8 @@ export default function ContractFormPage() {
 
   return (
     <div className={styles.page}>
-      <div style={{ position: 'relative', marginBottom: 8, overflow: 'hidden' }}>
+      <div className={styles.content}>
+        <div style={{ position: 'relative', marginBottom: 8, overflow: 'hidden' }}>
         <img src="https://static.toss.im/lotties/point-blue2.png" alt=""
           style={{ position: 'absolute', top: -30, right: -10, width: 160, height: 160, opacity: 0.3, pointerEvents: 'none' }}
         />
@@ -105,22 +108,43 @@ export default function ContractFormPage() {
         wageInsurance={() => (
           <Step4WageInsurance form={form} errors={errors} handleChange={handleChange} />
         )}
-        legalValidation={() => (
-          <Step5LegalValidation validationResult={validationResult} warnings={warnings} />
-        )}
-        preview={() => (
-          <Step6Preview
-            form={form}
-            warnings={warnings}
-            computeBreakMinutes={computeBreakMinutes}
-            formatWagePaymentDate={formatWagePaymentDate}
+        finalChecklist={() => (
+          <FinalChecklistStep 
+            form={form} 
+            onChange={handleChange}
+            toggleDay={toggleDay}
+            onNavigate={(step) => funnel.history.push(step as any)}
           />
         )}
+        preview={() => (
+          <div>
+            <Spacing size={24} />
+            <Step6Preview
+              form={form}
+              warnings={warnings}
+              computeBreakMinutes={computeBreakMinutes}
+              formatWagePaymentDate={formatWagePaymentDate}
+            />
+          </div>
+        )}
+        employerSignature={() => (
+          <div style={{ height: 'calc(100vh - 200px)', display: 'flex', flexDirection: 'column' }}>
+            <Spacing size={24} />
+            <SignaturePad 
+              title="사장님 서명"
+              onSign={async (data) => {
+                handleChange('employer_signature_data', data);
+                setTimeout(() => onSubmit(), 50);
+              }} 
+            />
+          </div>
+        )}
       />
+      </div>
 
       {/* Navigation */}
-      <Spacing size={48} />
-      <div style={{ display: 'flex', gap: 12 }}>
+      <div className={styles.bottomCta}>
+        <div style={{ display: 'flex', gap: 12, width: '100%' }}>
         {currentIndex > 0 && (
           <div style={{ flex: 1 }}>
             <Button color="light" variant="weak" display="block" size="xlarge" onClick={goBack}>
@@ -156,11 +180,13 @@ export default function ContractFormPage() {
               size="xlarge"
               loading={submitting}
               onClick={onSubmit}
+              disabled={true} // will auto-submit on signature
             >
-              {submitting ? '저장 중...' : '계약서 저장'}
+              서명을 완료해주세요
             </Button>
           </div>
         )}
+        </div>
       </div>
     </div>
   );

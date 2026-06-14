@@ -2,8 +2,8 @@ import { useNavigate } from 'react-router-dom';
 import { useContracts } from '../../hooks/useContracts';
 import { Top, Paragraph, Spacing, Button, List, ListRow, Badge } from '@toss/tds-mobile';
 import { Suspense, Delay } from '@suspensive/react';
+import { CONTRACT_TYPE_LABEL } from '../../utils/labels';
 import styles from './ContractListPage.module.css';
-
 
 function ContractListContent({ contracts, navigate, badgeFor }: {
   contracts: any[];
@@ -14,15 +14,15 @@ function ContractListContent({ contracts, navigate, badgeFor }: {
     <div className={styles.content}>
       <Spacing size={24} />
 
-      <Paragraph typography="st2" fontWeight="bold">근로계약서</Paragraph>
-      <Spacing size={8} />
-      <Paragraph typography="st5" color="grey-500">
+      <Paragraph typography="t3" fontWeight="bold">근로계약서</Paragraph>
+      <Spacing size={12} />
+      <Paragraph typography="t5" color="grey-500">
         {contracts.length > 0
           ? `총 ${contracts.length}건의 계약서가 있어요`
           : '아직 작성한 계약서가 없어요'}
       </Paragraph>
 
-      <Spacing size={24} />
+      <Spacing size={32} />
 
       {contracts.length > 0 ? (
         <List>
@@ -33,10 +33,11 @@ function ContractListContent({ contracts, navigate, badgeFor }: {
               aria-label={c.worker_name}
               contents={
                 <div className={styles.contractRow}>
-                  <Paragraph typography="st5" fontWeight="bold">
+                  <Paragraph typography="t5" fontWeight="bold" color="grey-800">
                     {c.worker_name} ({CONTRACT_TYPE_LABEL[c.contract_type as keyof typeof CONTRACT_TYPE_LABEL]})
                   </Paragraph>
-                  <Paragraph typography="st7" color="grey-500">
+                  <Spacing size={4} />
+                  <Paragraph typography="t7" color="grey-500">
                     {c.workplace} · {c.start_date}
                   </Paragraph>
                 </div>
@@ -55,10 +56,10 @@ function ContractListContent({ contracts, navigate, badgeFor }: {
             style={{ width: 72, height: 72 }}
           />
           <Spacing size={16} />
-          <Paragraph typography="st5" color="grey-500">
+          <Paragraph typography="t5" color="grey-600" fontWeight="bold">
             첫 계약서를 작성해보세요
           </Paragraph>
-          <Spacing size={20} />
+          <Spacing size={24} />
           <Button color="primary" variant="fill" size="large"
             onClick={() => navigate('/employer/contracts/new')}>
             계약서 작성하기
@@ -87,7 +88,7 @@ export default function ContractListPage() {
 
   return (
     <div className={styles.page}>
-      <Top title="계약서 목록">
+      <Top title="">
         <Button color="primary" variant="weak" size="small"
           onClick={() => navigate('/employer/contracts/new')}>
           + 새 계약서

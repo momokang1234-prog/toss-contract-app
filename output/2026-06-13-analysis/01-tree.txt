@@ -1,0 +1,346 @@
+.
+├── .omp
+│   ├── agents
+│   │   ├── code-structure-analyzer.md
+│   │   ├── functional-qa.md
+│   │   ├── robustness-auditor.md
+│   │   └── ux-auditor.md
+│   └── rules
+│       └── verification-gate.md
+├── app.ait
+├── app.json
+├── base-directory-tree
+│   ├── .babelrc
+│   ├── .gitignore
+│   ├── .postcssrc
+│   ├── LICENSE
+│   ├── README.md
+│   ├── package-lock.json
+│   ├── package.json
+│   ├── public
+│   │   ├── favicon.ico
+│   │   └── index.html
+│   └── src
+│       ├── App.vue
+│       ├── assets
+│       │   └── logo.png
+│       ├── components
+│       │   ├── AppArrow.vue
+│       │   ├── AppDarkmode.vue
+│       │   ├── AppItem.vue
+│       │   ├── AppLightmode.vue
+│       │   ├── AppMoreinfo.vue
+│       │   ├── AppNav.vue
+│       │   ├── AppNote.vue
+│       │   └── AppToggle.vue
+│       ├── main.js
+│       ├── name.js
+│       ├── store.js
+│       └── tree.js
+├── docs
+│   ├── auth_docs
+│   │   ├── supabase.md
+│   │   ├── toss_mini_app.md
+│   │   └── vite.md
+│   ├── audit
+│   │   ├── 2026-06-05-toss-contract-app-assessment-and-roadmap.md
+│   │   └── screenshots
+│   │       ├── 01-auth.png
+│   │       ├── 02-business.png
+│   │       ├── 03-business-empty-error.png
+│   │       ├── 04-business-verified.png
+│   │       ├── 05-contract-form.png
+│   │       ├── 06-contract-empty-errors.png
+│   │       ├── 07-result.png
+│   │       └── 08-result-valid.png
+│   └── plans
+│       └── 2026-06-05-toss-contract-app-audit-plan.md
+├── output
+│   └── 2026-06-13-analysis
+│       └── 01-tree.txt
+├── public
+│   ├── app.json
+│   ├── screenshots
+│   │   ├── madge-dep-graph.svg
+│   │   ├── project-explorer-full.png
+│   │   ├── business-new.png
+│   │   ├── contract-detail.png
+│   │   ├── contract-history.png
+│   │   ├── contracts-list.png
+│   │   ├── contracts-new.png
+│   │   ├── dashboard.png
+│   │   ├── deeplink.png
+│   │   ├── login.png
+│   │   ├── role-select.png
+│   │   ├── root.png
+│   │   ├── showcase-business.png
+│   │   ├── showcase-dashboard.png
+│   │   ├── showcase-detail.png
+│   │   ├── showcase-list.png
+│   │   ├── showcase-login.png
+│   │   ├── showcase-new.png
+│   │   ├── showcase-sign.png
+│   │   ├── showcase-worker-detail.png
+│   │   ├── showcase-worker-list.png
+│   │   ├── worker-detail.png
+│   │   ├── worker-list.png
+│   │   └── worker-sign.png
+│   ├── banks
+│   │   ├── busan.png
+│   │   ├── busan.svg
+│   │   ├── daegu.png
+│   │   ├── daegu.svg
+│   │   ├── gwangju.png
+│   │   ├── gwangju.svg
+│   │   ├── hana-real.png
+│   │   ├── hana.png
+│   │   ├── hana.svg
+│   │   ├── ibk-real.png
+│   │   ├── ibk.png
+│   │   ├── ibk.svg
+│   │   ├── icon-bank.svg
+│   │   ├── jeonbuk.png
+│   │   ├── jeonbuk.svg
+│   │   ├── kakao-gh.png
+│   │   ├── kakao-real.png
+│   │   ├── kakao.png
+│   │   ├── kakao.svg
+│   │   ├── kb-real.png
+│   │   ├── kb-test.png
+│   │   ├── kb.png
+│   │   ├── kb.svg
+│   │   ├── kbank-real.png
+│   │   ├── kbank.png
+│   │   ├── kbank.svg
+│   │   ├── nh-real.png
+│   │   ├── nh.png
+│   │   ├── nh.svg
+│   │   ├── sc.png
+│   │   ├── sc.svg
+│   │   ├── sh.png
+│   │   ├── sh.svg
+│   │   ├── shinhan-real.png
+│   │   ├── shinhan.png
+│   │   ├── shinhan.svg
+│   │   ├── toss-logo.svg
+│   │   ├── toss-real.svg
+│   │   ├── tossbank-real.png
+│   │   ├── tossbank.png
+│   │   ├── tossbank.svg
+│   │   ├── woori-real.png
+│   │   ├── woori.png
+│   │   └── woori.svg
+│   ├── icons
+│   │   └── banks
+│   │       ├── hana.svg
+│   │       ├── ibk.svg
+│   │       ├── kakao.svg
+│   │       ├── kb.svg
+│   │       ├── kbank.svg
+│   │       ├── kfcc.svg
+│   │       ├── nh.svg
+│   │       ├── post.svg
+│   │       ├── sc.svg
+│   │       ├── shinhan.svg
+│   │       ├── shinhyup.svg
+│   │       ├── suhyup.svg
+│   │       ├── toss.svg
+│   │       └── woori.svg
+│   ├── preview-test.html
+│   ├── showcase.html
+│   ├── tds-minimal.html
+│   └── workspace.html
+├── server
+│   ├── fly.toml
+│   ├── src
+│   │   ├── db
+│   │   │   ├── migrations
+│   │   │   │   ├── 002_create_profiles.sql
+│   │   │   │   ├── 003_businesses_and_contracts.sql
+│   │   │   │   ├── 004_fix_contracts.sql
+│   │   │   │   └── 001_initial.sql
+│   │   │   └── client.ts
+│   │   ├── app.ts
+│   │   ├── config
+│   │   │   └── index.ts
+│   │   ├── middleware
+│   │   │   ├── auth.ts
+│   │   │   └── validation.ts
+│   │   ├── models
+│   │   │   └── index.ts
+│   │   ├── routes
+│   │   │   ├── accounts.ts
+│   │   │   ├── auth.ts
+│   │   │   ├── transactions.ts
+│   │   │   └── transfers.ts
+│   │   ├── server.ts
+│   │   └── swagger.ts
+│   ├── .env.example
+│   ├── Dockerfile
+│   ├── README.md
+│   ├── docker-compose.yml
+│   ├── package-lock.json
+│   ├── package.json
+│   ├── tests
+│   │   ├── accounts.test.ts
+│   │   ├── auth.test.ts
+│   │   ├── setup.ts
+│   │   ├── transactions.test.ts
+│   │   └── transfers.test.ts
+│   ├── tsconfig.json
+│   └── vitest.config.ts
+├── src
+│   ├── components
+│   │   ├── SignaturePad.tsx
+│   │   ├── funnel
+│   │   │   ├── FunnelQuestion.module.css
+│   │   │   └── FunnelQuestion.tsx
+│   │   ├── AuthScreen.tsx
+│   │   ├── BusinessVerify.tsx
+│   │   ├── ContractResult.tsx
+│   │   ├── ErrorBoundary.tsx
+│   │   ├── auth
+│   │   │   └── RoleGuard.tsx
+│   │   ├── contract
+│   │   │   ├── ContractCard.module.css
+│   │   │   ├── ContractCard.tsx
+│   │   │   ├── ContractPreview.tsx
+│   │   │   └── ContractStatusBadge.tsx
+│   │   ├── delivery
+│   │   │   └── SendContractSheet.tsx
+│   │   └── shared
+│   │       ├── ContentContainer.module.css
+│   │       └── ContentContainer.tsx
+│   ├── utils
+│   │   ├── pdfGenerator.ts
+│   │   ├── errorHandler.ts
+│   │   ├── format.ts
+│   │   ├── labels.ts
+│   │   ├── pdf.ts
+│   │   └── sanitize.ts
+│   ├── App.tsx
+│   ├── api
+│   │   ├── smart-messenger.ts
+│   │   ├── supabase.ts
+│   │   └── toss-auth.ts
+│   ├── contexts
+│   │   └── AuthContext.tsx
+│   ├── domain
+│   │   └── contract
+│   │       ├── __tests__
+│   │       │   ├── schema.test.ts
+│   │       │   └── validation.test.ts
+│   │       ├── converter.ts
+│   │       ├── index.ts
+│   │       ├── laborRules.ts
+│   │       ├── schema.ts
+│   │       └── validation.ts
+│   ├── hooks
+│   │   ├── __tests__
+│   │   │   └── useContracts.test.ts
+│   │   ├── useBusiness.ts
+│   │   └── useContracts.ts
+│   ├── index.css
+│   ├── main.tsx
+│   ├── pages
+│   │   ├── auth
+│   │   │   ├── LoginPage.module.css
+│   │   │   └── LoginPage.tsx
+│   │   ├── employer
+│   │   │   ├── BusinessFormPage.module.css
+│   │   │   ├── BusinessFormPage.tsx
+│   │   │   ├── ContractDetailPage.module.css
+│   │   │   ├── ContractDetailPage.tsx
+│   │   │   ├── ContractFormPage.module.css
+│   │   │   ├── ContractFormPage.tsx
+│   │   │   ├── ContractHistoryPage.module.css
+│   │   │   ├── ContractHistoryPage.tsx
+│   │   │   ├── ContractListPage.module.css
+│   │   │   ├── ContractListPage.tsx
+│   │   │   ├── DashboardPage.module.css
+│   │   │   ├── DashboardPage.tsx
+│   │   │   └── contract-form
+│   │   │       ├── hooks
+│   │   │       │   └── useContractForm.ts
+│   │   │       ├── steps
+│   │   │       │   ├── FieldLabel.tsx
+│   │   │       │   ├── Step1BasicInfo.tsx
+│   │   │       │   ├── Step2WorkConditions.tsx
+│   │   │       │   ├── Step3WorkSchedule.tsx
+│   │   │       │   ├── Step4WageInsurance.tsx
+│   │   │       │   ├── Step5LegalValidation.tsx
+│   │   │       │   └── Step6Preview.tsx
+│   │   │       └── types.ts
+│   │   ├── shared
+│   │   │   ├── DeeplinkHandler.module.css
+│   │   │   ├── DeeplinkHandler.tsx
+│   │   │   ├── NotFoundPage.module.css
+│   │   │   └── NotFoundPage.tsx
+│   │   └── worker
+│   │       ├── ContractDetailPage.module.css
+│   │       ├── ContractDetailPage.tsx
+│   │       ├── ContractListPage.module.css
+│   │       ├── ContractListPage.tsx
+│   │       ├── ContractSignPage.module.css
+│   │       └── ContractSignPage.tsx
+│   ├── types
+│   │   └── roles.ts
+│   └── vite-env.d.ts
+├── supabase
+│   ├── .temp
+│   │   ├── cli-latest
+│   │   └── linked-project.json
+│   ├── functions
+│   │   ├── auth-token
+│   │   │   └── index.ts
+│   │   ├── contracts-cancel
+│   │   │   └── index.ts
+│   │   ├── contracts-complete
+│   │   │   └── index.ts
+│   │   ├── contracts-expire
+│   │   │   └── index.ts
+│   │   ├── contracts-reject
+│   │   │   └── index.ts
+│   │   ├── contracts-send
+│   │   │   └── index.ts
+│   │   ├── contracts-sign
+│   │   │   └── index.ts
+│   │   └── contracts-view
+│   │       └── index.ts
+│   └── migrations
+│       ├── 001_initial_schema.sql
+│       ├── 002_rls_policies.sql
+│       └── 004_expire_cron.sql
+├── test_supabase.ts
+├── .env.example
+├── .gitignore
+├── .granite
+│   └── app.json
+├── .hermes
+│   ├── AGENTS.md
+│   └── plans
+│       └── 2026-06-10-tds-inline-cleanup.md
+├── MEMORY.md
+├── PRD.md
+├── README.md
+├── bossimclockedin.ait
+├── code_review_report.md
+├── granite.config.ts
+├── index.html
+├── legal_risk_analysis.md
+├── log-server.py
+├── package-lock.json
+├── package.json
+├── plan.md
+├── scripts
+│   ├── capture-screenshots.cjs
+│   └── capture-screenshots.js
+├── tds-minimal.html
+├── toss-contract-app
+├── toss-contract-app.ait
+├── tsconfig.json
+├── vite.config.ts
+├── vitest.config.ts
+├── workflow
+│   └── seed.yaml
+└── workspace.html

@@ -158,7 +158,7 @@ export function validateLaborContract(input: unknown): ValidationResult {
   } else if (hourlyEquivalent < MINIMUM_HOURLY_WAGE_2026 * 1.1) {
     warnings.push({
       field: "contract.baseWage",
-      message: `시급 환산 시 ${Math.round(hourlyEquivalent).toLocaleString()}원으로 최저시급 대비 ${((hourlyEquivalent / MINIMUM_HOURLY_WAGE_2026) * 100).toFixed(1)}% 수준입니다. 최저임금 위반 가능성을 검토하세요.`,
+      message: `시급 환산 시 ${Math.round(hourlyEquivalent).toLocaleString()}원으로 최저시급 대비 ${((hourlyEquivalent / MINIMUM_HOURLY_WAGE_2026) * 100).toFixed(1)}% 수준입니다. 입력된 시급이 2026년 고시 최저시급(10,030원)보다 낮습니다.`,
       code: "NEAR_MINIMUM_WAGE",
     });
   }
@@ -218,7 +218,7 @@ export function validateLaborContract(input: unknown): ValidationResult {
     warnings.push({
       field: "contract.paidLeaveClause",
       message:
-        "연차 유급휴가 조항이 포함되지 않았습니다. 근로기준법 제60조에 따라 1년간 80% 이상 출근 시 15일 이상 유급휴가를 부여해야 합니다.",
+        "연차 유급휴가 조항이 포함되지 않았습니다. 근로기준법 제60조에 관련 규정이 있습니다.",
       code: "MISSING_PAID_LEAVE",
     });
   }
@@ -236,7 +236,7 @@ export function validateLaborContract(input: unknown): ValidationResult {
     warnings.push({
       field: "contract.severanceClause",
       message:
-        "퇴직금 조항이 포함되지 않았습니다. 1년 이상 계속 근로자에게는 퇴직금(퇴직급여)을 지급해야 합니다.",
+        "퇴직금 조항이 포함되지 않았습니다. 퇴직급여보장법에 관련 규정이 있습니다.",
       code: "MISSING_SEVERANCE",
     });
   }

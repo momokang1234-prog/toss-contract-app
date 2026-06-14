@@ -1,6 +1,6 @@
 
 import { createContext, useContext, useState, useCallback, type ReactNode } from 'react';
-import { IS_MOCK } from '../api/supabase';
+import { IS_MOCK, supabase } from '../api/supabase';
 import { tossLogin } from '../api/toss-auth';
 const MOCK_AUTH_DELAY_MS = 500;
 
@@ -95,9 +95,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return;
       }
 
-      // Real Toss Login: appLogin() → Fly.io API → 사용자 정보
-      const user = await tossLogin();
+      // Real Toss Login: appLogin() → Supabase auth-token Edge Function → Custom JWT + 사용자 정보
+      const { customToken, user } = await tossLogin();
       const selectedRole = role ?? 'worker';
+
+      // Store custom JWT manually instead of using setSession
+      // because Custom JWTs don't have a GoTrue session in auth.sessions
+      sessionStorage.setItem('custom_jwt', customToken);
+
 
       sessionStorage.setItem('user_role', selectedRole);
       setIsAuthenticated(true);
@@ -118,13 +123,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  const logout = useCallback(() => {
+  const logout = useCallback(async () => {
     sessionStorage.removeItem('mock_role');
+    sessionStorage.removeItem('user_role');
     setIsAuthenticated(false);
     setUserRole(null);
     setUserName(null);
     setCi(null);
     setUserProfile(null);
+    if (!IS_MOCK) {
+      await supabase.auth.signOut();
+    }
   }, []);
 
   const setRole = useCallback(async (role: 'employer' | 'worker') => {

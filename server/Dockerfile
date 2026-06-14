@@ -4,7 +4,7 @@ FROM node:24-alpine AS builder
 WORKDIR /app
 
 COPY package.json package-lock.json ./
-RUN npm ci --omit=dev
+RUN npm ci
 
 COPY tsconfig.json ./
 COPY src/ src/
@@ -18,6 +18,7 @@ WORKDIR /app
 
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/dist ./dist
+COPY certs/ ./certs/
 COPY package.json ./
 
 EXPOSE 3000

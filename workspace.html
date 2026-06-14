@@ -649,7 +649,7 @@
 <script>
 // ============ ULTRA-DETAILED DEBUG LOG SYSTEM ============
 const LOG_SERVER = 'http://localhost:9876/log';
-const LOG_ENABLED = true;
+const LOG_ENABLED = false;
 let _logSeq = 0;
 const _logBuffer = [];
 
@@ -767,7 +767,7 @@ logEvent('system', 'LOG_SERVER=' + LOG_SERVER + ' userAgent=' + navigator.userAg
 
 // ============ DATA: PAGE INVENTORY ============
 // Dynamic BASE_URL — follows whatever origin the user opened
-const BASE_URL = window.location.origin;
+const BASE_URL = window.location.origin === 'null' || window.location.origin.includes('file://') ? 'http://localhost:5173' : window.location.origin;
 logEvent('system', 'BASE_URL=' + BASE_URL + ' (from window.location.origin)');
 const MOCK_IDS = { ':id': 'mock-contract-001' }; // :id 파라미터 대체값
 

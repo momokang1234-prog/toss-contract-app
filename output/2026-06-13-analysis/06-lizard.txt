@@ -1,0 +1,15 @@
+src/utils/pdf.ts:26: warning: baseCSS has 105 NLOC, 1 CCN, 28 token, 0 PARAM, 107 length, 0 ND
+src/utils/pdf.ts:132: warning: generatePrintableHTML has 64 NLOC, 4 CCN, 99 token, 1 PARAM, 65 length, 0 ND
+src/utils/pdf.ts:352: warning: downloadContractPDF has 45 NLOC, 3 CCN, 296 token, 1 PARAM, 56 length, 0 ND
+src/hooks/useContracts.ts:213: warning: generateContractHtml has 51 NLOC, 3 CCN, 198 token, 1 PARAM, 53 length, 0 ND
+src/hooks/useContracts.ts:267: warning: useContracts has 11 NLOC, 1 CCN, 135 token, 0 PARAM, 79 length, 0 ND
+src/hooks/useContracts.ts:347: warning: createContract has 56 NLOC, 49 CCN, 434 token, 1 PARAM, 60 length, 0 ND
+src/hooks/useBusiness.ts:84: warning: useBusiness has 10 NLOC, 1 CCN, 100 token, 0 PARAM, 78 length, 0 ND
+src/pages/employer/contract-form/hooks/useContractForm.ts:138: warning: validateStep has 85 NLOC, 44 CCN, 710 token, 1 PARAM, 85 length, 0 ND
+src/pages/employer/contract-form/hooks/useContractForm.ts:224: warning: handleSubmit has 48 NLOC, 12 CCN, 287 token, 0 PARAM, 49 length, 0 ND
+src/pages/employer/contract-form/hooks/useContractForm.ts:37: warning: useContractForm has 42 NLOC, 1 CCN, 276 token, 0 PARAM, 258 length, 0 ND
+src/domain/contract/__tests__/validation.test.ts:49: warning: (anonymous) has 25 NLOC, 1 CCN, 232 token, 0 PARAM, 231 length, 0 ND
+src/domain/contract/validation.ts:83: warning: validateLaborContract has 141 NLOC, 25 CCN, 713 token, 1 PARAM, 174 length, 0 ND
+server/src/routes/transactions.ts:43: warning: (anonymous) has 22 NLOC, 4 CCN, 131 token, 0 PARAM, 56 length, 0 ND
+server/src/routes/transfers.ts:51: warning: (anonymous) has 63 NLOC, 6 CCN, 384 token, 0 PARAM, 76 length, 0 ND
+server/src/routes/auth.ts:287: warning: (anonymous) has 92 NLOC, 30 CCN, 789 token, 0 PARAM, 119 length, 0 ND

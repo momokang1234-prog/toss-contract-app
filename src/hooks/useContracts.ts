@@ -36,10 +36,12 @@ export interface Contract {
   social_insurance_clause: boolean;
   severance_clause: boolean;
   employer_signed_at?: string;
+  employer_signature_data?: string;
   worker_signed_at?: string;
   worker_signature_data?: string;
   contract_html?: string;
   rejection_reason?: string;
+  contract_pdf_url?: string;
   created_at: string;
   updated_at: string;
 }
@@ -300,8 +302,9 @@ export function useContracts() {
   // Task 25: Supabase Realtime 구독 — UPDATE + INSERT (Real 모드에서만)
   useEffect(() => {
     if (IS_MOCK) return;
+    const channelId = `contract-changes-${Date.now()}-${Math.random()}`;
     const channel = supabase
-      .channel('contract-changes')
+      .channel(channelId)
       .on('postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'contracts' },
         (payload) => {
@@ -374,6 +377,7 @@ export function useContracts() {
         accident_insurance: input.accident_insurance ?? true,
         social_insurance_clause: input.social_insurance_clause ?? true,
         severance_clause: input.severance_clause ?? true,
+        employer_signature_data: input.employer_signature_data,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       };
@@ -387,7 +391,7 @@ export function useContracts() {
       .from('businesses')
       .select('id')
       .eq('id', input.business_id)
-      .eq('owner_id', userProfile.userKey)
+      .eq('owner_user_key', userProfile.userKey)
       .single();
     if (!business) throw new Error('사업장을 찾을 수 없거나 접근 권한이 없습니다.');
 
@@ -467,7 +471,7 @@ export function useContracts() {
   };
 
   // Task 8 + 11: completeContract — employer_signed_at + contract_html + contract_pdf_url
-  const completeContract = async (id: string) => {
+  const completeContract = async (id: string, htmlStr?: string, pdfUrl?: string) => {
     if (IS_MOCK) {
       const contract = mockContractStore.find(c => c.id === id);
       if (!contract) throw new Error('계약서를 찾을 수 없습니다.');
@@ -475,63 +479,103 @@ export function useContracts() {
       return updateContract(id, {
         status: 'completed',
         employer_signed_at: new Date().toISOString(),
-        contract_html: html,
+        contract_html: htmlStr || html,
+        contract_pdf_url: pdfUrl,
       });
     }
-    // Real: contracts-complete Edge Function이 서버 측에서 employer_signed_at, HTML/PDF 생성 처리
-    const { data, error } = await supabase.functions.invoke('contracts-complete', {
-      body: { contractId: id },
-    });
+    
+    // update to Supabase
+    const { data, error } = await supabase
+      .from('contracts')
+      .update({
+        status: 'completed',
+        employer_signed_at: new Date().toISOString(),
+        contract_html: htmlStr,
+        contract_pdf_url: pdfUrl,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', id)
+      .select()
+      .single();
+
     if (error) throw error;
+    
+    // Add history
+    await supabase.from('contract_history').insert({
+      contract_id: id,
+      action: 'completed',
+      actor_role: 'employer',
+      actor_user_key: userProfile?.userKey,
+    });
+
     await fetchContracts();
     return data;
   };
 
-  // Task 14: cancelContract → contracts-cancel Edge Function
+  // Task 14: cancelContract
   const cancelContract = async (id: string) => {
     if (IS_MOCK) {
       return updateContract(id, { status: 'cancelled' });
     }
-    const { data, error } = await supabase.functions.invoke('contracts-cancel', {
-      body: { contractId: id },
-    });
+    const { data, error } = await supabase
+      .from('contracts')
+      .update({ status: 'cancelled', updated_at: new Date().toISOString() })
+      .eq('id', id)
+      .select()
+      .single();
     if (error) throw error;
+    
+    await supabase.from('contract_history').insert({
+      contract_id: id,
+      action: 'cancelled',
+      actor_role: 'employer',
+      actor_user_key: userProfile?.userKey,
+    });
+
     await fetchContracts();
     return data;
   };
 
-  // Task 14: expireContract → contracts-expire Edge Function
+  // Task 14: expireContract
   const expireContract = async (id: string) => {
     if (IS_MOCK) {
       return updateContract(id, { status: 'expired' });
     }
-    const { data, error } = await supabase.functions.invoke('contracts-expire', {
-      body: { contractId: id },
-    });
+    const { data, error } = await supabase
+      .from('contracts')
+      .update({ status: 'expired', updated_at: new Date().toISOString() })
+      .eq('id', id)
+      .select()
+      .single();
     if (error) throw error;
     await fetchContracts();
     return data;
   };
 
-  // Task 13: viewContract → contracts-view Edge Function
+  // Task 13: viewContract
   const viewContract = async (id: string) => {
     if (IS_MOCK) {
       return updateContract(id, { status: 'viewed' });
     }
-    const { data, error } = await supabase.functions.invoke('contracts-view', {
-      body: { contractId: id },
+    const { data, error } = await supabase.rpc('view_contract', {
+      p_contract_id: id,
+      p_worker_user_key: userProfile?.userKey,
+      p_worker_phone: userProfile?.phone,
     });
     if (error) throw error;
     return data;
   };
 
-  // Task 21: rejectContract → contracts-reject Edge Function
+  // Task 21: rejectContract
   const rejectContract = async (id: string, reason?: string) => {
     if (IS_MOCK) {
-      return updateContract(id, { status: 'rejected' });
+      return updateContract(id, { status: 'rejected', rejection_reason: reason });
     }
-    const { data, error } = await supabase.functions.invoke('contracts-reject', {
-      body: { contractId: id, rejection_reason: reason },
+    const { data, error } = await supabase.rpc('reject_contract', {
+      p_contract_id: id,
+      p_worker_user_key: userProfile?.userKey,
+      p_worker_phone: userProfile?.phone,
+      p_reason: reason,
     });
     if (error) throw error;
     await fetchContracts();

@@ -1,8 +1,8 @@
-import React from 'react';
-import { TextField, Paragraph } from '@toss/tds-mobile';
+import React, { useState } from 'react';
+import { Spacing } from '@toss/tds-mobile';
 import type { ContractFormData } from '../types';
 import { DAYS, DAY_LABELS } from '../types';
-import { FieldLabel } from './FieldLabel';
+import { FunnelQuestion } from '../../../../components/funnel/FunnelQuestion';
 
 interface Step3WorkScheduleProps {
   form: ContractFormData;
@@ -14,61 +14,151 @@ interface Step3WorkScheduleProps {
 
 function pillStyle(active: boolean): React.CSSProperties {
   return {
-    width: 44, height: 44, borderRadius: 22, fontSize: 13, fontWeight: 600,
+    padding: '12px 20px',
+    borderRadius: 24,
+    fontSize: 16,
+    fontWeight: 600,
     color: active ? '#fff' : '#333D4B',
-    backgroundColor: active ? '#3182F6' : '#F5F6F8',
-    border: 'none', cursor: 'pointer',
+    backgroundColor: active ? '#3182F6' : '#F2F4F6',
+    border: 'none',
+    cursor: 'pointer',
+    transition: 'all 0.2s',
+    flex: '1 1 calc(33.333% - 8px)',
+    minWidth: '60px',
+    textAlign: 'center'
   };
 }
 
 export default function Step3WorkSchedule({ form, errors, handleChange, toggleDay, selectWeeklyHoliday }: Step3WorkScheduleProps) {
+  const [activeField, setActiveField] = useState<'days' | 'holiday' | 'workTime' | 'breakTime'>('days');
+
   return (
     <div>
-      <Paragraph typography="st3" fontWeight="bold" style={{ marginBottom: 12 }}>근무 시간</Paragraph>
-      <FieldLabel>근무 요일</FieldLabel>
-      <div style={{ display: 'flex', gap: 8, marginBottom: 12, flexWrap: 'wrap' }}>
-        {DAYS.map(day => (
-          <button key={day} onClick={() => toggleDay(day)} style={pillStyle(form.work_days.includes(day))}>
-            {DAY_LABELS[day]}
+      <FunnelQuestion
+        title={<>무슨 요일에<br/>출근하시나요?</>}
+        subtitle="출근하는 모든 요일을 선택해주세요"
+        isActive={activeField === 'days'}
+        onEnter={() => setActiveField('days')}
+        summary={form.work_days.length > 0 ? `출근일: ${form.work_days.map(d => DAY_LABELS[d]).join(', ')}` : undefined}
+      >
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+          {DAYS.map(day => (
+            <button key={day} onClick={() => toggleDay(day)} style={pillStyle(form.work_days.includes(day))}>
+              {DAY_LABELS[day]}
+            </button>
+          ))}
+        </div>
+        {errors.work_days && <div style={{ color: '#FF5252', fontSize: 13, marginTop: 8 }}>{errors.work_days}</div>}
+        
+        {/* Next button for multiple selection */}
+        {activeField === 'days' && form.work_days.length > 0 && (
+          <button 
+            style={{ width: '100%', padding: 16, borderRadius: 16, backgroundColor: '#333D4B', color: 'white', marginTop: 24, fontSize: 16, fontWeight: 'bold', border: 'none' }}
+            onClick={() => setActiveField('holiday')}
+          >
+            선택 완료
           </button>
-        ))}
-        {errors.work_days && <span style={{ color: '#FF5252', fontSize: 12, width: '100%' }}>{errors.work_days}</span>}
-      </div>
-      <FieldLabel>주휴일</FieldLabel>
-      <div style={{ display: 'flex', gap: 8, marginBottom: 12, flexWrap: 'wrap', alignItems: 'center' }}>
-        {DAYS.map(day => (
-          <button key={day} onClick={() => selectWeeklyHoliday(day)} style={pillStyle(form.weekly_holiday === day)}>
-            {DAY_LABELS[day]}
-          </button>
-        ))}
-        {errors.weekly_holiday && <span style={{ color: '#FF5252', fontSize: 12, width: '100%' }}>{errors.weekly_holiday}</span>}
-      </div>
-      <div style={{ display: 'flex', gap: 12, marginBottom: 12 }}>
-        <div style={{ flex: 1 }}>
-          <FieldLabel>시작</FieldLabel>
-          <TextField variant="box" type="time" value={form.start_time}
-            onChange={e => handleChange('start_time', e.target.value)}
-            hasError={!!errors.start_time} help={errors.start_time} aria-label="시작 시간" />
-        </div>
-        <div style={{ flex: 1 }}>
-          <FieldLabel>종료</FieldLabel>
-          <TextField variant="box" type="time" value={form.end_time}
-            onChange={e => handleChange('end_time', e.target.value)}
-            hasError={!!errors.end_time} help={errors.end_time} aria-label="종료 시간" />
-        </div>
-      </div>
-      <div style={{ display: 'flex', gap: 12 }}>
-        <div style={{ flex: 1 }}>
-          <FieldLabel>휴게 시작</FieldLabel>
-          <TextField variant="box" type="time" value={form.break_start}
-            onChange={e => handleChange('break_start', e.target.value)} aria-label="휴게 시작 시간" />
-        </div>
-        <div style={{ flex: 1 }}>
-          <FieldLabel>휴게 종료</FieldLabel>
-          <TextField variant="box" type="time" value={form.break_end}
-            onChange={e => handleChange('break_end', e.target.value)} aria-label="휴게 종료 시간" />
-        </div>
-      </div>
+        )}
+      </FunnelQuestion>
+
+      {/* Show holiday if days are selected */}
+      {(form.work_days.length > 0 || activeField === 'holiday' || activeField === 'workTime' || activeField === 'breakTime') && (
+        <FunnelQuestion
+          title={<>주휴일은<br/>무슨 요일인가요?</>}
+          subtitle="일주일 만근 시 유급휴일을 주는 요일"
+          isActive={activeField === 'holiday'}
+          onEnter={() => setActiveField('holiday')}
+          summary={form.weekly_holiday ? `주휴일: ${DAY_LABELS[form.weekly_holiday]}` : undefined}
+        >
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+            {DAYS.map(day => (
+              <button 
+                key={day} 
+                onClick={() => {
+                  selectWeeklyHoliday(day);
+                  setActiveField('workTime');
+                }} 
+                style={pillStyle(form.weekly_holiday === day)}
+              >
+                {DAY_LABELS[day]}
+              </button>
+            ))}
+          </div>
+          {errors.weekly_holiday && <div style={{ color: '#FF5252', fontSize: 13, marginTop: 8 }}>{errors.weekly_holiday}</div>}
+        </FunnelQuestion>
+      )}
+
+      {/* Show work time if holiday is selected */}
+      {(form.weekly_holiday || activeField === 'workTime' || activeField === 'breakTime') && (
+        <FunnelQuestion
+          title={<>출퇴근 시간은<br/>언제인가요?</>}
+          subtitle="업무 시작과 종료 시간을 선택해주세요"
+          isActive={activeField === 'workTime'}
+          onEnter={() => setActiveField('workTime')}
+          summary={(form.start_time && form.end_time) ? `근무시간: ${form.start_time} ~ ${form.end_time}` : undefined}
+        >
+          <div style={{ display: 'flex', gap: 16 }}>
+            <div style={{ flex: 1 }}>
+              <label className="funnel-label">출근 시간</label>
+              <input
+                type="time"
+                className="funnel-huge-input"
+                value={form.start_time}
+                onChange={e => handleChange('start_time', e.target.value)}
+              />
+            </div>
+            <div style={{ flex: 1 }}>
+              <label className="funnel-label">퇴근 시간</label>
+              <input
+                type="time"
+                className="funnel-huge-input"
+                value={form.end_time}
+                onChange={e => {
+                  handleChange('end_time', e.target.value);
+                  if (form.start_time && e.target.value) {
+                    setActiveField('breakTime');
+                  }
+                }}
+              />
+            </div>
+          </div>
+          {(errors.start_time || errors.end_time) && (
+            <div style={{ color: '#FF5252', fontSize: 13, marginTop: 8 }}>{errors.start_time || errors.end_time}</div>
+          )}
+        </FunnelQuestion>
+      )}
+
+      {/* Show break time if work time is selected */}
+      {(form.start_time && form.end_time) && (
+        <FunnelQuestion
+          title={<>쉬는 시간은<br/>언제인가요?</>}
+          subtitle="점심시간 등 휴게시간을 입력해주세요"
+          isActive={activeField === 'breakTime'}
+          onEnter={() => setActiveField('breakTime')}
+          summary={(form.break_start && form.break_end) ? `휴게시간: ${form.break_start} ~ ${form.break_end}` : undefined}
+        >
+          <div style={{ display: 'flex', gap: 16 }}>
+            <div style={{ flex: 1 }}>
+              <label className="funnel-label">휴게 시작</label>
+              <input
+                type="time"
+                className="funnel-huge-input"
+                value={form.break_start}
+                onChange={e => handleChange('break_start', e.target.value)}
+              />
+            </div>
+            <div style={{ flex: 1 }}>
+              <label className="funnel-label">휴게 종료</label>
+              <input
+                type="time"
+                className="funnel-huge-input"
+                value={form.break_end}
+                onChange={e => handleChange('break_end', e.target.value)}
+              />
+            </div>
+          </div>
+        </FunnelQuestion>
+      )}
     </div>
   );
 }

@@ -16,12 +16,12 @@ function ContractListContent({ contracts, navigate, businessMap, badgeFor }: {
   return (
     <div className={styles.content}>
       <Spacing size={24} />
-      <Paragraph typography="st2" fontWeight="bold">받은 계약서</Paragraph>
-      <Spacing size={8} />
-      <Paragraph typography="st5" color="grey-500">
+      <Paragraph typography="t3" fontWeight="bold">받은 계약서</Paragraph>
+      <Spacing size={12} />
+      <Paragraph typography="t5" color="grey-500">
         {contracts.length > 0 ? `${contracts.length}건의 계약서` : '아직 받은 계약서가 없어요'}
       </Paragraph>
-      <Spacing size={24} />
+      <Spacing size={32} />
 
       {contracts.length > 0 ? (
         <List>
@@ -32,10 +32,11 @@ function ContractListContent({ contracts, navigate, businessMap, badgeFor }: {
               aria-label={businessMap[c.business_id] ?? c.workplace}
               contents={
                 <div className={styles.contractRow}>
-                  <Paragraph typography="t4" fontWeight="bold" color="grey-800">
+                  <Paragraph typography="t5" fontWeight="bold" color="grey-800">
                     {businessMap[c.business_id] ?? c.workplace}
                   </Paragraph>
-                  <Paragraph typography="st7" color="grey-400" style={{ fontSize: 12, marginTop: 4 }}>
+                  <Spacing size={4} />
+                  <Paragraph typography="t7" color="grey-500">
                     {c.start_date}
                   </Paragraph>
                 </div>
@@ -50,12 +51,12 @@ function ContractListContent({ contracts, navigate, businessMap, badgeFor }: {
         </List>
       ) : (
         <div className={styles.empty}>
-          <Paragraph typography="st1">📬</Paragraph>
+          <Paragraph typography="t1">📬</Paragraph>
           <Spacing size={16} />
-          <Paragraph typography="st5" color="grey-500">사장님이 보낸 계약서가 여기에 표시돼요</Paragraph>
+          <Paragraph typography="t5" color="grey-500" fontWeight="bold">사장님이 보낸 계약서가 여기에 표시돼요</Paragraph>
         </div>
       )}
-      <Spacing size={40} />
+      <Spacing size={48} />
     </div>
   );
 }
