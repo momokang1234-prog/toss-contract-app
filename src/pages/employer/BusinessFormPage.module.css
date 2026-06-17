@@ -55,3 +55,8 @@
 .keypadEmpty:active {
   background: transparent;
 }
+
+/* Hide TDS Top's empty right-action area when no children are passed (Comment 2 fix) */
+.page > :first-child :empty {
+  display: none;
+}

@@ -54,7 +54,7 @@ export default function BusinessFormPage() {
   if (step === 'info') {
     return (
       <div className={styles.page}>
-        <Top title="사업장 등록" />
+        <Top title="" />
         <div className={styles.content}>
           <Spacing size={40} />
           <Paragraph typography="t3" fontWeight="bold">사업장 정보를</Paragraph>
@@ -84,7 +84,7 @@ export default function BusinessFormPage() {
 
   return (
     <div className={styles.page}>
-      <Top title="사업장 등록" />
+      <Top title="" />
       <div className={styles.content}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <Paragraph typography="t3" fontWeight="bold">사업자등록번호를</Paragraph>

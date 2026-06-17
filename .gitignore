@@ -13,3 +13,28 @@ Thumbs.db
 npm-debug.log*
 coverage/
 .omg/
+
+# Vertex AI service account key
+certs/vertex-sa-key.json
+.aider*
+
+# Local Claude Code settings (permissions only, no secrets but machine-specific)
+.claude/settings.local.json
+
+# Large binaries
+*.deb
+
+# UX test runtime session data
+server/ux-test-sessions/
+
+# Temporary build/test artifacts
+*.b64
+*_datauri.txt
+*.patch
+*.diff
+curl
+
+# Root-level temp screenshots (test artifacts)
+/step*.png
+/employment_contract_pass.png
+/"image copy.png"

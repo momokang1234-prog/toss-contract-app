@@ -1,14 +1,14 @@
 import styles from './HeroMarquee.module.css';
 
 const IMAGES = [
-  '/assets/marquee/01991f04-03bb-7612-8b82-cc3586b49659.png',
-  '/assets/marquee/01991ef8-4f7b-754a-8a56-0953a5dc8140.png',
-  '/assets/marquee/01991ef8-4f62-7618-a896-a0019028796f.png',
-  '/assets/marquee/01991f05-0336-7511-b745-1c275d80f79e.png',
-  '/assets/marquee/01991ef8-4f62-75a8-86a1-a6c99d1ec8f6.png',
-  '/assets/marquee/01991ef8-4f69-7036-90dc-0c79f8c4aca9.png',
-  '/assets/marquee/01991f05-457e-7239-ae3a-5ea65a697f85.png',
-  '/assets/marquee/01991ef8-4f48-7053-8291-41649aa8298c.png'
+  '/assets/marquee/contract_doc_1781603373026_transparent.png',
+  '/assets/marquee/digital_sign_1781603405614_transparent.png',
+  '/assets/marquee/handshake_deal_1781603394558_transparent.png',
+  '/assets/marquee/salary_coins_1781603382673_transparent.png',
+  '/assets/marquee/contract_doc_1781603373026_transparent.png',
+  '/assets/marquee/digital_sign_1781603405614_transparent.png',
+  '/assets/marquee/handshake_deal_1781603394558_transparent.png',
+  '/assets/marquee/salary_coins_1781603382673_transparent.png'
 ];
 
 export function HeroMarquee() {

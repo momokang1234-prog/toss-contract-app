@@ -1,6 +1,8 @@
-import { Spacing, TextField, SegmentedControl, Paragraph, Switch } from '@toss/tds-mobile';
+import { useState } from 'react';
+import { Spacing, SegmentedControl, Paragraph, Switch } from '@toss/tds-mobile';
 import type { ContractFormData } from '../types';
-import { FieldLabel } from './FieldLabel';
+import { CommentBoundary } from '../../../dev/CommentBoundary';
+import { FunnelQuestion } from '../../../../components/funnel/FunnelQuestion';
 
 interface Step4WageInsuranceProps {
   form: ContractFormData;
@@ -8,117 +10,196 @@ interface Step4WageInsuranceProps {
   handleChange: (field: string, value: string | boolean | string[]) => void;
 }
 
-function SwitchRow({ label, description, checked, onChange }: {
-  label: string; description?: string; checked: boolean;
-  onChange: (v: boolean) => void;
-}) {
-  return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', padding: '10px 0', gap: 12 }}>
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <Paragraph typography="st6" fontWeight="bold">{label}</Paragraph>
-        {description && (
-          <Paragraph typography="st7" color="grey-500" style={{ marginTop: 4, lineHeight: '1.6', wordBreak: 'keep-all' }}>
-            {description}
-          </Paragraph>
-        )}
-      </div>
-      <Switch checked={checked} onChange={(e) => onChange((e.target as HTMLInputElement).checked)} aria-label={label} />
-    </div>
-  );
-}
+const WAGE_PAYMENT_DAYS = [
+  { value: '1', label: '1일' }, { value: '5', label: '5일' },
+  { value: '10', label: '10일' }, { value: '15', label: '15일' },
+  { value: '20', label: '20일' }, { value: '25', label: '25일' },
+  { value: 'last', label: '말일' },
+];
 
 export default function Step4WageInsurance({ form, errors, handleChange }: Step4WageInsuranceProps) {
+  const [activeField, setActiveField] = useState<'wageType' | 'paymentMethod' | 'paymentDay' | 'paidLeave' | 'insurance'>('wageType');
+
+  const wageTypeLabel = form.wage_type === 'hourly' ? '시급' : form.wage_type === 'daily' ? '일급' : form.wage_type === 'weekly' ? '주급' : '월급';
+  const wageUnit = form.wage_type === 'hourly' ? '원/시간' : form.wage_type === 'daily' ? '원/일' : form.wage_type === 'weekly' ? '원/주' : '원/월';
+
   return (
     <div>
-      <Paragraph typography="t5" fontWeight="bold" color="grey800" style={{ marginBottom: 8 }}>임금</Paragraph>
-      <FieldLabel>급여 형태</FieldLabel>
-      <SegmentedControl value={form.wage_type} onChange={v => handleChange('wage_type', v)}>
-        <SegmentedControl.Item value="hourly">시급</SegmentedControl.Item>
-        <SegmentedControl.Item value="daily">일급</SegmentedControl.Item>
-        <SegmentedControl.Item value="weekly">주급</SegmentedControl.Item>
-        <SegmentedControl.Item value="monthly">월급</SegmentedControl.Item>
-      </SegmentedControl>
-      <Spacing size={32} />
-      <TextField
-        variant="line"
-        labelOption="sustain"
-        label="금액 (원)"
-        type="number"
-        placeholder="예: 3000000"
-        value={form.base_wage}
-        onChange={e => handleChange('base_wage', e.target.value)}
-        hasError={!!errors.base_wage}
-        help={errors.base_wage}
-      />
-      <Spacing size={32} />
-      <FieldLabel>지급 방법</FieldLabel>
-      <SegmentedControl value={form.wage_payment_method} onChange={v => handleChange('wage_payment_method', v)}>
-        <SegmentedControl.Item value="bankTransfer">계좌이체</SegmentedControl.Item>
-        <SegmentedControl.Item value="cash">현금</SegmentedControl.Item>
-        <SegmentedControl.Item value="mixed">혼합</SegmentedControl.Item>
-      </SegmentedControl>
-      <Spacing size={32} />
-      <FieldLabel>지급일</FieldLabel>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-        <span style={{ fontSize: 15, color: '#333D4B', whiteSpace: 'nowrap' }}>매월</span>
-        <select
-          value={form.wage_payment_day}
-          onChange={e => handleChange('wage_payment_day', e.target.value)}
-          style={{
-            flex: 1, padding: '14px 16px', fontSize: 16, borderRadius: 12,
-            border: 'none', borderBottom: '2px solid #E5E8EB', backgroundColor: 'transparent',
-            color: '#191F28', appearance: 'none', backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2212%22 height=%2212%22%3E%3Cpath d=%22M3 5l3 3 3-3%22 stroke=%22%238B95A1%22 stroke-width=%221.5%22 fill=%22none%22/%3E%3C/svg%3E")',
-            backgroundRepeat: 'no-repeat', backgroundPosition: 'right 8px center',
-          }}
+      {/* 1. Wage type + amount */}
+      <CommentBoundary name="임금-형태금액">
+      <FunnelQuestion
+        title={<>임금 형태와<br/>금액을 입력해주세요</>}
+        subtitle="근로기준법에 따른 최저임금 이상이어야 해요"
+        isActive={activeField === 'wageType'}
+        onEnter={() => setActiveField('wageType')}
+        summary={form.wage_type && form.base_wage ? `${wageTypeLabel} ${Number(form.base_wage).toLocaleString()}원` : undefined}
+      >
+        <SegmentedControl
+          value={form.wage_type}
+          onChange={v => { handleChange('wage_type', v); }}
+          size="large"
         >
-          {Array.from({ length: 28 }, (_, i) => i + 1).map(d =>
-            <option key={d} value={String(d)}>{d}일</option>
+          <SegmentedControl.Item value="hourly">시급</SegmentedControl.Item>
+          <SegmentedControl.Item value="daily">일급</SegmentedControl.Item>
+          <SegmentedControl.Item value="weekly">주급</SegmentedControl.Item>
+          <SegmentedControl.Item value="monthly">월급</SegmentedControl.Item>
+        </SegmentedControl>
+        {form.wage_type && (
+          <>
+            <Spacing size={24} />
+            <label className="funnel-label">{wageTypeLabel} 금액</label>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
+              <input
+                className="funnel-huge-input"
+                style={{ flex: 1 }}
+                placeholder="예: 10000"
+                value={form.base_wage}
+                onChange={e => handleChange('base_wage', e.target.value)}
+                onKeyDown={e => {
+                  if (e.key === 'Enter' && form.base_wage && Number(form.base_wage) > 0) {
+                    setActiveField('paymentMethod');
+                  }
+                }}
+              />
+              <Paragraph typography="st6" color="grey-500" style={{ whiteSpace: 'nowrap', flexShrink: 0 }}>{wageUnit}</Paragraph>
+            </div>
+            {errors.base_wage && (
+              <div style={{ color: '#f04452', fontSize: '13px', marginTop: '8px' }}>
+                {errors.base_wage}
+              </div>
+            )}
+          </>
+        )}
+      </FunnelQuestion>
+      </CommentBoundary>
+
+      {/* Show payment fields after wage is set */}
+      {(form.wage_type && form.base_wage) && (
+        <>
+          {/* 2. Payment method */}
+          <CommentBoundary name="임금-지급방법">
+          <FunnelQuestion
+            title={<>임금 지급 방법을<br/>선택해주세요</>}
+            subtitle="계좌이체, 현금 중 선택할 수 있어요"
+            isActive={activeField === 'paymentMethod'}
+            onEnter={() => setActiveField('paymentMethod')}
+            summary={form.wage_payment_method ? (form.wage_payment_method === 'bankTransfer' ? '계좌이체' : form.wage_payment_method === 'cash' ? '현금' : '혼합') : undefined}
+          >
+            <SegmentedControl
+              value={form.wage_payment_method}
+              onChange={v => { handleChange('wage_payment_method', v); }}
+              size="large"
+            >
+              <SegmentedControl.Item value="bankTransfer">계좌이체</SegmentedControl.Item>
+              <SegmentedControl.Item value="cash">현금</SegmentedControl.Item>
+              <SegmentedControl.Item value="mixed">혼합</SegmentedControl.Item>
+            </SegmentedControl>
+          </FunnelQuestion>
+          </CommentBoundary>
+
+          {/* 3. Payment day */}
+          {(form.wage_payment_method || activeField === 'paymentDay') && (
+            <CommentBoundary name="임금-지급일">
+            <FunnelQuestion
+              title={<>임금 지급일을<br/>선택해주세요</>}
+              subtitle="매월 정해진 날짜에 지급돼요"
+              isActive={activeField === 'paymentDay'}
+              onEnter={() => setActiveField('paymentDay')}
+              summary={form.wage_payment_day ? `매월 ${form.wage_payment_day === 'last' ? '말일' : `${form.wage_payment_day}일`}` : undefined}
+            >
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                {WAGE_PAYMENT_DAYS.map(d => (
+                  <button
+                    key={d.value}
+                    type="button"
+                    onClick={() => handleChange('wage_payment_day', d.value)}
+                    style={{
+                      padding: '12px 20px',
+                      borderRadius: 24,
+                      fontSize: 16,
+                      fontWeight: 600,
+                      color: form.wage_payment_day === d.value ? '#fff' : '#333D4B',
+                      backgroundColor: form.wage_payment_day === d.value ? '#3182F6' : '#F2F4F6',
+                      border: 'none',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s',
+                    }}
+                  >
+                    {d.label}
+                  </button>
+                ))}
+              </div>
+            </FunnelQuestion>
+            </CommentBoundary>
           )}
-          <option value="last">말일</option>
-        </select>
-      </div>
-      <Spacing size={48} />
-      <Paragraph typography="t5" fontWeight="bold" color="grey800" style={{ marginBottom: 12 }}>근로조건</Paragraph>
-      <SwitchRow
-        label="연차 유급휴가"
-        description="5인 이상 사업장 의무. 5인 미만은 권고사항 (근로기준법 제60조)"
-        checked={form.paid_leave_clause}
-        onChange={v => handleChange('paid_leave_clause', v)}
-      />
-      <Spacing size={32} />
-      <Paragraph typography="t5" fontWeight="bold" color="grey800" style={{ marginBottom: 16 }}>4대 보험</Paragraph>
-      <div style={{ paddingLeft: 16, borderLeft: '2px solid #E5E8EB', marginBottom: 24 }}>
-        <SwitchRow
-          label="국민연금"
-          description="만 18세 이상 60세 미만 사업장가입자. 월 8일 이상·월 60시간 이상 근무 시 의무가입"
-          checked={form.pension}
-          onChange={v => handleChange('pension', v)}
-        />
-        <SwitchRow
-          label="건강보험"
-          description="사업장가입자. 월 8일 이상·월 60시간 이상 근무 시 의무가입"
-          checked={form.health_insurance}
-          onChange={v => handleChange('health_insurance', v)}
-        />
-        <SwitchRow
-          label="고용보험"
-          description="전 근로자 의무가입 (단, 65세 이후 고용된 자 제외)"
-          checked={form.employment_insurance}
-          onChange={v => handleChange('employment_insurance', v)}
-        />
-        <SwitchRow
-          label="산재보험"
-          description="전 사업장 의무가입. 근로복지공단 관장"
-          checked={form.accident_insurance}
-          onChange={v => handleChange('accident_insurance', v)}
-        />
-      </div>
-      <div style={{ backgroundColor: '#F2F4F6', borderRadius: 16, padding: 20, marginBottom: 12 }}>
-        <Paragraph typography="t6" fontWeight="bold" color="grey800" style={{ marginBottom: 8 }}>퇴직금</Paragraph>
-        <Paragraph typography="t7" color="grey-600" style={{ lineHeight: '1.5', wordBreak: 'keep-all' }}>
-          근로자퇴직급여보장법에 따라 1년 이상 근무 시 의무 지급. 4주 평균 15시간 이상 근무 시 적용.
-        </Paragraph>
-      </div>
+        </>
+      )}
+
+      {/* Show leave + insurance after payment day is set */}
+      {(form.wage_payment_day || activeField === 'paidLeave' || activeField === 'insurance') && (
+        <>
+          {/* 4. Paid leave */}
+          <CommentBoundary name="임금-유급휴가">
+          <FunnelQuestion
+            title={<>유급휴가 조항을<br/>포함할까요?</>}
+            subtitle="근로기준법에 따라 연차 유급휴가를 보장합니다"
+            isActive={activeField === 'paidLeave'}
+            onEnter={() => setActiveField('paidLeave')}
+            summary={form.paid_leave_clause !== undefined ? (form.paid_leave_clause ? '포함' : '미포함') : undefined}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', padding: '12px 0', gap: 12 }}>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <Paragraph typography="st6" fontWeight="bold">연차 유급휴가 포함</Paragraph>
+                <Paragraph typography="st7" color="grey-500" style={{ marginTop: 4, lineHeight: '1.6', wordBreak: 'keep-all' }}>
+                  근로기준법 제60조에 따라 1년간 80% 이상 출근 시 15일의 유급휴가가 발생합니다
+                </Paragraph>
+              </div>
+              <Switch checked={form.paid_leave_clause} onChange={(e) => handleChange('paid_leave_clause', (e.target as HTMLInputElement).checked)} aria-label="연차 유급휴가 포함" />
+            </div>
+          </FunnelQuestion>
+          </CommentBoundary>
+
+          {/* 5. Insurance group */}
+          <CommentBoundary name="임금-보험">
+          <FunnelQuestion
+            title={<>4대 보험 가입<br/>여부를 선택해주세요</>}
+            subtitle="상시 근로자 수와 근로시간에 따라 의무 가입 여부가 달라져요"
+            isActive={activeField === 'insurance'}
+            onEnter={() => setActiveField('insurance')}
+            summary={
+              [form.pension, form.health_insurance, form.employment_insurance, form.accident_insurance].some(v => v !== undefined)
+                ? `${[form.pension, form.health_insurance, form.employment_insurance, form.accident_insurance].filter(Boolean).length}/4 가입`
+                : undefined
+            }
+          >
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 0', borderBottom: '1px solid #f2f4f6' }}>
+                <Paragraph typography="st6" fontWeight="bold">국민연금</Paragraph>
+                <Switch checked={form.pension} onChange={(e) => handleChange('pension', (e.target as HTMLInputElement).checked)} aria-label="국민연금" />
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 0', borderBottom: '1px solid #f2f4f6' }}>
+                <Paragraph typography="st6" fontWeight="bold">건강보험</Paragraph>
+                <Switch checked={form.health_insurance} onChange={(e) => handleChange('health_insurance', (e.target as HTMLInputElement).checked)} aria-label="건강보험" />
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 0', borderBottom: '1px solid #f2f4f6' }}>
+                <Paragraph typography="st6" fontWeight="bold">고용보험</Paragraph>
+                <Switch checked={form.employment_insurance} onChange={(e) => handleChange('employment_insurance', (e.target as HTMLInputElement).checked)} aria-label="고용보험" />
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 0' }}>
+                <Paragraph typography="st6" fontWeight="bold">산재보험</Paragraph>
+                <Switch checked={form.accident_insurance} onChange={(e) => handleChange('accident_insurance', (e.target as HTMLInputElement).checked)} aria-label="산재보험" />
+              </div>
+            </div>
+            <Spacing size={24} />
+            <div style={{ padding: 16, background: '#f8f9fa', borderRadius: 8 }}>
+              <Paragraph typography="st7" color="grey-500">
+                퇴직금은 1년 이상 근무 시 법정 의무 사항으로 자동 적용됩니다.
+              </Paragraph>
+            </div>
+          </FunnelQuestion>
+          </CommentBoundary>
+        </>
+      )}
     </div>
   );
 }

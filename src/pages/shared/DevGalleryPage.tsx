@@ -1,7 +1,7 @@
 import styles from './DevGalleryPage.module.css';
 
 const PAGES = [
-  { title: '로그인', url: '/login', role: null },
+  { title: '로그인', url: '/login?preview=true', role: null },
   { title: '메인 대시보드 (사장)', url: '/employer/dashboard', role: 'employer' },
   { title: '사업장 관리', url: '/employer/business/manage', role: 'employer' },
   { title: '진행중 계약 (사장)', url: '/employer/contracts', role: 'employer' },

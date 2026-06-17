@@ -1,16 +1,24 @@
 import { useEffect } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 
 export default function DevBypass() {
   const [searchParams] = useSearchParams();
-  const navigate = useNavigate();
   const { login } = useAuth();
 
   useEffect(() => {
     const role = searchParams.get('role') as 'employer' | 'worker';
-    const path = searchParams.get('path');
 
+    const rawPath = searchParams.get('path') || '';
+    const xray = searchParams.get('xray');
+    const v = searchParams.get('v');
+
+    const [basePath, existingQs] = rawPath.split('?');
+    const merged = new URLSearchParams(existingQs || '');
+    if (xray === 'true') merged.set('xray', 'true');
+    if (v) merged.set('v', v);
+    const mergedQs = merged.toString();
+    const finalPath = mergedQs ? `${basePath}?${mergedQs}` : basePath;
     if (role) {
       if (sessionStorage.getItem('force_mock') !== 'true') {
         sessionStorage.setItem('force_mock', 'true');
@@ -18,12 +26,12 @@ export default function DevBypass() {
         return;
       }
       login(role).then(() => {
-        if (path) navigate(path, { replace: true });
+        window.location.replace(finalPath);
       });
-    } else if (path) {
-      navigate(path, { replace: true });
+    } else if (rawPath) {
+      window.location.replace(finalPath);
     }
-  }, [searchParams, navigate, login]);
+  }, [searchParams, login]);
 
   return <div style={{ padding: 20 }}>개발 환경 우회 중...</div>;
 }

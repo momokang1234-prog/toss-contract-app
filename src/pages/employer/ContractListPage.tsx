@@ -3,6 +3,7 @@ import { useContracts } from '../../hooks/useContracts';
 import { Top, Paragraph, Spacing, Button, List, ListRow, Badge } from '@toss/tds-mobile';
 import { Suspense, Delay } from '@suspensive/react';
 import { CONTRACT_TYPE_LABEL } from '../../utils/labels';
+import { CommentBoundary } from '../dev/CommentBoundary';
 import styles from './ContractListPage.module.css';
 
 function ContractListContent({ contracts, navigate, badgeFor }: {
@@ -12,8 +13,6 @@ function ContractListContent({ contracts, navigate, badgeFor }: {
 }) {
   return (
     <div className={styles.content}>
-      <Spacing size={24} />
-
       <Paragraph typography="t3" fontWeight="bold">근로계약서</Paragraph>
       <Spacing size={12} />
       <Paragraph typography="t5" color="grey-500">
@@ -22,10 +21,12 @@ function ContractListContent({ contracts, navigate, badgeFor }: {
           : '아직 작성한 계약서가 없어요'}
       </Paragraph>
 
-      <Spacing size={32} />
+      <Spacing size={12} />
 
       {contracts.length > 0 ? (
-        <List>
+        <CommentBoundary name="계약서-목록">
+          <div style={{ margin: '0 -20px' }}>
+            <List>
           {contracts.map(c => (
             <ListRow
               key={c.id}
@@ -50,6 +51,8 @@ function ContractListContent({ contracts, navigate, badgeFor }: {
             />
           ))}
         </List>
+          </div>
+        </CommentBoundary>
       ) : (
         <div className={styles.empty}>
           <img src="https://static.toss.im/2d-emojis/png/4x/u1F4CB.png" alt=""
@@ -76,16 +79,14 @@ export default function ContractListPage() {
   const { contracts } = useContracts();
 
   const badgeFor = (status: string) => {
-    if (status === 'draft') return { label: '작성중', color: 'teal' as const };
-    if (status === 'sent') return { label: '진행중', color: 'blue' as const };
-    if (status === 'viewed') return { label: '진행중', color: 'yellow' as const };
-    if (status === 'signed') return { label: '서명완료', color: 'green' as const };
-    if (status === 'completed') return { label: '계약완료', color: 'elephant' as const };
-    if (status === 'cancelled' || status === 'expired') return { label: '취소', color: 'red' as const };
-    if (status === 'rejected') return { label: '수정 요청됨', color: 'blue' as const };
-    return { label: status, color: 'elephant' as const };
+    if (status === 'signed' || status === 'completed') {
+      return { label: '완료', color: 'blue' as const };
+    }
+    if (status === 'cancelled' || status === 'expired') {
+      return { label: '만료/취소', color: 'elephant' as const };
+    }
+    return { label: '서명 대기', color: 'yellow' as const };
   };
-
   return (
     <div className={styles.page}>
       <Top title="">

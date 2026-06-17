@@ -2,26 +2,27 @@ name: verification-gate
 type: always
 description: "UI 변경 시 브라우저 확인 없이 완료 선언 금지"
 
+
 # Verification Gate
 
-## 증거 없이 "완료" 선언 금지
+## Do not declare "done" without evidence
 
-| 검증 유형 | 최소 증거 | 반례 (불충분) |
-|-----------|----------|--------------|
-| UI/레이아웃 변경 | 브라우저 스크린샷 또는 Gemini Vision 확인 | "TSC 0 errors" |
-| 텍스트/간격/폰트 | 실제 렌더링 확인 (dev server --force 재시작 후) | "코드 추가함" |
-| CSS/스타일 변경 | 브라우저에서 해당 요소 검사 | "빌드 성공" |
-| 로직 변경 | 해당 케이스 테스트 통과 | "코드 리뷰 완료" |
-| 서버/환경 변경 | `curl`로 HTTP 응답 확인 | "프로세스 확인" |
+| Verification Type | Minimum Evidence | Counterexample (Insufficient) |
+|------------------|------------------|-------------------------------|
+| UI/Layout Change | Browser screenshot or Gemini Vision check | "TSC 0 errors" |
+| Text/Spacing/Font | Actual rendered check (after dev server `--force` restart) | "Added the code" |
+| CSS/Style Change | Inspect the element in browser | "Build passed" |
+| Logic Change | Relevant test case passes | "Code review done" |
+| Server/Environment Change | Verify HTTP response with `curl` | "Process checked" |
 
-## UI 변경 시 필수 체크리스트
+## Required checklist for UI changes
 
-1. dev server가 최신 코드 서빙 중인가? (`--force` 재시작 or HMR 확인)
-2. 브라우저에서 변경된 페이지를 실제로 열었나?
-3. 변경된 요소가 의도한 대로 렌더링되는가? (스크린샷 or Gemini Vision)
-4. 변경으로 깨진 다른 페이지는 없는가? (최소 1개 다른 페이지 확인)
+1. Is the dev server serving the latest code? (restart with `--force` or check HMR)
+2. Did you actually open the changed page in a browser?
+3. Does the changed element render as intended? (screenshot or Gemini Vision)
+4. Are there any other pages broken by the change? (check at least 1 other page)
 
-## "TSC OK"는 UI 검증이 아니다
+## "TSC OK" is not UI verification
 
-TypeScript 컴파일러는 CSS, 레이아웃, 텍스트 겹침, 스타일 충돌, Spacing 렌더링 여부를 검증하지 않는다.
-TSC 통과 ≠ UI 정상. 반드시 브라우저 확인을 동반할 것.
+TypeScript compiler does not verify CSS, layout, text overlap, style conflicts, or whether spacing renders.
+TSC pass ≠ UI is correct. Always accompany it with a browser check.

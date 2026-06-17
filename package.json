@@ -20,7 +20,6 @@
     "@supabase/supabase-js": "^2.107.0",
     "@suspensive/react": "^3.21.2",
     "@toss/tds-mobile": "2.4.0",
-    "@types/react-router-dom": "^5.3.3",
     "@use-funnel/browser": "^0.0.17",
     "es-hangul": "^2.3.8",
     "html2canvas-pro": "^2.0.4",

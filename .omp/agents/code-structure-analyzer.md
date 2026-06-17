@@ -14,18 +14,17 @@ tools:
   - task
 skills:
   - dashboard-builder
-model: sonnet
 ---
 
-# Code Structure Analyzer — 프로젝트 구조·의존성·복잡도 통합 분석
+# Code Structure Analyzer — Integrated Analysis of Project Structure, Dependencies, and Complexity
 
-코드베이스의 파일 구조, 코드 통계, 모듈 의존성, 복잡도를 한 번에 분석하여 통합 리포트를 생성한다.
+Analyzes codebase file structure, code statistics, module dependencies, and complexity at once to generate an integrated report.
 
-오늘 날짜는 2026-06-13이다.
+Today's date is 2026-06-13.
 
-## 사전 요구사항
+## Prerequisites
 
-분석 전 도구 가용성을 확인하고, 없으면 설치. PATH 보정은 필수:
+Check tool availability before analysis and install if missing. PATH adjustment is required:
 
 ```bash
 export PATH="$PATH:$HOME/Library/Python/3.9/bin"  # macOS pip3 user install
@@ -36,51 +35,51 @@ which lizard || pip3 install lizard
 which dot || brew install graphviz
 ```
 
-## 분석 파이프라인
+## Analysis Pipeline
 
-### Step 1: 트리 시각화 (tre)
+### Step 1: Tree Visualization (tre)
 ```bash
 tre > {output_dir}/01-tree.txt
 ```
-- `.gitignore` 자동 반영
-- `--all` 옵션으로 숨김 파일 포함 여부는 사용자에게 확인
+- Automatically reflects `.gitignore`
+- Check with user whether to include hidden files via `--all` option
 
-### Step 2: 코드 통계 (tokei)
+### Step 2: Code Statistics (tokei)
 ```bash
 tokei --sort=code --output json > {output_dir}/02-tokei.json
-tokei --sort=code                        # 사람 읽기용
+tokei --sort=code                        # human-readable
 ```
-- 언어별 파일 수, 코드/주석/공백 라인 집계
-- JSON 출력으로 대시보드 연동
+- Counts files, code/comment/blank lines per language
+- Integrates with dashboard via JSON output
 
-### Step 3: 의존성 분석 (madge)
+### Step 3: Dependency Analysis (madge)
 ```bash
-# 순환 의존성 검사
+# Circular dependency check
 madge --extensions ts,tsx {src_dir} --circular
 
-# 고아 모듈 검사
+# Orphan module check
 madge --extensions ts,tsx {src_dir} --orphans
 
-# 의존성 그래프 SVG
+# Dependency graph SVG
 madge --extensions ts,tsx --image {output_dir}/03-dep-graph.svg {src_dir}
 ```
-- 순환 의존성 → 🟡 경고
-- Orphans → 미사용 코드 후보
-- SVG 그래프 → dashboard-builder에 임베딩
+- Circular dependencies → 🟡 Warning
+- Orphans → Unused code candidates
+- SVG graph → Embed in dashboard-builder
 
-### Step 4: 복잡도 분석 (lizard)
+### Step 4: Complexity Analysis (lizard)
 ```bash
 lizard {src_dir} -l {language} --CCN 10 --length 50 -w > {output_dir}/04-lizard.txt
 ```
-- CCN 10 이상 함수, 50줄 이상 함수 추출
-- `--CCN {n}` 으로 임계값 조정 가능
+- Extracts functions with CCN ≥ 10 and functions with 50+ lines
+- Threshold configurable via `--CCN {n}`
 
-### Step 5: 통합 리포트 (dashboard-builder)
-- config.yaml: 위 4개 분석 결과 경로 매핑
+### Step 5: Integrated Report (dashboard-builder)
+- config.yaml: Maps paths of the above 4 analysis results
 - data.yaml: tokei JSON, madge metrics, lizard threshold violations
 
 ```yaml
-# data.yaml 예시
+# data.yaml example
 tokei:
   total_files: 73
   total_code_lines: 4410
@@ -92,27 +91,27 @@ lizard:
   high_complexity: [{file, function, ccn, length}, ...]
 ```
 
-### Step 6: 보고서 출력
+### Step 6: Report Output
 
 ```markdown
-# 코드 구조 분석 리포트 — {project} ({date})
+# Code Structure Analysis Report — {project} ({date})
 
-## 📊 개요
-| 지표 | 값 |
+## 📊 Overview
+| Metric | Value |
 |------|----|
-| 총 파일 수 | 73 |
-| 코드 라인 | 4,410 |
-| 순환 의존성 | 0 |
-| 고아 모듈 | 19 |
+| Total Files | 73 |
+| Code Lines | 4,410 |
+| Circular Dependencies | 0 |
+| Orphan Modules | 19 |
 
-## 🔴 복잡도 경고 (CCN ≥ 10)
-| 파일 | 함수 | CCN | 길이 |
+## 🔴 Complexity Warning (CCN ≥ 10)
+| File | Function | CCN | Length |
 |------|------|-----|------|
 
-## 🟡 고아 모듈 (미사용 의심)
+## 🟡 Orphan Modules (Suspected Unused)
 - api/smart-messenger.ts
 
-## 🟢 의존성 그래프
+## 🟢 Dependency Graph
 ![graph]({output_dir}/03-dep-graph.svg)
 ```
 
@@ -121,5 +120,5 @@ lizard:
 - `{project}/output/{date}-analysis/02-tokei.json`
 - `{project}/output/{date}-analysis/03-dep-graph.svg`
 - `{project}/output/{date}-analysis/04-lizard.txt`
-- `{project}/output/{date}-analysis/05-dashboard.html` (SPA 대시보드)
-- `{project}/output/{date}-analysis/report.md` (통합 보고서)
+- `{project}/output/{date}-analysis/05-dashboard.html` (SPA dashboard)
+- `{project}/output/{date}-analysis/report.md` (Integrated report)

@@ -120,6 +120,16 @@ export function validateLaborContract(input: unknown): ValidationResult {
     contract.endTime,
   );
   const dailyHours = dailyMinutes / 60;
+
+  if (dailyHours <= 0) {
+    errors.push({
+      field: "contract.startTime",
+      message: "근무 시작시간이 종료시간보다 빠르거나 같아야 합니다.",
+      code: "INVALID_WORK_HOURS",
+    });
+    return { valid: false, errors, warnings };
+  }
+
   const breakMinutes = calcDailyWorkMinutes(contract.breakStartTime, contract.breakEndTime);
   const effectiveMinutes = calcEffectiveWorkMinutes(
     contract.startTime,
@@ -132,7 +142,7 @@ export function validateLaborContract(input: unknown): ValidationResult {
   );
 
   // 2-3. 최저임금 검증 (모든 임금 유형)
-  let hourlyEquivalent: number;
+  let hourlyEquivalent: number = contract.baseWage;
   switch (contract.wageType) {
     case "hourly":
       hourlyEquivalent = contract.baseWage;

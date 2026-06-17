@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { CommentBoundary } from '../dev/CommentBoundary';
 import { useParams, useNavigate, Navigate } from 'react-router-dom';
 import { useContracts, type Contract } from '../../hooks/useContracts';
 import { Top, Paragraph, Spacing, Button, TextField, BottomSheet, ListRow } from '@toss/tds-mobile';
@@ -79,6 +80,7 @@ function PhoneStep({ initialPhone, onNext }: { initialPhone: string, onNext: (v:
     <div className={styles.page}>
       <Top title="연락처 입력" />
       <div className={styles.content}>
+        <CommentBoundary name="연락처-입력-폼">
         <Spacing size={24} />
         <Paragraph typography="st3" fontWeight="bold">연락처를 입력해주세요</Paragraph>
         <Spacing size={8} />
@@ -87,6 +89,7 @@ function PhoneStep({ initialPhone, onNext }: { initialPhone: string, onNext: (v:
         <TextField variant="box" placeholder="010-0000-0000" value={val} onChange={e => setVal(e.target.value)} />
         <Spacing size={32} />
         <Button color="primary" variant="fill" size="xlarge" display="block" onClick={() => { if (!val) return; onNext(val); }}>다음</Button>
+        </CommentBoundary>
       </div>
     </div>
   );
@@ -98,6 +101,7 @@ function AddressStep({ onNext }: { onNext: (v: string) => void }) {
     <div className={styles.page}>
       <Top title="주소 입력" />
       <div className={styles.content}>
+        <CommentBoundary name="주소-입력-폼">
         <Spacing size={24} />
         <Paragraph typography="st3" fontWeight="bold">주소를 입력해주세요</Paragraph>
         <Spacing size={8} />
@@ -106,6 +110,7 @@ function AddressStep({ onNext }: { onNext: (v: string) => void }) {
         <TextField variant="box" placeholder="예: 서울시 강남구 역삼동" value={val} onChange={e => setVal(e.target.value)} />
         <Spacing size={32} />
         <Button color="primary" variant="fill" size="xlarge" display="block" onClick={() => { if (!val) return; onNext(val); }}>다음</Button>
+        </CommentBoundary>
       </div>
     </div>
   );
@@ -137,6 +142,7 @@ function AccountStep({ onNext }: { onNext: (v: string) => void }) {
     <div className={styles.page}>
       <Top title="계좌번호 입력" />
       <div className={styles.content}>
+        <CommentBoundary name="계좌-입력-폼">
         <Spacing size={24} />
         <Paragraph typography="st3" fontWeight="bold">급여를 받을 계좌번호를 입력해주세요</Paragraph>
         <Spacing size={8} />
@@ -154,6 +160,7 @@ function AccountStep({ onNext }: { onNext: (v: string) => void }) {
 
         <Spacing size={32} />
         <Button color="primary" variant="fill" size="xlarge" display="block" onClick={() => { if (!bank || !account) return; onNext(`${bank} ${account}`); }}>다음</Button>
+        </CommentBoundary>
       </div>
 
       <BottomSheet open={isBankOpen} onClose={() => setIsBankOpen(false)} header={<BottomSheet.Header>은행 선택</BottomSheet.Header>}>
@@ -267,12 +274,15 @@ function SignStep({ id, context, userProfile, signContract, onDone }: { id: stri
     <div className={styles.page}>
       <Top title="서명하기" />
       <div className={styles.content}>
+        <CommentBoundary name="서명-안내">
         <Spacing size={24} />
         <Paragraph typography="st2" fontWeight="bold">전자서명</Paragraph>
         <Spacing size={8} />
         <Paragraph typography="st5" color="grey-500">화면에 서명을 그려주세요</Paragraph>
+        </CommentBoundary>
         <Spacing size={24} />
 
+        <CommentBoundary name="서명-패드">
         <div className={styles.canvasWrap}>
           <canvas ref={canvasRef} className={styles.canvas}
             aria-label="전자서명 입력 영역"
@@ -283,12 +293,15 @@ function SignStep({ id, context, userProfile, signContract, onDone }: { id: stri
         </div>
         <Spacing size={12} />
         <Button color="primary" variant="weak" size="small" onClick={clearCanvas}>지우기</Button>
+        </CommentBoundary>
 
+        <CommentBoundary name="서명-제출">
         <Spacing size={32} />
         <Button color="primary" variant="fill" display="block" size="xlarge"
           onClick={() => { if (!hasSignature || signing) return; handleSign(); }}>
           {signing ? '서명 중...' : '계약 완료'}
         </Button>
+        </CommentBoundary>
       </div>
     </div>
   );
@@ -301,6 +314,7 @@ function DoneStep({ id }: { id: string }) {
     <div className={styles.page}>
       <Top title="계약 완료" />
       <div className={styles.center} style={{ textAlign: 'center' }}>
+        <CommentBoundary name="완료-화면">
         <Spacing size={60} />
         <div style={{ textAlign: 'center' }}>
           <img src="https://static.toss.im/illusts/wiki-highlight-L.png" alt=""
@@ -314,6 +328,7 @@ function DoneStep({ id }: { id: string }) {
         <Spacing size={32} />
         <Button color="primary" variant="weak" size="large"
           onClick={() => navigate(`/worker/contracts/${id}`)}>계약서 보기</Button>
+        </CommentBoundary>
       </div>
     </div>
   );

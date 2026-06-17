@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { SegmentedControl, WheelDatePicker } from '@toss/tds-mobile';
 import type { ContractFormData } from '../types';
+import { CommentBoundary } from '../../../dev/CommentBoundary';
 import { FunnelQuestion } from '../../../../components/funnel/FunnelQuestion';
 
 interface Step2WorkConditionsProps {
@@ -14,6 +15,7 @@ export default function Step2WorkConditions({ form, errors, handleChange }: Step
 
   return (
     <div>
+      <CommentBoundary name="근로조건-계약유형">
       <FunnelQuestion
         title={<>어떤 형태의<br/>계약인가요?</>}
         subtitle="근로 형태를 선택해주세요"
@@ -34,9 +36,11 @@ export default function Step2WorkConditions({ form, errors, handleChange }: Step
           <SegmentedControl.Item value="fixedTerm">기간제</SegmentedControl.Item>
         </SegmentedControl>
       </FunnelQuestion>
+      </CommentBoundary>
 
       {/* Show workplace if type is set */}
       {(form.contract_type || activeField === 'workplace' || activeField === 'job' || activeField === 'startDate' || activeField === 'endDate') && (
+        <CommentBoundary name="근로조건-근무장소">
         <FunnelQuestion
           title={<>어디서<br/>일하시나요?</>}
           subtitle="실제 근무할 장소를 알려주세요"
@@ -62,10 +66,12 @@ export default function Step2WorkConditions({ form, errors, handleChange }: Step
             </div>
           )}
         </FunnelQuestion>
+        </CommentBoundary>
       )}
 
       {/* Show job description if workplace is filled */}
       {(form.workplace.trim().length > 0 || activeField === 'job' || activeField === 'startDate' || activeField === 'endDate') && (
+        <CommentBoundary name="근로조건-직무">
         <FunnelQuestion
           title={<>어떤 업무를<br/>담당하시나요?</>}
           subtitle="담당할 업무 내용을 입력해주세요"
@@ -91,10 +97,12 @@ export default function Step2WorkConditions({ form, errors, handleChange }: Step
             </div>
           )}
         </FunnelQuestion>
+        </CommentBoundary>
       )}
 
       {/* Show dates if job description is filled */}
       {(form.job_description.trim().length > 0 || activeField === 'startDate' || activeField === 'endDate') && (
+        <CommentBoundary name="근로조건-계약기간">
         <FunnelQuestion
           title={<>언제부터<br/>일하시나요?</>}
           subtitle="근무를 시작하는 날짜를 선택해주세요"
@@ -128,6 +136,7 @@ export default function Step2WorkConditions({ form, errors, handleChange }: Step
             </div>
           </div>
         </FunnelQuestion>
+        </CommentBoundary>
       )}
     </div>
   );

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Spacing } from '@toss/tds-mobile';
 import type { ContractFormData } from '../types';
 import { DAYS, DAY_LABELS } from '../types';
+import { CommentBoundary } from '../../../dev/CommentBoundary';
 import { FunnelQuestion } from '../../../../components/funnel/FunnelQuestion';
 
 interface Step3WorkScheduleProps {
@@ -34,6 +35,7 @@ export default function Step3WorkSchedule({ form, errors, handleChange, toggleDa
 
   return (
     <div>
+      <CommentBoundary name="근무일정-요일선택">
       <FunnelQuestion
         title={<>무슨 요일에<br/>출근하시나요?</>}
         subtitle="출근하는 모든 요일을 선택해주세요"
@@ -60,9 +62,11 @@ export default function Step3WorkSchedule({ form, errors, handleChange, toggleDa
           </button>
         )}
       </FunnelQuestion>
+      </CommentBoundary>
 
       {/* Show holiday if days are selected */}
       {(form.work_days.length > 0 || activeField === 'holiday' || activeField === 'workTime' || activeField === 'breakTime') && (
+        <CommentBoundary name="근무일정-휴일선택">
         <FunnelQuestion
           title={<>주휴일은<br/>무슨 요일인가요?</>}
           subtitle="일주일 만근 시 유급휴일을 주는 요일"
@@ -86,10 +90,12 @@ export default function Step3WorkSchedule({ form, errors, handleChange, toggleDa
           </div>
           {errors.weekly_holiday && <div style={{ color: '#FF5252', fontSize: 13, marginTop: 8 }}>{errors.weekly_holiday}</div>}
         </FunnelQuestion>
+        </CommentBoundary>
       )}
 
       {/* Show work time if holiday is selected */}
       {(form.weekly_holiday || activeField === 'workTime' || activeField === 'breakTime') && (
+        <CommentBoundary name="근무일정-시간설정">
         <FunnelQuestion
           title={<>출퇴근 시간은<br/>언제인가요?</>}
           subtitle="업무 시작과 종료 시간을 선택해주세요"
@@ -126,10 +132,12 @@ export default function Step3WorkSchedule({ form, errors, handleChange, toggleDa
             <div style={{ color: '#FF5252', fontSize: 13, marginTop: 8 }}>{errors.start_time || errors.end_time}</div>
           )}
         </FunnelQuestion>
+        </CommentBoundary>
       )}
 
       {/* Show break time if work time is selected */}
       {(form.start_time && form.end_time) && (
+        <CommentBoundary name="근무일정-휴게시간">
         <FunnelQuestion
           title={<>쉬는 시간은<br/>언제인가요?</>}
           subtitle="점심시간 등 휴게시간을 입력해주세요"
@@ -158,6 +166,7 @@ export default function Step3WorkSchedule({ form, errors, handleChange, toggleDa
             </div>
           </div>
         </FunnelQuestion>
+        </CommentBoundary>
       )}
     </div>
   );

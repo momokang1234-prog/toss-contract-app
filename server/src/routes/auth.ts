@@ -260,7 +260,7 @@ function decryptAesGcm(encryptedTextBase64: string, keyBase64: string, aadStr: s
     return decrypted.toString("utf8");
   } catch (e) {
     console.error("Decryption failed:", e);
-    return encryptedTextBase64;
+    throw new Error(`Decryption failed: ${e instanceof Error ? e.message : String(e)}`);
   }
 }
 
@@ -339,7 +339,8 @@ router.post("/toss", async (req: Request, res: Response): Promise<void> => {
     const userProfile = userRes.data.success;
 
     // 3. Decrypt User Info
-    const aesKey = process.env.TOSS_AES_KEY || "/QpO9bBSmn/11AQ601gb0NNOIU9Cws61pB2rrJCTcYI=";
+    const aesKey = process.env.TOSS_AES_KEY;
+    if (!aesKey) throw new Error('TOSS_AES_KEY environment variable is required');
     const aad = process.env.TOSS_AAD || "TOSS";
 
     if (userProfile.name) userProfile.name = decryptAesGcm(userProfile.name, aesKey, aad);

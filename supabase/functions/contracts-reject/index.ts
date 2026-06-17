@@ -1,5 +1,6 @@
 import { serve } from 'https://deno.land/std@0.177.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import * as jose from 'https://deno.land/x/jose@v4.14.4/index.ts';
 
 const ALLOWED_ORIGINS = [
   'https://bossimclockedin.private-apps.tossmini.com',
@@ -24,23 +25,38 @@ serve(async (req) => {
 
     const { contractId, rejection_reason } = await req.json();
     const authHeader = req.headers.get('Authorization')!;
+    if (!authHeader) {
+      return new Response(JSON.stringify({ error: 'Missing Authorization header' }), { status: 401, headers: corsHeaders(req.headers.get('origin') || '') });
+    }
     const token = authHeader.replace('Bearer ', '');
-    const { data: { user } } = await supabase.auth.getUser(token);
 
-    if (!user) {
-      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
-        status: 401,
-        headers: corsHeaders(req.headers.get('origin') || ''),
-      });
+    const jwtSecret = Deno.env.get('CUSTOM_JWT_SECRET') || Deno.env.get('SUPABASE_AUTH_JWT_SECRET') || Deno.env.get('SUPABASE_JWT_SECRET');
+    if (!jwtSecret) {
+      throw new Error('JWT Secret is not configured.');
+    }
+    const secret = new TextEncoder().encode(jwtSecret);
+
+    let userKey: string | undefined;
+    let phone: string | undefined;
+
+    try {
+      const { payload } = await jose.jwtVerify(token, secret);
+      userKey = payload.user_key ? String(payload.user_key) : undefined;
+      phone = payload.phone ? String(payload.phone) : undefined;
+    } catch (err) {
+      return new Response(JSON.stringify({ error: 'Invalid or expired token', details: err.message }), { status: 401, headers: corsHeaders(req.headers.get('origin') || '') });
     }
 
-    const userKey = user.user_metadata?.user_key;
+    if (!userKey) {
+      return new Response(JSON.stringify({ error: 'Unauthorized: Missing userKey in token claims' }), { status: 401, headers: corsHeaders(req.headers.get('origin') || '') });
+    }
 
-    // 계약 조회 및 근로자 확인
+    // 계약 조회 및 근로자 확인 — 반드시 계약의 근로자 본인이어야 함
     const { data: contract, error: contractError } = await supabase
       .from('contracts')
       .select('*')
       .eq('id', contractId)
+      .or(`worker_user_key.eq.${userKey},worker_phone.eq.${phone ?? ''}`)
       .single();
 
     if (contractError || !contract) {
@@ -87,6 +103,7 @@ serve(async (req) => {
     await supabase
       .from('contract_history')
       .insert({
+        id: `reject-${contractId}-${Date.now()}`,
         contract_id: contractId,
         action: 'rejected',
         actor_role: 'worker',

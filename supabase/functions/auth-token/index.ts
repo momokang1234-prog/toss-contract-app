@@ -1,6 +1,7 @@
 import { serve } from 'https://deno.land/std@0.177.0/http/server.ts';
 import * as jose from 'https://deno.land/x/jose@v4.14.4/index.ts';
 import { decode } from 'https://deno.land/std@0.177.0/encoding/base64.ts';
+import { v5 as uuidv5 } from 'https://deno.land/x/uuid/mod.ts';
 
 const ALLOWED_ORIGINS = [
   'https://bossimclockedin.private-apps.tossmini.com',
@@ -11,6 +12,7 @@ const corsHeaders = (origin: string) => ({
   'Access-Control-Allow-Origin': ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0],
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 });
+const NAMESPACE_UUID = '1b671a64-40d5-491e-99b0-da01ff1f3341';
 
 async function decryptAesGcm(encryptedTextBase64: string, keyBase64: string, aadStr: string) {
   if (!encryptedTextBase64) return null;
@@ -44,7 +46,7 @@ async function decryptAesGcm(encryptedTextBase64: string, keyBase64: string, aad
     return new TextDecoder().decode(decryptedBuffer);
   } catch (e) {
     console.error("Decryption failed:", e);
-    return encryptedTextBase64;
+    throw new Error(`Decryption failed: ${e instanceof Error ? e.message : String(e)}`);
   }
 }
 
@@ -98,10 +100,9 @@ serve(async (req) => {
     }
 
     let userProfile = userData.success;
-
-    // 3. Decrypt User Info
-    const aesKey = Deno.env.get('TOSS_AES_KEY') || '/QpO9bBSmn/11AQ601gb0NNOIU9Cws61pB2rrJCTcYI=';
-    const aad = Deno.env.get('TOSS_AAD') || 'TOSS'; // Usually TOSS or app package name
+    const aesKey = Deno.env.get('TOSS_AES_KEY');
+    if (!aesKey) throw new Error('TOSS_AES_KEY environment variable is required');
+    const aad = Deno.env.get('TOSS_AAD') || 'TOSS';
 
     userProfile.name = await decryptAesGcm(userProfile.name, aesKey, aad);
     userProfile.phone = await decryptAesGcm(userProfile.phone, aesKey, aad);
@@ -119,10 +120,11 @@ serve(async (req) => {
     const secret = new TextEncoder().encode(jwtSecret);
     const alg = 'HS256';
 
+    const userUuid = uuidv5(String(userProfile.userKey), NAMESPACE_UUID);
     const jwt = await new jose.SignJWT({
       aud: 'authenticated',
       exp: Math.floor(Date.now() / 1000) + (60 * 60 * 24), // 24 hours
-      sub: String(userProfile.userKey),
+      sub: userUuid,
       email: userProfile.email || `${userProfile.userKey}@toss.im`,
       phone: userProfile.phone || '',
       role: 'authenticated',

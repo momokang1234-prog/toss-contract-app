@@ -3,17 +3,17 @@
   margin: 0 auto;
   min-height: 100vh;
   background: #fff;
-  padding: 0;
+  padding: 0 24px;
   position: relative;
   padding-bottom: 180px;
 }
 
 .hero {
-  padding: 60px 24px 0;
+  padding: 60px 0 0;
 }
 
 .marqueeContainer {
-  margin: 0 -24px;
+  margin: 0;
 }
 
 .bottomCta {

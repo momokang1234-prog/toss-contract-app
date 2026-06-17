@@ -8,9 +8,11 @@ export default function BusinessManagePage() {
   const navigate = useNavigate();
   const { businesses, updateBusiness } = useBusiness();
   const [isEditSheetOpen, setIsEditSheetOpen] = useState(false);
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
+  const [selectedBusinessId, setSelectedBusinessId] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   
-  const biz = businesses[0];
+  const biz = businesses.find(b => b.id === selectedBusinessId) || businesses[0];
   
   const [form, setForm] = useState({
     business_name: '',
@@ -58,8 +60,33 @@ export default function BusinessManagePage() {
     <div className={styles.page}>
       <Top title="" />
       
+      {businesses.length > 0 && (
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0 8px' }}>
+          <div 
+            className={styles.businessSelector}
+            onClick={() => setIsSheetOpen(true)}
+          >
+            🏢 {biz.business_name} <span style={{ color: '#b0b8c1', fontSize: '12px' }}>▼</span>
+          </div>
+        </div>
+      )}
+
+      <BottomSheet 
+        open={isSheetOpen} 
+        onClose={() => setIsSheetOpen(false)}
+        header={<BottomSheet.Header>사업장 선택</BottomSheet.Header>}
+      >
+        <BottomSheet.Select
+          options={businesses.map(b => ({ name: b.business_name, label: b.business_name, value: b.id }))}
+          value={biz.id}
+          onChange={(val: any) => {
+            setSelectedBusinessId(val?.target?.value || val);
+            setIsSheetOpen(false);
+          }}
+        />
+      </BottomSheet>
+      
       <div style={{ padding: '0 24px' }}>
-        <Spacing size={24} />
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <Paragraph typography="t3" fontWeight="bold">사업장 정보</Paragraph>
           <TextButton size="small" onClick={handleEditClick}>수정하기</TextButton>

@@ -1,0 +1,47 @@
+.page {
+  padding: 0 0 40px;
+  max-width: 480px;
+  margin: 0 auto;
+  background-color: #ffffff;
+  min-height: 100vh;
+}
+
+.timeline {
+  display: flex;
+  flex-direction: column;
+}
+
+.item {
+  display: flex;
+  gap: 16px;
+}
+
+.dotCol {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+  width: 12px;
+}
+
+.dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background-color: #3182f6;
+  flex-shrink: 0;
+  margin-top: 4px;
+}
+
+.line {
+  width: 2px;
+  flex: 1;
+  background-color: #e5e8eb;
+  margin: 6px 0;
+  min-height: 24px;
+}
+
+.body {
+  padding-bottom: 28px;
+  flex: 1;
+}

@@ -1,11 +1,26 @@
 .page {
+  display: flex;
+  flex-direction: column;
   max-width: 480px;
   margin: 0 auto;
-  min-height: 100vh;
+  min-height: 100dvh;
+  height: 100dvh;
   background: #fff;
-  padding-bottom: 120px;
   position: relative;
 }
+
+.header {
+  flex-shrink: 0;
+  padding: 16px 24px 0;
+}
+
+.content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 24px 24px;
+}
+
+
 
 .progressTrack {
   height: 3px;
@@ -19,15 +34,7 @@
   transition: width 0.3s ease;
 }
 
-.content {
-  padding: 40px 24px 0;
-}
 
-.progressBar {
-  height: 100%;
-  background: #3182f6;
-  transition: width 0.3s ease;
-}
 
 .label {
   margin-bottom: 8px;

@@ -4,6 +4,8 @@ import styles from './NotFoundPage.module.css';
 
 export default function NotFoundPage() {
   const navigate = useNavigate();
+  const location = window.location;
+  console.log('NotFoundPage hit for:', location.pathname, location.search);
 
   return (
     <div className={styles.page}>

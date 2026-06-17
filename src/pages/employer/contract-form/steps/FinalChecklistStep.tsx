@@ -3,6 +3,7 @@ import { BottomSheet, Button, TextField, TextButton } from '@toss/tds-mobile';
 import { ContractFormData } from '../types';
 import { calcDailyWorkMinutes, calcEffectiveWorkMinutes, calcWeeklyWorkHours } from '../../../../domain/contract/validation';
 import { MINIMUM_HOURLY_WAGE_2026 } from '../../../../domain/contract/laborRules';
+import { CommentBoundary } from '../../../dev/CommentBoundary';
 
 interface FinalChecklistStepProps {
   form: ContractFormData;
@@ -72,6 +73,7 @@ export function FinalChecklistStep({ form, onChange, toggleDay, onNavigate }: Fi
 
   return (
     <div>
+      <CommentBoundary name="최종검증-체크리스트">
       <div style={{ padding: '40px 0 24px 0' }}>
         <div style={{ fontSize: '26px', fontWeight: 'bold', color: '#333D4B', marginBottom: '12px', lineHeight: 1.4 }}>서명 전,<br/>이런 부분들을 챙겨보세요</div>
         <div style={{ fontSize: '15px', color: '#8B95A1', wordBreak: 'keep-all', lineHeight: 1.5 }}>
@@ -108,6 +110,7 @@ export function FinalChecklistStep({ form, onChange, toggleDay, onNavigate }: Fi
           </div>
         ))}
       </div>
+      </CommentBoundary>
 
       {onChange && (
         <BottomSheet 

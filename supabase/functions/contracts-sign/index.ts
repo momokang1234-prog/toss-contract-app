@@ -1,5 +1,6 @@
 import { serve } from 'https://deno.land/std@0.177.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import * as jose from 'https://deno.land/x/jose@v4.14.4/index.ts';
 
 const ALLOWED_ORIGINS = [
   'https://bossimclockedin.private-apps.tossmini.com',
@@ -24,14 +25,29 @@ serve(async (req) => {
 
     const { contractId, workerInfo } = await req.json();
     const authHeader = req.headers.get('Authorization')!;
+    if (!authHeader) {
+      return new Response(JSON.stringify({ error: 'Missing Authorization header' }), { status: 401, headers: corsHeaders(req.headers.get('origin') || '') });
+    }
     const token = authHeader.replace('Bearer ', '');
-    const { data: { user } } = await supabase.auth.getUser(token);
 
-    if (!user) {
-      return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401, headers: corsHeaders(req.headers.get('origin') || '') });
+    const jwtSecret = Deno.env.get('CUSTOM_JWT_SECRET') || Deno.env.get('SUPABASE_AUTH_JWT_SECRET') || Deno.env.get('SUPABASE_JWT_SECRET');
+    if (!jwtSecret) {
+      throw new Error('JWT Secret is not configured.');
+    }
+    const secret = new TextEncoder().encode(jwtSecret);
+
+    let userKey: string | undefined;
+
+    try {
+      const { payload } = await jose.jwtVerify(token, secret);
+      userKey = payload.user_key ? String(payload.user_key) : undefined;
+    } catch (err) {
+      return new Response(JSON.stringify({ error: 'Invalid or expired token', details: err.message }), { status: 401, headers: corsHeaders(req.headers.get('origin') || '') });
     }
 
-    const userKey = user.user_metadata?.user_key || workerInfo.userKey;
+    if (!userKey) {
+      return new Response(JSON.stringify({ error: 'Unauthorized: Missing userKey in token claims' }), { status: 401, headers: corsHeaders(req.headers.get('origin') || '') });
+    }
 
     // sign_contract RPC 호출 (SECURITY DEFINER 함수)
     const { error } = await supabase.rpc('sign_contract', {
@@ -44,8 +60,8 @@ serve(async (req) => {
       return new Response(JSON.stringify({ error: error.message }), { status: 400, headers: corsHeaders(req.headers.get('origin') || '') });
     }
 
-    // Update worker info
-    await supabase
+    // Update worker info (RPC already set status, worker_signed_at, worker_signature_data, worker_user_key)
+    const { error: workerInfoError } = await supabase
       .from('contracts')
       .update({
         worker_phone: workerInfo.phone,
@@ -54,23 +70,14 @@ serve(async (req) => {
         worker_name: workerInfo.name,
         worker_ci: workerInfo.ci,
       })
-      .eq('id', contractId);
-
-    // Update contract status to signed
-    const now = new Date().toISOString();
-    await supabase
-      .from('contracts')
-      .update({
-        status: 'signed',
-        worker_signed_at: now,
-        updated_at: now,
-      })
-      .eq('id', contractId);
+      .eq('id', contractId)
+      .eq('worker_user_key', userKey); // ownership check
 
     // 계약 이력 추가 (서명 완료)
     await supabase
       .from('contract_history')
       .insert({
+        id: `sign-${contractId}-${Date.now()}`,
         contract_id: contractId,
         action: 'signed',
         actor_role: 'worker',
@@ -81,6 +88,7 @@ serve(async (req) => {
     await supabase
       .from('contract_history')
       .insert({
+        id: `complete-${contractId}-${Date.now()}`,
         contract_id: contractId,
         action: 'completed',
         actor_role: 'system',

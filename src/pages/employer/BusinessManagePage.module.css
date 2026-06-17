@@ -33,3 +33,16 @@
   background: linear-gradient(180deg, rgba(255,255,255,0) 0%, #FFFFFF 20%);
   z-index: 10;
 }
+
+.businessSelector {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background-color: #f2f4f6;
+  border-radius: 20px;
+  font-weight: 600;
+  color: #333d4b;
+  cursor: pointer;
+  margin: 4px 0 20px;
+}

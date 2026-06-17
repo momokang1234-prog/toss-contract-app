@@ -2,6 +2,7 @@ import { Spacing, Paragraph } from '@toss/tds-mobile';
 import type { ValidationWarning } from '../../../../domain/contract/validation';
 import type { ContractFormData } from '../types';
 import { DAY_LABELS } from '../types';
+import { CommentBoundary } from '../../../dev/CommentBoundary';
 
 interface Step6PreviewProps {
   form: ContractFormData;
@@ -23,6 +24,7 @@ export default function Step6Preview({ form, warnings, computeBreakMinutes, form
   return (
     <>
       <Paragraph typography="t6" color="grey-500" style={{ marginBottom: 32 }}>아래 내용을 확인한 후 계약서를 저장합니다.</Paragraph>
+      <CommentBoundary name="미리보기-계약요약">
       <div style={{ backgroundColor: '#F2F4F6', padding: '24px 20px', borderRadius: 16 }}>
         <SummaryRow label="근로자" value={`${form.worker_name} (${form.worker_phone})`} />
         {form.worker_address && <SummaryRow label="주소" value={form.worker_address} />}
@@ -47,6 +49,8 @@ export default function Step6Preview({ form, warnings, computeBreakMinutes, form
         <SummaryRow label="산재보험" value={form.accident_insurance ? '가입' : '미가입'} />
         <SummaryRow label="퇴직금" value="법정 의무 적용" />
       </div>
+      </CommentBoundary>
+      <CommentBoundary name="미리보기-검토사항">
       {warnings.length > 0 && (
         <div style={{ backgroundColor: '#FFF9DB', borderRadius: 16, padding: 20, marginTop: 24, border: '1px solid #F2E49B' }}>
           <div style={{ fontSize: 13, fontWeight: 600, color: '#8B6F00', marginBottom: 8 }}>⚠ 검토 필요 사항</div>
@@ -55,6 +59,7 @@ export default function Step6Preview({ form, warnings, computeBreakMinutes, form
           ))}
         </div>
       )}
+      </CommentBoundary>
     </>
   );
 }

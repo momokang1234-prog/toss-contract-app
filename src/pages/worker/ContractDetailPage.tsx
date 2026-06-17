@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react';
+import { CommentBoundary } from '../dev/CommentBoundary';
 import { supabase, IS_MOCK } from '../../api/supabase';
 import { useParams, useNavigate, Navigate } from 'react-router-dom';
 import { useContracts, type Contract } from '../../hooks/useContracts';
 import { Top, Paragraph, Spacing, Button, Badge, TextField, ListRow, BottomSheet } from '@toss/tds-mobile';
 import { CONTRACT_TYPE_LABEL, WAGE_TYPE_LABEL, WORK_DAY_LABEL } from '../../utils/labels';
+import { getContractBadge } from '../../utils/badgeUtils';
 import styles from './ContractDetailPage.module.css';
 
 export default function WorkerContractDetailPage() {
@@ -47,7 +49,7 @@ export default function WorkerContractDetailPage() {
   if (error) return <div className={styles.page}><Top title="계약서" /><div className={styles.center}><Spacing size={40} /><Paragraph typography="t4" color="grey-600">{error}</Paragraph></div></div>;
   if (!contract) return <div className={styles.page}><Top title="계약서" /><div className={styles.center}><Spacing size={24} /><Paragraph typography="t5" color="grey-500">불러오는 중...</Paragraph></div></div>;
 
-  const b = { sent: { label:'미열람',color:'blue' as const}, viewed: { label:'확인완료',color:'blue' as const}, signed: { label:'서명완료',color:'yellow' as const}, completed: { label:'계약완료',color:'teal' as const}, rejected: { label:'수정 요청됨',color:'blue' as const} }[contract.status] || { label:contract.status, color:'elephant' as const };
+  const b = getContractBadge(contract.status);
   const canSign = contract.status === 'sent' || contract.status === 'viewed';
   const wageLabel = WAGE_TYPE_LABEL[contract.wage_type] || '';
   const dayStr = contract.work_days.map(d => WORK_DAY_LABEL[d] || d).join(', ');
@@ -67,6 +69,7 @@ export default function WorkerContractDetailPage() {
         <Paragraph typography="t3" fontWeight="bold">근로계약서</Paragraph>
         <Spacing size={24} />
 
+        <CommentBoundary name="계약상태-배너">
         {contract.status === 'completed' || contract.status === 'signed' ? (
           <div style={{ backgroundColor: '#E4F4EC', padding: 20, borderRadius: 16, marginBottom: 24, border: '1px solid #C3E8D7' }}>
             <Paragraph typography="t5" fontWeight="bold" color="grey-800">🎉 서명이 완료되었습니다</Paragraph>
@@ -80,10 +83,14 @@ export default function WorkerContractDetailPage() {
             <Paragraph typography="t7" color="grey-600">사장님이 확인 후 계약서를 수정할 수 있습니다</Paragraph>
           </div>
         ) : null}
+        </CommentBoundary>
 
+        <CommentBoundary name="근로자-정보">
         <Section title="근로자">
           <Row label="이름" value={contract.worker_name} />
         </Section>
+        </CommentBoundary>
+        <CommentBoundary name="근로조건-정보">
         <Section title="근로조건">
           <Row label="계약 유형" value={CONTRACT_TYPE_LABEL[contract.contract_type] || contract.contract_type} />
           <Row label="근무 장소" value={contract.workplace} />
@@ -91,16 +98,22 @@ export default function WorkerContractDetailPage() {
           <Row label="시작일" value={contract.start_date} />
           {contract.end_date&&<Row label="종료일" value={contract.end_date}/>}
         </Section>
+        </CommentBoundary>
+        <CommentBoundary name="임금-정보">
         <Section title="임금">
           <Row label="급여 형태" value={wageLabel} />
           <Row label="기본급" value={`${contract.base_wage.toLocaleString()}원`} />
           <Row label="지급일" value={contract.wage_payment_date} />
         </Section>
+        </CommentBoundary>
+        <CommentBoundary name="근무시간-정보">
         <Section title="근무시간">
           <Row label="근무 요일" value={dayStr} />
           <Row label="근무 시간" value={`${contract.start_time}~${contract.end_time}`} />
           <Row label="휴게시간" value={`${contract.break_start_time} ~ ${contract.break_end_time}`} />
         </Section>
+        </CommentBoundary>
+        <CommentBoundary name="기타근로조건-정보">
         <Section title="기타 근로조건">
           <Row label="연차유급휴가" value={contract.paid_leave_clause?'근로기준법에 따름':'미포함'} />
           <Row label="국민연금" value={contract.pension?'가입':'미가입'} />
@@ -109,7 +122,9 @@ export default function WorkerContractDetailPage() {
           <Row label="산재보험" value={contract.accident_insurance?'가입':'미가입'} />
           <Row label="퇴직금" value={contract.severance_clause?'퇴직급여 보장법에 따름':'해당 없음'} />
         </Section>
+        </CommentBoundary>
 
+        <CommentBoundary name="서명-액션-영역">
         {canSign && (
           <>
             <Spacing size={32} />
@@ -145,6 +160,7 @@ export default function WorkerContractDetailPage() {
             </BottomSheet>
           </>
         )}
+        </CommentBoundary>
         <Spacing size={40} />
       </div>
     </div>

@@ -207,6 +207,64 @@ const MOCK_CONTRACTS: Contract[] = [
     created_at: '2025-12-01T09:00:00Z',
     updated_at: '2026-01-15T10:00:00Z',
   },
+  {
+    id: 'mock-6',
+    business_id: 'biz-001',
+    employer_user_key: 'mock-employer-key',
+    worker_user_key: 'worker-user-6',
+    worker_name: '고길동',
+    worker_phone: '01012345678',
+    contract_type: 'fullTime',
+    status: 'cancelled',
+    start_date: '2026-01-01',
+    workplace: '서초구 서초대로 10',
+    job_description: '시설 관리 및 고객 응대',
+    wage_type: 'monthly',
+    base_wage: 2800000,
+    wage_payment_date: '15',
+    wage_payment_method: 'bankTransfer',
+    work_days: ['mon', 'tue', 'wed', 'thu', 'fri'],
+    start_time: '08:00',
+    end_time: '17:00',
+    break_start_time: '12:00',
+    break_end_time: '13:00',
+    weekly_holiday: 'sun',
+    paid_leave_clause: true,
+    pension: true,
+    health_insurance: true,
+    employment_insurance: true,
+    accident_insurance: true,
+    social_insurance_clause: true,
+    severance_clause: true,
+    created_at: '2025-12-20T09:00:00Z',
+    updated_at: '2026-01-05T10:00:00Z',
+  },
+  {
+    id: 'mock-7',
+    business_id: 'biz-001',
+    employer_user_key: 'mock-employer-key',
+    worker_user_key: 'worker-user-7',
+    worker_name: '오영심',
+    worker_phone: '01099990000',
+    contract_type: 'partTime',
+    status: 'expired',
+    start_date: '2026-02-01',
+    workplace: '강남구 테헤란로 123',
+    job_description: '홀 서빙 및 캐셔',
+    wage_type: 'hourly',
+    base_wage: 15000,
+    wage_payment_date: '20',
+    wage_payment_method: 'bankTransfer',
+    work_days: ['sat', 'sun'],
+    start_time: '10:00',
+    end_time: '15:00',
+    break_start_time: '12:00',
+    break_end_time: '12:30',
+    weekly_holiday: '',
+    paid_leave_clause: false,
+    created_at: '2026-01-10T09:00:00Z',
+    updated_at: '2026-02-15T10:00:00Z',
+  },
 ];
 
 // 근로계약서 HTML 생성 헬퍼 (Mock 모드용)
@@ -484,30 +542,12 @@ export function useContracts() {
       });
     }
     
-    // update to Supabase
-    const { data, error } = await supabase
-      .from('contracts')
-      .update({
-        status: 'completed',
-        employer_signed_at: new Date().toISOString(),
-        contract_html: htmlStr,
-        contract_pdf_url: pdfUrl,
-        updated_at: new Date().toISOString(),
-      })
-      .eq('id', id)
-      .select()
-      .single();
-
+    // Route through Edge Function for business rule validation
+    const { data, error } = await supabase.functions.invoke('contracts-complete', {
+      body: { contractId: id, contract_html: htmlStr, contract_pdf_url: pdfUrl },
+    });
     if (error) throw error;
     
-    // Add history
-    await supabase.from('contract_history').insert({
-      contract_id: id,
-      action: 'completed',
-      actor_role: 'employer',
-      actor_user_key: userProfile?.userKey,
-    });
-
     await fetchContracts();
     return data;
   };
@@ -517,21 +557,11 @@ export function useContracts() {
     if (IS_MOCK) {
       return updateContract(id, { status: 'cancelled' });
     }
-    const { data, error } = await supabase
-      .from('contracts')
-      .update({ status: 'cancelled', updated_at: new Date().toISOString() })
-      .eq('id', id)
-      .select()
-      .single();
+    const { data, error } = await supabase.functions.invoke('contracts-cancel', {
+      body: { contractId: id },
+    });
     if (error) throw error;
     
-    await supabase.from('contract_history').insert({
-      contract_id: id,
-      action: 'cancelled',
-      actor_role: 'employer',
-      actor_user_key: userProfile?.userKey,
-    });
-
     await fetchContracts();
     return data;
   };
@@ -541,12 +571,9 @@ export function useContracts() {
     if (IS_MOCK) {
       return updateContract(id, { status: 'expired' });
     }
-    const { data, error } = await supabase
-      .from('contracts')
-      .update({ status: 'expired', updated_at: new Date().toISOString() })
-      .eq('id', id)
-      .select()
-      .single();
+    const { data, error } = await supabase.functions.invoke('contracts-expire', {
+      body: { contractId: id },
+    });
     if (error) throw error;
     await fetchContracts();
     return data;
@@ -559,8 +586,6 @@ export function useContracts() {
     }
     const { data, error } = await supabase.rpc('view_contract', {
       p_contract_id: id,
-      p_worker_user_key: userProfile?.userKey,
-      p_worker_phone: userProfile?.phone,
     });
     if (error) throw error;
     return data;
@@ -573,8 +598,6 @@ export function useContracts() {
     }
     const { data, error } = await supabase.rpc('reject_contract', {
       p_contract_id: id,
-      p_worker_user_key: userProfile?.userKey,
-      p_worker_phone: userProfile?.phone,
       p_reason: reason,
     });
     if (error) throw error;
@@ -604,30 +627,39 @@ export function useContracts() {
 async function getHistory(contractId: string) {
   if (IS_MOCK) {
     const histories: Record<string, Array<{id:string; contract_id:string; action:string; actor_role:string; created_at:string}>> = {
-      'mock-contract-1': [
+      'mock-1': [
         { id:'h1-1', contract_id: contractId, action:'create', actor_role:'employer', created_at:'2026-06-05T10:00:00+09:00' },
       ],
-      'mock-contract-2': [
+      'mock-2': [
         { id:'h2-1', contract_id: contractId, action:'create', actor_role:'employer', created_at:'2026-06-04T14:00:00+09:00' },
         { id:'h2-2', contract_id: contractId, action:'send', actor_role:'employer', created_at:'2026-06-08T09:00:00+09:00' },
       ],
-      'mock-contract-3': [
+      'mock-3': [
         { id:'h3-1', contract_id: contractId, action:'create', actor_role:'employer', created_at:'2026-05-28T16:00:00+09:00' },
         { id:'h3-2', contract_id: contractId, action:'send', actor_role:'employer', created_at:'2026-05-28T17:00:00+09:00' },
         { id:'h3-3', contract_id: contractId, action:'view', actor_role:'worker', created_at:'2026-06-01T11:30:00+09:00' },
       ],
-      'mock-contract-4': [
+      'mock-4': [
         { id:'h4-1', contract_id: contractId, action:'create', actor_role:'employer', created_at:'2026-05-10T09:00:00+09:00' },
         { id:'h4-2', contract_id: contractId, action:'send', actor_role:'employer', created_at:'2026-05-10T10:00:00+09:00' },
         { id:'h4-3', contract_id: contractId, action:'view', actor_role:'worker', created_at:'2026-05-12T14:00:00+09:00' },
         { id:'h4-4', contract_id: contractId, action:'sign', actor_role:'worker', created_at:'2026-05-20T14:00:00+09:00' },
       ],
-      'mock-contract-5': [
+      'mock-5': [
         { id:'h5-1', contract_id: contractId, action:'create', actor_role:'employer', created_at:'2026-03-25T10:00:00+09:00' },
         { id:'h5-2', contract_id: contractId, action:'send', actor_role:'employer', created_at:'2026-03-25T11:00:00+09:00' },
         { id:'h5-3', contract_id: contractId, action:'view', actor_role:'worker', created_at:'2026-03-26T09:00:00+09:00' },
         { id:'h5-4', contract_id: contractId, action:'sign', actor_role:'worker', created_at:'2026-04-08T11:00:00+09:00' },
         { id:'h5-5', contract_id: contractId, action:'complete', actor_role:'employer', created_at:'2026-04-10T17:00:00+09:00' },
+      ],
+      'mock-6': [
+        { id:'h6-1', contract_id: contractId, action:'create', actor_role:'employer', created_at:'2025-12-20T09:00:00+09:00' },
+        { id:'h6-2', contract_id: contractId, action:'cancel', actor_role:'employer', created_at:'2026-01-05T10:00:00+09:00' },
+      ],
+      'mock-7': [
+        { id:'h7-1', contract_id: contractId, action:'create', actor_role:'employer', created_at:'2026-01-10T09:00:00+09:00' },
+        { id:'h7-2', contract_id: contractId, action:'send', actor_role:'employer', created_at:'2026-01-11T10:00:00+09:00' },
+        { id:'h7-3', contract_id: contractId, action:'expire', actor_role:'system', created_at:'2026-02-15T10:00:00+09:00' },
       ],
     };
     return histories[contractId] || [];
