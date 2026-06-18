@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { BottomSheet, Button, TextField, TextButton } from '@toss/tds-mobile';
-import { ContractFormData } from '../types';
-import { calcDailyWorkMinutes, calcEffectiveWorkMinutes, calcWeeklyWorkHours } from '../../../../domain/contract/validation';
+import { BottomSheet, Button, TextField, TextButton, Switch, Paragraph } from '@toss/tds-mobile';
+import { ContractFormData, type DaySchedule } from '../types';
+import { calcDailyWorkMinutes, calcEffectiveWorkMinutes } from '../../../../domain/contract/validation';
 import { MINIMUM_HOURLY_WAGE_2026 } from '../../../../domain/contract/laborRules';
 import { CommentBoundary } from '../../../dev/CommentBoundary';
 
@@ -14,12 +14,25 @@ interface FinalChecklistStepProps {
 
 export function FinalChecklistStep({ form, onChange, toggleDay, onNavigate }: FinalChecklistStepProps) {
   const [editTarget, setEditTarget] = useState<string | null>(null);
-  // 1. Calculate hours
-  const dailyMinutes = calcDailyWorkMinutes(form.start_time, form.end_time);
-  const dailyHours = dailyMinutes / 60;
-  const breakMinutes = calcDailyWorkMinutes(form.break_start || '00:00', form.break_end || '00:00');
-  const effectiveMinutes = calcEffectiveWorkMinutes(form.start_time, form.end_time, breakMinutes);
-  const weeklyHours = calcWeeklyWorkHours(effectiveMinutes, form.work_days.length);
+  // 1. 일별 근무시간 집계 (범용 per-day)
+  const dayEntries: DaySchedule[] = form.work_days
+    .map(d => form.work_schedule[d])
+    .filter((s): s is DaySchedule => !!s && !!s.start && !!s.end);
+  let weeklyMinutes = 0;
+  let maxDailyHours = 0;
+  let insufficientBreak = false;
+  for (const s of dayEntries) {
+    const dailyMinutes = calcDailyWorkMinutes(s.start, s.end);
+    const dailyHours = dailyMinutes / 60;
+    const breakMinutes = calcDailyWorkMinutes(s.break_start || '00:00', s.break_end || '00:00');
+    weeklyMinutes += calcEffectiveWorkMinutes(s.start, s.end, breakMinutes);
+    if (dailyHours > maxDailyHours) maxDailyHours = dailyHours;
+    if ((dailyHours >= 4 && breakMinutes < 30) || (dailyHours >= 8 && breakMinutes < 60)) {
+      insufficientBreak = true;
+    }
+  }
+  const weeklyHours = weeklyMinutes / 60;
+  const avgDailyHours = dayEntries.length > 0 ? weeklyHours / dayEntries.length : 0;
 
   // 2. Calculate duration
   const start = new Date(form.start_date);
@@ -35,8 +48,8 @@ export function FinalChecklistStep({ form, onChange, toggleDay, onNavigate }: Fi
   if (baseWage > 0) {
     switch (form.wage_type) {
       case 'hourly': hourlyEquivalent = baseWage; break;
-      case 'daily': hourlyEquivalent = dailyHours > 0 ? baseWage / dailyHours : 0; break;
-      case 'weekly': hourlyEquivalent = (dailyHours > 0 && form.work_days.length > 0) ? baseWage / (dailyHours * form.work_days.length) : 0; break;
+      case 'daily': hourlyEquivalent = avgDailyHours > 0 ? baseWage / avgDailyHours : 0; break;
+      case 'weekly': hourlyEquivalent = weeklyHours > 0 ? baseWage / weeklyHours : 0; break;
       case 'monthly': hourlyEquivalent = weeklyHours > 0 ? baseWage / (weeklyHours * 4.345) : 0; break;
     }
   }
@@ -62,12 +75,11 @@ export function FinalChecklistStep({ form, onChange, toggleDay, onNavigate }: Fi
     });
   }
 
-  // 휴게시간 체크
-  if ((dailyHours >= 4 && breakMinutes < 30) || (dailyHours >= 8 && breakMinutes < 60)) {
+  // 휴게시간 체크 (일별 순회)
+  if (insufficientBreak) {
     guideItems.push({
       title: "휴게시간 확인",
       desc: "4시간 일하면 30분, 8시간 일하면 1시간의 휴게 시간이 필요해요.",
-      editStep: 'workTime'
     });
   }
 
@@ -110,6 +122,19 @@ export function FinalChecklistStep({ form, onChange, toggleDay, onNavigate }: Fi
           </div>
         ))}
       </div>
+
+      {/* 확인 동의 — checklist_agreed (서명 진행 전 필수) */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '20px 0 0', borderTop: '1px solid #f2f4f6', marginTop: 24, gap: 16 }}>
+        <div>
+          <Paragraph typography="st6" fontWeight="bold">체크리스트를 모두 확인했어요</Paragraph>
+          <Paragraph typography="st8" color="grey-500">서명하기 전 위 내용을 점검했는지 확인해주세요</Paragraph>
+        </div>
+        <Switch
+          checked={form.checklist_agreed}
+          onChange={(e) => onChange?.('checklist_agreed', (e.target as HTMLInputElement).checked)}
+          aria-label="체크리스트 확인 동의"
+        />
+      </div>
       </CommentBoundary>
 
       {onChange && (
@@ -128,12 +153,6 @@ export function FinalChecklistStep({ form, onChange, toggleDay, onNavigate }: Fi
                 onChange={(e) => onChange('base_wage', e.target.value)}
                 suffix="원"
               />
-            )}
-            {editTarget === 'workTime' && (
-              <div style={{ display: 'flex', gap: '8px' }}>
-                <TextField variant="line" label="시작 시간" type="time" value={form.start_time} onChange={(e) => onChange('start_time', e.target.value)} />
-                <TextField variant="line" label="종료 시간" type="time" value={form.end_time} onChange={(e) => onChange('end_time', e.target.value)} />
-              </div>
             )}
             {editTarget === 'workDays' && (
               <div>

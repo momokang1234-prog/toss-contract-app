@@ -1,9 +1,9 @@
 /**
- * Step1 기본정보 — Variant C: 원형 숫자 아이콘 스테퍼 + 현재 스텝명 텍스트
- * design session: 20260618_060000
+ * step-label Variant A: Paragraph(스텝명) + Badge(1/7 카운터) 나란히
+ * design session: 20260618_070000
  */
 import { useState } from 'react';
-import { ProgressStepper, ProgressStep, Paragraph, TextField, Spacing } from '@toss/tds-mobile';
+import { ProgressStepper, ProgressStep, Paragraph, Badge, TextField, Spacing } from '@toss/tds-mobile';
 import { FunnelQuestion } from '../../components/funnel/FunnelQuestion';
 import { CommentBoundary } from './CommentBoundary';
 
@@ -22,7 +22,7 @@ function NumberIcon({ n, active }: { n: number; active: boolean }) {
   );
 }
 
-export default function FormVariantC() {
+export default function FormStepLabelVariantA() {
   const [activeField, setActiveField] = useState<'name' | 'phone' | 'address'>('name');
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
@@ -30,22 +30,22 @@ export default function FormVariantC() {
 
   return (
     <div style={{ background: '#fff', minHeight: '100vh', maxWidth: 480, margin: '0 auto' }}>
-      <CommentBoundary name="진행표시-숫자아이콘">
+      <CommentBoundary name="진행표시-스테퍼">
         <ProgressStepper variant="icon" activeStepIndex={STEP_INDEX} checkForFinish paddingTop="default">
           {STEPS.map((label, i) => (
-            <ProgressStep
-              key={label}
-              icon={<NumberIcon n={i + 1} active={i === STEP_INDEX} />}
-            />
+            <ProgressStep key={label} icon={<NumberIcon n={i + 1} active={i === STEP_INDEX} />} />
           ))}
         </ProgressStepper>
+      </CommentBoundary>
+
+      <CommentBoundary name="스텝레이블-paragraph+badge">
         <div style={{ padding: '8px 24px 0', display: 'flex', alignItems: 'center', gap: 8 }}>
           <Paragraph typography="st5" fontWeight="bold" color="grey-900">
             {STEPS[STEP_INDEX]}
           </Paragraph>
-          <Paragraph typography="st7" color="grey-500">
+          <Badge size="small" variant="weak" color="blue">
             {STEP_INDEX + 1}/{STEPS.length}
-          </Paragraph>
+          </Badge>
         </div>
         <Spacing size={20} />
       </CommentBoundary>

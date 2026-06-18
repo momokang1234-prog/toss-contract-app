@@ -6,6 +6,7 @@ import { useContracts, type Contract } from '../../hooks/useContracts';
 import { Top, Paragraph, Spacing, Button, Badge, TextField, ListRow, BottomSheet } from '@toss/tds-mobile';
 import { CONTRACT_TYPE_LABEL, WAGE_TYPE_LABEL, WORK_DAY_LABEL } from '../../utils/labels';
 import { getContractBadge } from '../../utils/badgeUtils';
+import { formatWorkScheduleForDisplay } from '../employer/contract-form/formatSchedule';
 import styles from './ContractDetailPage.module.css';
 
 export default function WorkerContractDetailPage() {
@@ -53,6 +54,7 @@ export default function WorkerContractDetailPage() {
   const canSign = contract.status === 'sent' || contract.status === 'viewed';
   const wageLabel = WAGE_TYPE_LABEL[contract.wage_type] || '';
   const dayStr = contract.work_days.map(d => WORK_DAY_LABEL[d] || d).join(', ');
+  const scheduleEntries = formatWorkScheduleForDisplay(contract);
 
   const CheckCircleIcon = ({ size = 60, color = "#3182f6" }) => (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -109,8 +111,21 @@ export default function WorkerContractDetailPage() {
         <CommentBoundary name="근무시간-정보">
         <Section title="근무시간">
           <Row label="근무 요일" value={dayStr} />
-          <Row label="근무 시간" value={`${contract.start_time}~${contract.end_time}`} />
-          <Row label="휴게시간" value={`${contract.break_start_time} ~ ${contract.break_end_time}`} />
+          {scheduleEntries.length <= 1 ? (
+            (() => {
+              const e = scheduleEntries[0] ?? { workTime: `${contract.start_time}~${contract.end_time}`, breakTime: `${contract.break_start_time} ~ ${contract.break_end_time}` };
+              return (
+                <>
+                  <Row label="근무 시간" value={e.workTime} />
+                  {e.breakTime && <Row label="휴게시간" value={e.breakTime} />}
+                </>
+              );
+            })()
+          ) : (
+            scheduleEntries.map((e, i) => (
+              <Row key={i} label={`${e.label} 근무`} value={e.breakTime ? `${e.workTime} (휴게 ${e.breakTime})` : e.workTime} />
+            ))
+          )}
         </Section>
         </CommentBoundary>
         <CommentBoundary name="기타근로조건-정보">

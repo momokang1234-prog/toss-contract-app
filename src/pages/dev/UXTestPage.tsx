@@ -167,9 +167,7 @@ const ALL_PAGES: PageDef[] = [
   { id: 'business-manage', route: '/employer/business/manage', title: '사업장 관리', emoji: '⚙️', role: 'employer', group: '사장님' },
   { id: 'contracts', route: '/employer/contracts', title: '계약 목록', emoji: '📋', role: 'employer', group: '사장님' },
   { id: 'contract-new', route: '/employer/contracts/new', title: '계약서 작성', emoji: '📝', role: 'employer', group: '사장님' },
-  { id: 'form-proposal-1', route: '/dev/employer/contracts/new/proposal-1', title: '[시안1] 퍼널 UX 정제', emoji: '🔵', role: 'employer', group: '폼 디자인 시안' },
-  { id: 'form-proposal-2', route: '/dev/employer/contracts/new/proposal-2', title: '[시안2] TDS TextField 통일', emoji: '🟢', role: 'employer', group: '폼 디자인 시안' },
-  { id: 'form-proposal-3', route: '/dev/employer/contracts/new/proposal-3', title: '[시안3] 카드 섹션형', emoji: '🟣', role: 'employer', group: '폼 디자인 시안' },
+  { id: 'contract-new-stepper', route: '/dev/employer/contracts/new/step-label/variant-b', title: '스텝 표시 확정 (8단계 네비)', emoji: '🔢', role: 'employer', group: '사장님' },
   { id: 'contract-detail', route: '/employer/contracts/mock-1', title: '계약서 상세', emoji: '🔍', role: 'employer', group: '사장님' },
   { id: 'contract-history', route: '/employer/contracts/mock-1/history', title: '계약 이력', emoji: '📜', role: 'employer', group: '사장님' },
   { id: 'worker-list', route: '/worker/contracts', title: '내 계약 목록', emoji: '📋', role: 'worker', group: '근로자' },
@@ -177,7 +175,7 @@ const ALL_PAGES: PageDef[] = [
   { id: 'worker-sign', route: '/worker/contracts/mock-1/sign', title: '전자서명', emoji: '✍️', role: 'worker', group: '근로자' },
 ];
 
-const GROUP_ORDER = ['공통', '사장님', '근로자', '폼 디자인 시안'];
+const GROUP_ORDER = ['공통', '사장님', '근로자'];
 
 const STATUS_COLORS: Record<string, string> = {
   draft: '#9e9e9e', sent: '#1565c0', viewed: '#6a1b9a', signed: '#2e7d32',

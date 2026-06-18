@@ -53,6 +53,7 @@ Text input. Most frequently used in forms.
 
 ```tsx
 <TextField
+  variant="line"
   label="Employee Name"
   value={name}
   onChange={(e) => setName(e.target.value)}
@@ -64,6 +65,7 @@ Text input. Most frequently used in forms.
 
 | Prop | Type | Description |
 |------|------|-------------|
+| **variant** | `"line"` | **Required.** Always use `"line"` for TDS forms. |
 | label | string | Field label |
 | value | string | Input value |
 | onChange | (e: ChangeEvent) => void | Change handler |
@@ -119,7 +121,16 @@ List items. Used in settings screens and information display.
 
 ```tsx
 <List>
-  <ListRow title="Name" subtitle="Hong Gil-dong" right={<Badge color="blue">Active</Badge>} onClick={handleClick} />
+  <ListRow
+    contents={
+      <div>
+        <Paragraph typography="st5" fontWeight="bold" color="grey-900">Hong Gil-dong</Paragraph>
+        <Paragraph typography="st6" color="grey-500">Active employee</Paragraph>
+      </div>
+    }
+    right={<Badge size="small" variant="fill" color="blue">Active</Badge>}
+    onClick={handleClick}
+  />
 </List>
 ```
 
@@ -127,8 +138,7 @@ List items. Used in settings screens and information display.
 
 | Prop | Type | Description |
 |------|------|-------------|
-| title | string | Title |
-| subtitle | string | Secondary text |
+| **contents** | ReactNode | **Required.** Main cell content — use Paragraph elements inside. (`title`/`subtitle` string props do NOT exist.) |
 | right | ReactNode | Right-side custom element |
 | onClick | () => void | Click handler |
 
@@ -151,12 +161,14 @@ Text display. Size/color controlled via typography.
 Status indicator badge. Used for contract status, etc.
 
 ```tsx
-<Badge color="green">Active</Badge>
+<Badge size="small" variant="fill" color="green">Active</Badge>
 ```
 
 | Prop | Type | Values |
 |------|------|--------|
-| color | string | blue, teal, green, red, yellow, elephant |
+| **size** | string | **Required.** `"small"` \| `"medium"` |
+| **variant** | string | **Required.** `"fill"` \| `"outline"` |
+| color | string | `blue` \| `teal` \| `green` \| `red` \| `yellow` \| `elephant` |
 
 ### Border
 Divider line.

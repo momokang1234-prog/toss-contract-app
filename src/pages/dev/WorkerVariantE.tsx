@@ -5,7 +5,7 @@ export default function WorkerVariantE() {
   return (
     <div style={{ background: '#fff', minHeight: '100vh', paddingBottom: 24, display: 'flex', flexDirection: 'column' }}>
       <CommentBoundary name="인사말">
-        <Top title="진행 중인 과제" subtitle="E: 퍼널 (단계별 진행)" />
+        <Top title="진행 중인 과제" subtitleBottom="E: 퍼널 (단계별 진행)" />
       </CommentBoundary>
       
       <CommentBoundary name="상태카드">

@@ -60,6 +60,10 @@ const ContractListVariantC = lazy(() => import('./pages/dev/ContractListVariantC
 const ContractListVariantD = lazy(() => import('./pages/dev/ContractListVariantD'));
 const ContractListVariantE = lazy(() => import('./pages/dev/ContractListVariantE'));
 
+const FormStepLabelVariantA = lazy(() => import('./pages/dev/FormStepLabelVariantA'));
+const FormStepLabelVariantB = lazy(() => import('./pages/dev/FormStepLabelVariantB'));
+const FormStepLabelVariantC = lazy(() => import('./pages/dev/FormStepLabelVariantC'));
+
 function Lazy({ children }: { children: ReactNode }) {
   return <Suspense fallback={<div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', background: 'var(--toss-bg, #fff)' }}><div className="loading-spinner">로딩 중...</div></div>}>{children}</Suspense>;
 }
@@ -173,6 +177,9 @@ export default function App() {
                   <Route path="/dev/employer/contracts/variant-c" element={<Lazy><ContractListVariantC /></Lazy>} />
                   <Route path="/dev/employer/contracts/variant-d" element={<Lazy><ContractListVariantD /></Lazy>} />
                   <Route path="/dev/employer/contracts/variant-e" element={<Lazy><ContractListVariantE /></Lazy>} />
+                  <Route path="/dev/employer/contracts/new/step-label/variant-a" element={<Lazy><FormStepLabelVariantA /></Lazy>} />
+                  <Route path="/dev/employer/contracts/new/step-label/variant-b" element={<Lazy><FormStepLabelVariantB /></Lazy>} />
+                  <Route path="/dev/employer/contracts/new/step-label/variant-c" element={<Lazy><FormStepLabelVariantC /></Lazy>} />
                 </>
               )}
 

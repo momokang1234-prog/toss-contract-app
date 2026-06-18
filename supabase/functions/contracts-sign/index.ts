@@ -95,45 +95,71 @@ serve(async (req) => {
       });
 
     // ----------------------------------------------------
-    // [Toss Smart Message Integration]
+    // [Apps-in-Toss Smart Message — mTLS]
+    // 사장님(userKey 보유)에게 "서명 완료" 알림 발송.
+    // 스펙: BaseURL https://apps-in-toss-api.toss.im
+    //       POST /api-partner/v1/apps-in-toss/messenger/send-message
+    //       인증 = mTLS (클라이언트 인증서). Bearer 아님.
+    //       수신자 식별 = 헤더 x-toss-user-key (사장님 userKey).
+    //       본문 = { templateSetCode, context: {...} }.
+    // (근로자는 userKey 없어 스마트메시지 불가 → 별도 share API로 처리됨.)
     // ----------------------------------------------------
-    const TOSS_SMART_MESSAGE_API_KEY = Deno.env.get('TOSS_SMART_MESSAGE_API_KEY'); 
-    const TOSS_CAMPAIGN_ID_SIGN_COMPLETE = Deno.env.get('TOSS_CAMPAIGN_ID_SIGN_COMPLETE'); // 콘솔에서 생성한 서명완료 캠페인 ID
-    
-    // 사장님의 user_key 조회
+    const TOSS_MTLS_CERT_B64 = Deno.env.get('TOSS_MTLS_CERT_B64'); // PEM 인증서(smart_public.crt) Base64
+    const TOSS_MTLS_KEY_B64 = Deno.env.get('TOSS_MTLS_KEY_B64');   // PEM 개인키(smart_private.key) Base64
+    const TOSS_TEMPLATE_SIGN_COMPLETE = Deno.env.get('TOSS_TEMPLATE_SIGN_COMPLETE') || 'bossimclockedin-contract_sign_complete';
+
+    // 사장님 user_key 조회
     const { data: contract } = await supabase
       .from('contracts')
       .select('employer_user_key, worker_name')
       .eq('id', contractId)
       .single();
 
-    if (contract?.employer_user_key) {
-      if (TOSS_SMART_MESSAGE_API_KEY && TOSS_CAMPAIGN_ID_SIGN_COMPLETE) {
-        try {
-          const response = await fetch(`https://api.toss.im/smart-message/v1/campaigns/${TOSS_CAMPAIGN_ID_SIGN_COMPLETE}/send`, {
-             method: 'POST',
-             headers: { 
-               'Content-Type': 'application/json', 
-               'Authorization': `Bearer ${TOSS_SMART_MESSAGE_API_KEY}` 
-             },
-             body: JSON.stringify({ 
-               audience: { userKey: contract.employer_user_key },
-               variables: {
-                 이름: workerInfo.name || contract.worker_name || '근로자',
-                 링크: `https://bossimclockedin.private-apps.tossmini.com/contract/${contractId}`
-               }
-             })
-          });
-          if (!response.ok) {
-            console.error(`[TOSS PUSH ERROR] API 응답 실패: ${response.status}`, await response.text());
-          } else {
-            console.log(`[TOSS PUSH SUCCESS] 사장님(userKey: ${contract.employer_user_key})에게 서명 완료 푸시 발송 완료`);
+    const employerUserKey = contract?.employer_user_key;
+    if (!employerUserKey) {
+      console.log('[NOTIFY SKIP] 사장님 user_key 없음 — 서명 완료 알림 발송 생략');
+    } else if (!TOSS_MTLS_CERT_B64 || !TOSS_MTLS_KEY_B64) {
+      console.log(`[MOCK NOTIFY] 사장님(userKey: ${employerUserKey})에게 서명 완료 알림 (mTLS 인증서 미설정)`);
+    } else {
+      try {
+        // PEM 문자열 복원 (Base64 → 멀티라인 PEM)
+        const certPem = atob(TOSS_MTLS_CERT_B64);
+        const keyPem = atob(TOSS_MTLS_KEY_B64);
+
+        // Deno mTLS: createHttpClient 옵션은 cert/key (certChain/privateKey 아님).
+        const httpClient = Deno.createHttpClient({ cert: certPem, key: keyPem });
+
+        const workerName = workerInfo.name || contract?.worker_name || '근로자';
+        const contractUrl = `https://bossimclockedin.private-apps.tossmini.com/contract/${contractId}`;
+
+        const response = await fetch(
+          'https://apps-in-toss-api.toss.im/api-partner/v1/apps-in-toss/messenger/send-message',
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'x-toss-user-key': employerUserKey,
+            },
+            body: JSON.stringify({
+              templateSetCode: TOSS_TEMPLATE_SIGN_COMPLETE,
+              context: {
+                이름: workerName,
+                링크: contractUrl,
+              },
+            }),
+            // @ts-expect-error — Deno fetch는 client 옵션을 받지만 DOM lib의 fetch 타입에는 없음
+            client: httpClient,
           }
-        } catch (err) {
-          console.error(`[TOSS PUSH EXCEPTION] 푸시 발송 중 에러:`, err);
+        );
+
+        if (!response.ok) {
+          console.error(`[SMART MESSAGE ERROR] ${response.status}`, await response.text());
+        } else {
+          console.log(`[SMART MESSAGE OK] 사장님(userKey: ${employerUserKey})에게 서명 완료 알림 발송`);
         }
-      } else {
-        console.log(`[MOCK NOTIFY] 사장님(userKey: ${contract.employer_user_key})에게 서명 완료 알림 발송 (API 키 없음)`);
+      } catch (err) {
+        // 알림 실패가 서명 자체를 실패시키지 않도록 격리
+        console.error(`[SMART MESSAGE EXCEPTION]`, err);
       }
     }
 

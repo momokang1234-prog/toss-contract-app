@@ -5,7 +5,7 @@ export default function WorkerVariantC() {
   return (
     <div style={{ background: '#f2f4f6', minHeight: '100vh', paddingBottom: 24 }}>
       <CommentBoundary name="인사말">
-        <Top title="내 계약 목록" subtitle="C: 리스트-디테일 (정통 뷰)" />
+        <Top title="내 계약 목록" subtitleBottom="C: 리스트-디테일 (정통 뷰)" />
         <Spacing size={24} />
         <Paragraph typography="t4" fontWeight="bold" style={{ padding: '0 24px' }}>받은 계약서 목록</Paragraph>
         <Spacing size={8} />
@@ -16,20 +16,32 @@ export default function WorkerVariantC() {
       </CommentBoundary>
       <CommentBoundary name="계약리스트">
         <List>
-          <ListRow 
-            title="토스커피 (강남점)" 
-            subtitle="전송일: 2026.06.16" 
-            right={<Badge color="blue">서명 대기</Badge>} 
+          <ListRow
+            contents={
+              <div>
+                <Paragraph typography="t5" fontWeight="bold" color="grey-800">토스커피 (강남점)</Paragraph>
+                <Paragraph typography="t7" color="grey-500">전송일: 2026.06.16</Paragraph>
+              </div>
+            }
+            right={<Badge size="small" variant="fill" color="blue">서명 대기</Badge>}
           />
-          <ListRow 
-            title="비바 리퍼블리카" 
-            subtitle="전송일: 2026.05.01" 
-            right={<Badge color="green">계약 완료</Badge>} 
+          <ListRow
+            contents={
+              <div>
+                <Paragraph typography="t5" fontWeight="bold" color="grey-800">비바 리퍼블리카</Paragraph>
+                <Paragraph typography="t7" color="grey-500">전송일: 2026.05.01</Paragraph>
+              </div>
+            }
+            right={<Badge size="small" variant="fill" color="green">계약 완료</Badge>}
           />
-          <ListRow 
-            title="토스프론트 (을지로점)" 
-            subtitle="전송일: 2026.04.15" 
-            right={<Badge color="red">만료됨</Badge>} 
+          <ListRow
+            contents={
+              <div>
+                <Paragraph typography="t5" fontWeight="bold" color="grey-800">토스프론트 (을지로점)</Paragraph>
+                <Paragraph typography="t7" color="grey-500">전송일: 2026.04.15</Paragraph>
+              </div>
+            }
+            right={<Badge size="small" variant="fill" color="red">만료됨</Badge>}
           />
         </List>
       </CommentBoundary>

@@ -1,18 +1,27 @@
 import { Top, Paragraph, Spacing, List, ListRow, Badge, Button } from '@toss/tds-mobile';
+
 import { CommentBoundary } from './CommentBoundary';
 
 export default function WorkerVariantD() {
   return (
     <div style={{ background: '#f2f4f6', minHeight: '100vh', paddingBottom: 24, position: 'relative' }}>
       <CommentBoundary name="인사말">
-        <Top title="내 계약 목록" subtitle="D: 모달 알림 강조" />
+        <Top title="내 계약 목록" subtitleBottom="D: 모달 알림 강조" />
         <Spacing size={24} />
         <Paragraph typography="t4" fontWeight="bold" style={{ padding: '0 24px' }}>받은 계약서</Paragraph>
         <Spacing size={16} />
       </CommentBoundary>
       <CommentBoundary name="계약리스트">
         <List>
-          <ListRow title="토스커피 (강남점)" subtitle="서명 대기" right={<Badge color="blue">작성중</Badge>} />
+          <ListRow
+            contents={
+              <div>
+                <Paragraph typography="t5" fontWeight="bold" color="grey-800">토스커피 (강남점)</Paragraph>
+                <Paragraph typography="t7" color="grey-500">서명 대기</Paragraph>
+              </div>
+            }
+            right={<Badge size="small" variant="fill" color="blue">작성중</Badge>}
+          />
         </List>
       </CommentBoundary>
 

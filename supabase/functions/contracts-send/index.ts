@@ -23,7 +23,7 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
     );
 
-    const { contractId, method } = await req.json();
+    const { contractId } = await req.json();
     const authHeader = req.headers.get('Authorization')!;
     if (!authHeader) {
       return new Response(JSON.stringify({ error: 'Missing Authorization header' }), { status: 401, headers: corsHeaders(req.headers.get('origin') || '') });
@@ -67,7 +67,7 @@ serve(async (req) => {
       .insert({
         id: `delivery-${contractId}-${Date.now()}`,
         contract_id: contractId,
-        method: method || 'sms',
+        method: 'share',
         recipient_phone: contract.worker_phone,
         status: 'sent',
         sent_at: new Date().toISOString(),
@@ -90,49 +90,12 @@ serve(async (req) => {
         action: 'sent',
         actor_role: 'employer',
         actor_user_key: userKey,
-        details: { method, delivery_id: delivery?.id },
+        details: { method: 'share', delivery_id: delivery?.id },
       });
-    // ----------------------------------------------------
-    // [Toss Smart Message Integration]
-    // ----------------------------------------------------
-    const TOSS_SMART_MESSAGE_API_KEY = Deno.env.get('TOSS_SMART_MESSAGE_API_KEY'); // 토스 디벨로퍼스에서 발급받은 API Key
-    const TOSS_CAMPAIGN_ID_SEND = Deno.env.get('TOSS_CAMPAIGN_ID_SEND'); // 콘솔에서 생성한 캠페인 ID (계약서 전송 알림)
 
-    if (TOSS_SMART_MESSAGE_API_KEY && TOSS_CAMPAIGN_ID_SEND) {
-      try {
-        // [참고] 스마트 발송 직접 API 연동 예시
-        // 토스에게 발송을 직접 요청하여, 즉각적이고 확실한 실시간 알림을 보냅니다.
-        const response = await fetch(`https://api.toss.im/smart-message/v1/campaigns/${TOSS_CAMPAIGN_ID_SEND}/send`, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${TOSS_SMART_MESSAGE_API_KEY}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            // 대상자 지정 (전화번호 또는 토스 userKey)
-            // 토스 앱인토스에서는 주로 userKey나 phone을 지원합니다 (실제 API 스펙 문서 참조)
-            audience: { 
-              phone: contract.worker_phone 
-            },
-            // 변수 처리 (콘솔에서 #{이름} 이라고 설정했다면 아래와 같이 매핑)
-            variables: {
-              이름: contract.worker_name || '근로자',
-              링크: `https://bossimclockedin.private-apps.tossmini.com/contract/${contractId}`
-            }
-          })
-        });
-
-        if (!response.ok) {
-          console.error(`[TOSS PUSH ERROR] API 응답 실패: ${response.status}`, await response.text());
-        } else {
-          console.log(`[TOSS PUSH SUCCESS] ${contract.worker_phone} 에게 계약서 전송 푸시 발송 완료`);
-        }
-      } catch (err) {
-        console.error(`[TOSS PUSH EXCEPTION] 푸시 발송 중 에러:`, err);
-      }
-    } else {
-      console.log(`[MOCK NOTIFY] ${contract.worker_phone} 번호로 계약서 도착 알림 발송 (API 키 없음)`);
-    }
+    // NOTE: 실제 근로자 도달은 사장님이 프론트 공유 시트(share API)로 직접 수행.
+    // 근로자는 아직 userKey가 없어 스마트메시지 API로 도달 불가하므로, 이 함수는
+    // 상태를 'sent'로 표시 + 이력/deliveries 기록 역할만 담당한다.
 
     return new Response(
       JSON.stringify({ success: true, deliveryId: delivery?.id }),

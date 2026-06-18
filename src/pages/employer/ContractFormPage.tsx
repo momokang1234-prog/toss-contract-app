@@ -7,8 +7,10 @@ import Step1BasicInfo from './contract-form/steps/Step1BasicInfo';
 import Step2WorkConditions from './contract-form/steps/Step2WorkConditions';
 import Step3WorkSchedule from './contract-form/steps/Step3WorkSchedule';
 import Step4WageInsurance from './contract-form/steps/Step4WageInsurance';
+import Step5OtherConditions from './contract-form/steps/Step5OtherConditions';
 import { FinalChecklistStep } from './contract-form/steps/FinalChecklistStep';
 import Step6Preview from './contract-form/steps/Step6Preview';
+import { ContractFormProgress } from './contract-form/ContractFormProgress';
 import SignaturePad from '../../components/SignaturePad';
 
 export default function ContractFormPage() {
@@ -21,6 +23,8 @@ export default function ContractFormPage() {
     handleChange,
     toggleDay,
     selectWeeklyHoliday,
+    updateDaySchedule,
+    setScheduleMode,
     validateStep,
     handleSubmit,
     computeBreakMinutes,
@@ -33,6 +37,7 @@ export default function ContractFormPage() {
     workConditions: NonNullable<unknown>;
     workSchedule: NonNullable<unknown>;
     wageInsurance: NonNullable<unknown>;
+    otherConditions: NonNullable<unknown>;
     finalChecklist: NonNullable<unknown>;
     preview: NonNullable<unknown>;
     employerSignature: NonNullable<unknown>;
@@ -43,7 +48,6 @@ export default function ContractFormPage() {
 
   const currentStep = funnel.step as ContractFormStep;
   const currentIndex = STEP_ORDER.indexOf(currentStep);
-  const progressPct = ((currentIndex + 1) / TOTAL_STEPS) * 100;
   const isLastStep = currentIndex === TOTAL_STEPS - 1;
   const isValidationStep = currentStep === 'finalChecklist';
 
@@ -79,14 +83,9 @@ export default function ContractFormPage() {
         />
         <Paragraph typography="st3" fontWeight="bold">근로계약서 작성</Paragraph>
       </div>
+      <Spacing size={16} />
+      <ContractFormProgress currentIndex={currentIndex} labels={STEP_ORDER.map((s) => STEP_LABELS[s])} />
       <Spacing size={8} />
-      <Paragraph typography="st7" color="grey-500">
-        {STEP_LABELS[currentStep]} ({currentIndex + 1}/{TOTAL_STEPS})
-      </Paragraph>
-      <Spacing size={12} />
-      <div style={{ height: 4, borderRadius: 2, backgroundColor: '#E5E8EB', overflow: 'hidden', marginBottom: 24 }}>
-        <div style={{ height: '100%', width: `${progressPct}%`, borderRadius: 2, backgroundColor: '#3182F6', transition: 'width 0.3s ease' }} />
-      </div>
 
       {/* Step content */}
       <funnel.Render
@@ -103,10 +102,15 @@ export default function ContractFormPage() {
             handleChange={handleChange}
             toggleDay={toggleDay}
             selectWeeklyHoliday={selectWeeklyHoliday}
+            updateDaySchedule={updateDaySchedule}
+            setScheduleMode={setScheduleMode}
           />
         )}
         wageInsurance={() => (
           <Step4WageInsurance form={form} errors={errors} handleChange={handleChange} />
+        )}
+        otherConditions={() => (
+          <Step5OtherConditions form={form} handleChange={handleChange} />
         )}
         finalChecklist={() => (
           <FinalChecklistStep 
@@ -159,7 +163,7 @@ export default function ContractFormPage() {
               variant="fill"
               display="block"
               size="xlarge"
-              disabled={currentStep === 'workSchedule' && form.work_days.length === 0}
+              disabled={(currentStep === 'workSchedule' && form.work_days.length === 0) || (isValidationStep && !form.checklist_agreed)}
               onClick={() => {
                 if (isValidationStep) {
                   onValidationRun();

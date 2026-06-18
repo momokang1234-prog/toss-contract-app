@@ -1,5 +1,32 @@
 import type { ValidationWarning } from '../../../domain/contract/validation';
 
+/** 요일별 근무 스케줄 (시작/종료/휴게) — 범용 per-day 모델 */
+export interface DaySchedule {
+  start: string;
+  end: string;
+  break_start: string;
+  break_end: string;
+}
+
+/** 'same' = 모든 요일 동일, 'perDay' = 요일별 입력 */
+export type ScheduleMode = 'same' | 'perDay';
+
+export const DEFAULT_DAY_SCHEDULE: DaySchedule = {
+  start: '09:00',
+  end: '18:00',
+  break_start: '12:00',
+  break_end: '13:00',
+};
+
+/** 주어진 요일들에 대한 기본 스케줄 맵 생성 */
+export function buildDefaultWorkSchedule(
+  days: readonly string[] = ['mon', 'tue', 'wed', 'thu', 'fri'],
+): Record<string, DaySchedule> {
+  const schedule: Record<string, DaySchedule> = {};
+  for (const d of days) schedule[d] = { ...DEFAULT_DAY_SCHEDULE };
+  return schedule;
+}
+
 export interface ContractFormData {
   worker_name: string;
   worker_phone: string;
@@ -14,10 +41,8 @@ export interface ContractFormData {
   wage_payment_day: string;
   wage_payment_method: 'bankTransfer' | 'cash' | 'mixed';
   work_days: string[];
-  start_time: string;
-  end_time: string;
-  break_start: string;
-  break_end: string;
+  work_schedule: Record<string, DaySchedule>;
+  schedule_mode: ScheduleMode;
   weekly_holiday: string;
   paid_leave_clause: boolean;
   pension: boolean;
@@ -26,6 +51,7 @@ export interface ContractFormData {
   accident_insurance: boolean;
   severance_clause: boolean;
   checklist_agreed: boolean;
+  other_conditions: string;
   employer_signature_data?: string;
 }
 
@@ -34,6 +60,7 @@ export type ContractFormStep =
   | 'workConditions'
   | 'workSchedule'
   | 'wageInsurance'
+  | 'otherConditions'
   | 'finalChecklist'
   | 'preview'
   | 'employerSignature';
@@ -43,7 +70,8 @@ export const STEP_LABELS: Record<ContractFormStep, string> = {
   workConditions: '계약 조건',
   workSchedule: '근무 시간',
   wageInsurance: '임금 및 보험',
-  finalChecklist: '알아두면 좋은 정보',
+  otherConditions: '기타 조건',
+  finalChecklist: '체크리스트',
   preview: '최종 확인',
   employerSignature: '사장님 서명',
 };
@@ -53,6 +81,7 @@ export const STEP_ORDER: ContractFormStep[] = [
   'workConditions',
   'workSchedule',
   'wageInsurance',
+  'otherConditions',
   'finalChecklist',
   'preview',
   'employerSignature',
@@ -79,10 +108,8 @@ export const DEFAULT_FORM: ContractFormData = {
   wage_payment_day: '25',
   wage_payment_method: 'bankTransfer',
   work_days: ['mon', 'tue', 'wed', 'thu', 'fri'],
-  start_time: '09:00',
-  end_time: '18:00',
-  break_start: '12:00',
-  break_end: '13:00',
+  work_schedule: buildDefaultWorkSchedule(),
+  schedule_mode: 'same',
   weekly_holiday: 'sun',
   paid_leave_clause: false,
   pension: true,
@@ -91,6 +118,7 @@ export const DEFAULT_FORM: ContractFormData = {
   accident_insurance: true,
   severance_clause: true,
   checklist_agreed: false,
+  other_conditions: '',
 };
 
 export interface ValidationResultData {

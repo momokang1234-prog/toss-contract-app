@@ -44,8 +44,30 @@ Upon receiving a user request:
 ```
 
 3. **Save**: `server/ux-test-sessions/design-{timestamp}.json`
-4. **Delegate for Mock Previews**: Pass the design JSON to the `toss-app-dev:toss-mini-app` agent to create 5 temporary mock React components (VariantA.tsx ~ VariantE.tsx).
-5. **Output to user**: Inform the user that 5 mock proposals are ready. Ask them to preview and select one.
+4. **Write Variant Files** (NOT delegated — do this directly, same turn): Create standalone mock React components that are displayed as iframe previews in the Design History → Layout Proposals section at `/dev/ux-test`.
+
+   **File naming and location rules** (MANDATORY):
+   - Always write to `src/pages/dev/{PagePrefix}Variant{A-E}.tsx`
+   - Page → Prefix mapping:
+
+   | `content.page` | File Prefix | Dev Route Pattern |
+   |---|---|---|
+   | `/employer/contracts/new` | `FormVariant` | `/dev/employer/contracts/new/variant-{a\|b\|c\|d\|e}` |
+   | `/employer/business/new` | `BusinessVariant` | `/dev/employer/business/new/variant-{a\|...}` |
+   | `/employer/contracts` | `ContractListVariant` | `/dev/employer/contracts/variant-{a\|...}` |
+   | `/login` | `LoginVariant` | `/dev/login/variant-{a\|...}` |
+   | `/worker/contracts` | `WorkerVariant` | `/dev/worker/contracts/variant-{a\|...}` |
+
+   - These routes are already registered in `src/App.tsx` under `{import.meta.env.DEV && ...}`. If the target page is **not** in this table, add new `<Route>` entries and lazy imports to `src/App.tsx`.
+
+   **Variant file structure rules** (MANDATORY):
+   - Standalone components — **no external props**. Use `useState` internally with hardcoded mock data.
+   - Import `CommentBoundary` from `./CommentBoundary` and wrap each logical region for Xray mode support.
+   - Import TDS components from `@toss/tds-mobile` only — no custom CSS classes.
+   - Previous variant files are overwritten by each new design session. History is preserved in the JSON.
+   - If the user requests fewer than 5 variants (e.g., 3 drafts), write only those variants (A, B, C). Leave D and E as-is from the previous session.
+
+5. **Output to user**: Show the variant summary and tell the user to open `/dev/ux-test` → 디자인 히스토리 tab to preview them side-by-side.
 
 ### Step 1.5: Modify Existing Proposals
 

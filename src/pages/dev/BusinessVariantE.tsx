@@ -1,4 +1,4 @@
-import { Top, List, ListRow, Button, Spacing } from '@toss/tds-mobile';
+import { Top, List, ListRow, Button, Spacing, Paragraph } from '@toss/tds-mobile';
 import { CommentBoundary } from './CommentBoundary';
 export default function BusinessVariantE() {
   return (
@@ -12,9 +12,36 @@ export default function BusinessVariantE() {
       </CommentBoundary>
       <CommentBoundary name="사업장-폼">
         <List>
-          <ListRow title="사업자등록번호" subtitle="입력 필요" right={<span style={{color: '#3182f6', fontSize: 14}}>입력하기</span>} onClick={() => {}} />
-          <ListRow title="상호 및 대표자" subtitle="입력 필요" right={<span style={{color: '#3182f6', fontSize: 14}}>입력하기</span>} onClick={() => {}} />
-          <ListRow title="사업장 소재지" subtitle="입력 필요" right={<span style={{color: '#3182f6', fontSize: 14}}>입력하기</span>} onClick={() => {}} />
+          <ListRow
+            contents={
+              <div>
+                <Paragraph typography="t5" fontWeight="bold" color="grey-800">사업자등록번호</Paragraph>
+                <Paragraph typography="t7" color="grey-500">입력 필요</Paragraph>
+              </div>
+            }
+            right={<span style={{color: '#3182f6', fontSize: 14}}>입력하기</span>}
+            onClick={() => {}}
+          />
+          <ListRow
+            contents={
+              <div>
+                <Paragraph typography="t5" fontWeight="bold" color="grey-800">상호 및 대표자</Paragraph>
+                <Paragraph typography="t7" color="grey-500">입력 필요</Paragraph>
+              </div>
+            }
+            right={<span style={{color: '#3182f6', fontSize: 14}}>입력하기</span>}
+            onClick={() => {}}
+          />
+          <ListRow
+            contents={
+              <div>
+                <Paragraph typography="t5" fontWeight="bold" color="grey-800">사업장 소재지</Paragraph>
+                <Paragraph typography="t7" color="grey-500">입력 필요</Paragraph>
+              </div>
+            }
+            right={<span style={{color: '#3182f6', fontSize: 14}}>입력하기</span>}
+            onClick={() => {}}
+          />
         </List>
       </CommentBoundary>
       <CommentBoundary name="사업장-제출">

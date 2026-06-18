@@ -7,7 +7,12 @@ export default function LoginVariantE() {
   const [step, setStep] = useState(1);
   return (
     <div style={{ height: '100vh', display: 'flex', flexDirection: 'column', background: '#fff' }}>
-      <Top title={step === 1 ? "" : "역할 선택"} onBack={step === 2 ? () => setStep(1) : undefined} />
+      <Top title={step === 1 ? "" : "역할 선택"} />
+      {step === 2 && (
+        <div style={{ padding: '8px 16px' }}>
+          <button type="button" onClick={() => setStep(1)} style={{ background: 'none', border: 'none', color: '#3182f6', fontSize: 14, cursor: 'pointer', padding: 0 }}>← 뒤로</button>
+        </div>
+      )}
       <div style={{ padding: 24, flex: 1 }}>
         {step === 1 ? (
           <CommentBoundary name="로그인-히어로">

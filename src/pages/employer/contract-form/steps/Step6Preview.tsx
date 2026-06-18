@@ -2,6 +2,7 @@ import { Spacing, Paragraph } from '@toss/tds-mobile';
 import type { ValidationWarning } from '../../../../domain/contract/validation';
 import type { ContractFormData } from '../types';
 import { DAY_LABELS } from '../types';
+import { formatWorkScheduleForDisplay } from '../formatSchedule';
 import { CommentBoundary } from '../../../dev/CommentBoundary';
 
 interface Step6PreviewProps {
@@ -38,8 +39,21 @@ export default function Step6Preview({ form, warnings, computeBreakMinutes, form
         <SummaryRow label="지급 방식" value={form.wage_payment_method === 'bankTransfer' ? '계좌이체' : form.wage_payment_method === 'cash' ? '현금' : '혼합'} />
         <SummaryRow label="지급일" value={formatWagePaymentDate(form.wage_payment_day)} />
         <Spacing size={16} />
-        <SummaryRow label="근무 요일" value={form.work_days.map(d => DAY_LABELS[d]).join(', ')} />
-        <SummaryRow label="근무 시간" value={`${form.start_time} ~ ${form.end_time} (휴게 ${computeBreakMinutes(form.break_start, form.break_end)}분)`} />
+        {(() => {
+          const entries = formatWorkScheduleForDisplay(form);
+          if (entries.length <= 1) {
+            const e = entries[0] ?? { label: '', workTime: '', breakTime: '' };
+            return (
+              <>
+                <SummaryRow label="근무 요일" value={e.label || form.work_days.map(d => DAY_LABELS[d]).join(', ')} />
+                <SummaryRow label="근무 시간" value={e.breakTime ? `${e.workTime} (휴게 ${e.breakTime})` : e.workTime} />
+              </>
+            );
+          }
+          return entries.map((e, i) => (
+            <SummaryRow key={i} label={`${e.label} 근무`} value={e.breakTime ? `${e.workTime} (휴게 ${e.breakTime})` : e.workTime} />
+          ));
+        })()}
         <SummaryRow label="주휴일" value={form.weekly_holiday ? DAY_LABELS[form.weekly_holiday] : '없음'} />
         <Spacing size={16} />
         <SummaryRow label="연차 유급휴가" value={form.paid_leave_clause ? '포함' : '미포함'} />
@@ -48,6 +62,12 @@ export default function Step6Preview({ form, warnings, computeBreakMinutes, form
         <SummaryRow label="고용보험" value={form.employment_insurance ? '가입' : '미가입'} />
         <SummaryRow label="산재보험" value={form.accident_insurance ? '가입' : '미가입'} />
         <SummaryRow label="퇴직금" value="법정 의무 적용" />
+        {form.other_conditions && (
+          <>
+            <Spacing size={16} />
+            <SummaryRow label="기타 조건" value={form.other_conditions} />
+          </>
+        )}
       </div>
       </CommentBoundary>
       <CommentBoundary name="미리보기-검토사항">

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Button, Paragraph, Spacing, Border, Top } from '@toss/tds-mobile';
 import type { Contract } from '../../hooks/useContracts';
+import { formatWorkScheduleForDisplay } from '../../pages/employer/contract-form/formatSchedule';
 
 interface ContractPreviewProps {
   contract: Contract;
@@ -35,6 +36,7 @@ export function ContractPreview({ contract }: ContractPreviewProps) {
     mon: '월', tue: '화', wed: '수', thu: '목', fri: '금', sat: '토', sun: '일',
   };
   const workDaysStr = contract.work_days.map(d => dayLabels[d] ?? d).join(', ');
+  const scheduleEntries = formatWorkScheduleForDisplay(contract);
 
   return (
     <div>
@@ -62,8 +64,21 @@ export function ContractPreview({ contract }: ContractPreviewProps) {
       <InfoRow label="지급일" value={contract.wage_payment_date} />
       <SectionTitle>4. 근무 시간</SectionTitle>
       <InfoRow label="근무일" value={workDaysStr} />
-      <InfoRow label="근무 시간" value={`${contract.start_time} ~ ${contract.end_time}`} />
-      <InfoRow label="휴게시간" value={`${contract.break_start_time} ~ ${contract.break_end_time}`} />
+      {scheduleEntries.length <= 1 ? (
+        (() => {
+          const e = scheduleEntries[0] ?? { workTime: `${contract.start_time} ~ ${contract.end_time}`, breakTime: `${contract.break_start_time} ~ ${contract.break_end_time}` };
+          return (
+            <>
+              <InfoRow label="근무 시간" value={e.workTime} />
+              {e.breakTime && <InfoRow label="휴게시간" value={e.breakTime} />}
+            </>
+          );
+        })()
+      ) : (
+        scheduleEntries.map((e, i) => (
+          <InfoRow key={i} label={`${e.label} 근무`} value={e.breakTime ? `${e.workTime} (휴게 ${e.breakTime})` : e.workTime} />
+        ))
+      )}
       {contract.weekly_holiday && (
         <InfoRow label="주휴일" value={dayLabels[contract.weekly_holiday] ?? contract.weekly_holiday} />
       )}

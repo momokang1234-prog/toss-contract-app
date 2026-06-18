@@ -1,6 +1,7 @@
 import type { Contract } from '../hooks/useContracts';
 import { escapeHtml } from './sanitize';
 import { WORK_DAY_LABEL, WAGE_TYPE_LABEL, CONTRACT_TYPE_LABEL, WAGE_PAYMENT_METHOD_LABEL } from './labels';
+import { formatWorkScheduleForDisplay } from '../pages/employer/contract-form/formatSchedule';
 
 // ── A4 상수 (mm) ──────────────────────────────────────────────
 const A4_WIDTH_MM = 210;
@@ -131,6 +132,18 @@ function baseCSS(): string {
 // ── HTML 생성 ─────────────────────────────────────────────────
 export function generatePrintableHTML(contract: Contract): string {
   const workDaysStr = contract.work_days.map(d => WORK_DAY_LABEL[d] ?? d).join(', ');
+  const scheduleEntries = formatWorkScheduleForDisplay(contract);
+  const scheduleRowsHtml = scheduleEntries.length <= 1
+    ? (() => {
+        const e = scheduleEntries[0] ?? {
+          workTime: `${escapeHtml(contract.start_time)} ~ ${escapeHtml(contract.end_time)}`,
+          breakTime: contract.break_start_time && contract.break_end_time
+            ? `${escapeHtml(contract.break_start_time)} ~ ${escapeHtml(contract.break_end_time)}`
+            : '',
+        };
+        return `<tr><th>근무 시간</th><td>${e.workTime}</td></tr>${e.breakTime ? `<tr><th>휴게시간</th><td>${e.breakTime}</td></tr>` : ''}`;
+      })()
+    : scheduleEntries.map(e => `<tr><th>${escapeHtml(e.label)} 근무</th><td>${e.breakTime ? `${e.workTime} (휴게 ${e.breakTime})` : e.workTime}</td></tr>`).join('');
   const holidayStr = contract.weekly_holiday
     ? WORK_DAY_LABEL[contract.weekly_holiday] ?? contract.weekly_holiday
     : '없음';
@@ -180,8 +193,7 @@ export function generatePrintableHTML(contract: Contract): string {
     <p class="section-title">4. 근무 시간</p>
     <table>
       <tr><th>근무일</th><td>${workDaysStr}</td></tr>
-      <tr><th>근무 시간</th><td>${escapeHtml(contract.start_time)} ~ ${escapeHtml(contract.end_time)}</td></tr>
-      <tr><th>휴게시간</th><td>${escapeHtml(contract.break_start_time)} ~ ${escapeHtml(contract.break_end_time)}</td></tr>
+      ${scheduleRowsHtml}
       <tr><th>주휴일</th><td>${holidayStr}</td></tr>
     </table>
 

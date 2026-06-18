@@ -1,31 +1,84 @@
-
-import { Top, Text, Button, Spacing, TextField } from '@toss/tds-mobile';
+/**
+ * Step1 기본정보 — Variant E: compact ProgressStepper + 우상단 DoughnutChart 병렬 이중 표시
+ * design session: 20260618_050000
+ */
+import { useState } from 'react';
+import { ProgressStepper, ProgressStep, TextField, Spacing } from '@toss/tds-mobile';
+import { FunnelQuestion } from '../../components/funnel/FunnelQuestion';
 import { CommentBoundary } from './CommentBoundary';
+
+const STEPS = ['기본정보', '근무조건', '근무일정', '임금·보험', '체크리스트', '미리보기', '서명'];
+const STEP_INDEX = 0;
+
 export default function FormVariantE() {
+  const [activeField, setActiveField] = useState<'name' | 'phone' | 'address'>('name');
+  const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [address, setAddress] = useState('');
+
   return (
-    <div style={{ background: '#191f28', minHeight: '100vh', display: 'flex', flexDirection: 'column', maxWidth: 480, margin: '0 auto' }}>
-      <CommentBoundary name="폼-헤더">
-        <Top title="계약서 작성" style={{ background: '#191f28', color: '#fff' }} />
-      </CommentBoundary>
-      <CommentBoundary name="폼-필드">
-        <div style={{ padding: '0 24px', flex: 1, display: 'flex', alignItems: 'center' }}>
-          <div style={{ background: '#fff', width: '100%', borderRadius: 24, padding: '32px 24px', boxShadow: '0 8px 32px rgba(0,0,0,0.2)' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 24 }}>
-              <Text typography="t6" color="grey-500" fontWeight="bold">Step 1 of 7</Text>
-              <Text typography="t6" color="blue" fontWeight="bold">건너뛰기</Text>
-            </div>
-            <Text typography="t3" fontWeight="bold">어디서 일하나요?</Text>
-            <Spacing size={8} />
-            <Text typography="t6" color="grey-600">근무 장소를 입력해주세요.</Text>
-            <Spacing size={32} />
-            <TextField variant="line" placeholder="사업장명" autoFocus />
-            <Spacing size={32} />
-            <CommentBoundary name="폼-제출">
-              <Button size="large" display="block">다음 단계로</Button>
-            </CommentBoundary>
+    <div style={{ background: '#fff', minHeight: '100vh', maxWidth: 480, margin: '0 auto' }}>
+      <CommentBoundary name="진행표시-복합">
+        <div>
+          <div style={{ flex: 1 }}>
+            <ProgressStepper variant="compact" activeStepIndex={STEP_INDEX} paddingTop="default">
+              {STEPS.map((label) => (
+                <ProgressStep key={label} title={label} />
+              ))}
+            </ProgressStepper>
           </div>
         </div>
+        <Spacing size={8} />
       </CommentBoundary>
+
+      <div style={{ padding: '0 24px 120px' }}>
+        <CommentBoundary name="기본정보-이름필드">
+          <FunnelQuestion
+            title={<>근로자의 이름을<br />입력해주세요</>}
+            subtitle="본명이 아니면 법적 효력이 없을 수 있어요"
+            isActive={activeField === 'name'}
+            onEnter={() => setActiveField('name')}
+            summary={name ? `이름: ${name}` : undefined}
+          >
+            <TextField variant="line" label="근로자 이름" value={name}
+              onChange={(e) => setName(e.target.value)} placeholder="예: 홍길동" required />
+            <Spacing size={16} />
+          </FunnelQuestion>
+        </CommentBoundary>
+
+        {name.trim().length > 0 && (
+          <CommentBoundary name="기본정보-전화번호필드">
+            <FunnelQuestion
+              title={<>{name}님의<br />전화번호를 알려주세요</>}
+              subtitle="- 없이 숫자만 입력해주세요"
+              isActive={activeField === 'phone'}
+              onEnter={() => setActiveField('phone')}
+              summary={phone ? `전화번호: ${phone}` : undefined}
+            >
+              <TextField variant="line" label="전화번호" value={phone}
+                onChange={(e) => setPhone(e.target.value.replace(/\D/g, '').slice(0, 11))}
+                placeholder="01012345678" required />
+              <Spacing size={16} />
+            </FunnelQuestion>
+          </CommentBoundary>
+        )}
+
+        {phone.length >= 10 && (
+          <CommentBoundary name="기본정보-주소필드">
+            <FunnelQuestion
+              title={<>{name}님의<br />주소를 입력해주세요</>}
+              subtitle="선택사항이며 나중에 적어도 돼요"
+              isActive={activeField === 'address'}
+              onEnter={() => setActiveField('address')}
+              summary={address ? `주소: ${address}` : undefined}
+            >
+              <TextField variant="line" label="근로자 주소 (선택)" value={address}
+                onChange={(e) => setAddress(e.target.value)} placeholder="서울특별시 강남구..." />
+              <Spacing size={16} />
+            </FunnelQuestion>
+          </CommentBoundary>
+        )}
+      </div>
     </div>
   );
 }

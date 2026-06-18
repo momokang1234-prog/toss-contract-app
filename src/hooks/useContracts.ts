@@ -23,6 +23,8 @@ export interface Contract {
   wage_payment_date: string;
   wage_payment_method: string;
   work_days: string[];
+  work_schedule?: Record<string, { start: string; end: string; break_start: string; break_end: string }>;
+  schedule_mode?: 'same' | 'perDay';
   start_time: string;
   end_time: string;
   break_start_time: string;
@@ -42,6 +44,7 @@ export interface Contract {
   contract_html?: string;
   rejection_reason?: string;
   contract_pdf_url?: string;
+  other_conditions?: string;
   created_at: string;
   updated_at: string;
 }
@@ -262,6 +265,12 @@ const MOCK_CONTRACTS: Contract[] = [
     break_end_time: '12:30',
     weekly_holiday: '',
     paid_leave_clause: false,
+    pension: false,
+    health_insurance: false,
+    employment_insurance: false,
+    accident_insurance: true,
+    social_insurance_clause: false,
+    severance_clause: false,
     created_at: '2026-01-10T09:00:00Z',
     updated_at: '2026-02-15T10:00:00Z',
   },
@@ -423,6 +432,8 @@ export function useContracts() {
         wage_payment_date: input.wage_payment_date ?? '',
         wage_payment_method: input.wage_payment_method ?? 'bankTransfer',
         work_days: input.work_days ?? [],
+        work_schedule: input.work_schedule,
+        schedule_mode: input.schedule_mode,
         start_time: input.start_time ?? '',
         end_time: input.end_time ?? '',
         break_start_time: input.break_start_time ?? '',

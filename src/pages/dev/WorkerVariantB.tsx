@@ -41,10 +41,14 @@ export default function WorkerVariantB() {
       <Spacing size={8} />
       <CommentBoundary name="List (계약 리스트)">
         <List>
-          <ListRow 
-            title="토스커피 (강남점)" 
-            subtitle="최신 업데이트: 방금 전" 
-            right={<Badge color="blue">서명 대기</Badge>} 
+          <ListRow
+            contents={
+              <div>
+                <Paragraph typography="t5" fontWeight="bold" color="grey-800">토스커피 (강남점)</Paragraph>
+                <Paragraph typography="t7" color="grey-500">최신 업데이트: 방금 전</Paragraph>
+              </div>
+            }
+            right={<Badge size="small" variant="fill" color="blue">서명 대기</Badge>}
           />
         </List>
       </CommentBoundary>

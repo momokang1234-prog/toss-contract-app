@@ -3,13 +3,22 @@ import { josa } from 'es-hangul';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useContracts } from '../../../../hooks/useContracts';
 import { useBusiness } from '../../../../hooks/useBusiness';
-import { validateLaborContract, type ValidationWarning, calcDailyWorkMinutes, calcEffectiveWorkMinutes, calcWeeklyWorkHours } from '../../../../domain/contract/validation';
+import { validateLaborContract, type ValidationWarning, calcWeeklyHoursFromSchedule } from '../../../../domain/contract/validation';
 import {
   type ContractFormData,
   type ContractFormStep,
   type ValidationResultData,
+  type DaySchedule,
   DEFAULT_FORM,
+  DEFAULT_DAY_SCHEDULE,
+  buildDefaultWorkSchedule,
+  DAY_LABELS,
 } from '../types';
+import {
+  buildContractData,
+  formatWagePaymentDate,
+  wagePaymentDayLabel,
+} from '../buildContractData';
 
 function mapFieldPath(path: string): string {
   const parts = path.split('.');
@@ -26,12 +35,19 @@ function computeBreakMinutes(start: string, end: string): number {
   return Math.max(0, mins);
 }
 
-function wagePaymentDayLabel(day: string): string {
-  return day === 'last' ? '말일' : `${day}일`;
-}
-
-function formatWagePaymentDate(day: string): string {
-  return `매월 ${wagePaymentDayLabel(day)}`;
+/** 레거시 단일 시간 컬럼을 요일별 스케줄로 변환 (구 데이터 호환) */
+function buildLegacySchedule(
+  days: string[],
+  start: string,
+  end: string,
+  breakStart: string,
+  breakEnd: string,
+): Record<string, DaySchedule> {
+  const schedule: Record<string, DaySchedule> = {};
+  for (const d of days) {
+    schedule[d] = { start, end, break_start: breakStart, break_end: breakEnd };
+  }
+  return schedule;
 }
 
 export function useContractForm() {
@@ -85,10 +101,8 @@ export function useContractForm() {
             wage_payment_day: c.wage_payment_date.replace(/[^0-9]/g, '') || 'last',
             wage_payment_method: c.wage_payment_method as any,
             work_days: c.work_days,
-            start_time: c.start_time,
-            end_time: c.end_time,
-            break_start: c.break_start_time || '',
-            break_end: c.break_end_time || '',
+            work_schedule: c.work_schedule ?? buildLegacySchedule(c.work_days, c.start_time, c.end_time, c.break_start_time || '', c.break_end_time || ''),
+            schedule_mode: (c.schedule_mode as ContractFormData['schedule_mode']) ?? 'same',
             weekly_holiday: c.weekly_holiday || '',
             paid_leave_clause: c.paid_leave_clause,
             pension: c.pension,
@@ -97,6 +111,7 @@ export function useContractForm() {
             accident_insurance: c.accident_insurance,
             severance_clause: c.severance_clause,
             checklist_agreed: false,
+            other_conditions: c.other_conditions || '',
             employer_signature_data: c.employer_signature_data,
           });
         }
@@ -122,10 +137,7 @@ export function useContractForm() {
   useEffect(() => {
     if (!insurancePristine) return;
     
-    const dailyMinutes = calcDailyWorkMinutes(form.start_time, form.end_time);
-    const breakMinutes = calcDailyWorkMinutes(form.break_start || '00:00', form.break_end || '00:00');
-    const effectiveMinutes = calcEffectiveWorkMinutes(form.start_time, form.end_time, breakMinutes);
-    const weeklyHours = calcWeeklyWorkHours(effectiveMinutes, form.work_days.length);
+    const weeklyHours = calcWeeklyHoursFromSchedule(form.work_schedule);
 
     const start = new Date(form.start_date);
     let monthsDuration = 999;
@@ -154,8 +166,8 @@ export function useContractForm() {
       };
     });
   }, [
-    form.start_time, form.end_time, form.break_start, form.break_end,
-    form.work_days, form.start_date, form.end_date,
+    form.work_schedule,
+    form.start_date, form.end_date,
     insurancePristine
   ]);
 
@@ -168,12 +180,42 @@ export function useContractForm() {
   };
 
   const toggleDay = (day: string) => {
-    setForm(prev => ({
-      ...prev,
-      work_days: prev.work_days.includes(day)
-        ? prev.work_days.filter(d => d !== day)
-        : [...prev.work_days, day],
-    }));
+    setForm(prev => {
+      const isOn = prev.work_days.includes(day);
+      const nextDays = isOn ? prev.work_days.filter(d => d !== day) : [...prev.work_days, day];
+      const nextSchedule = { ...prev.work_schedule };
+      if (!isOn && !nextSchedule[day]) {
+        // 신규 요일: 기존 요일 값 복사, 없으면 기본값
+        const ref = Object.values(prev.work_schedule)[0] ?? DEFAULT_DAY_SCHEDULE;
+        nextSchedule[day] = { ...ref };
+      }
+      return { ...prev, work_days: nextDays, work_schedule: nextSchedule };
+    });
+  };
+
+  /** 요일 스케줄 필드 갱신 — 'same' 모드면 모든 근무요일에 동일 적용 */
+  const updateDaySchedule = (day: string, field: keyof DaySchedule, value: string) => {
+    setForm(prev => {
+      const days = prev.schedule_mode === 'same' ? prev.work_days : [day];
+      const nextSchedule = { ...prev.work_schedule };
+      for (const d of days) {
+        nextSchedule[d] = { ...(nextSchedule[d] ?? DEFAULT_DAY_SCHEDULE), [field]: value };
+      }
+      return { ...prev, work_schedule: nextSchedule };
+    });
+  };
+
+  const setScheduleMode = (mode: ContractFormData['schedule_mode']) => {
+    setForm(prev => {
+      if (mode === 'same' && prev.work_days.length > 0) {
+        // 'same' 전환 시 첫 근무요일 기준으로 모두 동기화
+        const ref = prev.work_schedule[prev.work_days[0]] ?? Object.values(prev.work_schedule)[0] ?? DEFAULT_DAY_SCHEDULE;
+        const nextSchedule: Record<string, DaySchedule> = {};
+        for (const d of prev.work_days) nextSchedule[d] = { ...ref };
+        return { ...prev, schedule_mode: mode, work_schedule: nextSchedule };
+      }
+      return { ...prev, schedule_mode: mode };
+    });
   };
 
   const selectWeeklyHoliday = (day: string) => {
@@ -197,10 +239,16 @@ export function useContractForm() {
       case 'workSchedule':
         if (form.work_days.length === 0) e.work_days = `${josa('근무 요일', '을/를')} 선택해주세요`;
         if (!form.weekly_holiday) e.weekly_holiday = '주휴일을 선택해주세요';
-        if (!form.start_time) e.start_time = `${josa('시작 시간', '을/를')} 입력해주세요`;
-        if (!form.end_time) e.end_time = `${josa('종료 시간', '을/를')} 입력해주세요`;
-        if (form.start_time && form.end_time && form.start_time >= form.end_time) {
-          e.end_time = '종료 시간은 시작 시간보다 늦어야 합니다';
+        for (const d of form.work_days) {
+          const s = form.work_schedule[d];
+          if (!s || !s.start || !s.end) {
+            e.workSchedule = `${DAY_LABELS[d] ?? d}요일의 근무시간을 입력해주세요`;
+            break;
+          }
+          if (s.start >= s.end) {
+            e.workSchedule = `${DAY_LABELS[d] ?? d}요일 종료 시간은 시작 시간보다 늦어야 합니다`;
+            break;
+          }
         }
         break;
       case 'wageInsurance':
@@ -208,11 +256,16 @@ export function useContractForm() {
         if (!form.wage_payment_day) e.wage_payment_day = '지급일을 선택해주세요';
         if (form.accident_insurance !== true) e.accident_insurance = '산재보험은 전 사업장 의무가입입니다';
         break;
+      case 'otherConditions':
+        break;
       case 'finalChecklist': {
         if (!businesses || businesses.length === 0) {
           alert('사업장 정보를 먼저 등록해주세요.');
           navigate('/employer/business/new');
           return false;
+        }
+        if (!form.checklist_agreed) {
+          e.checklist_agreed = '체크리스트 확인에 동의해주세요';
         }
         break;
       }
@@ -226,36 +279,8 @@ export function useContractForm() {
     setSubmitting(true);
     try {
       let contract;
-      const contractData = {
-        business_id: businesses[0].id,
-        worker_name: form.worker_name,
-        worker_phone: form.worker_phone,
-        contract_type: form.contract_type,
-        workplace: form.workplace,
-        job_description: form.job_description,
-        start_date: form.start_date,
-        end_date: form.end_date || undefined,
-        wage_type: form.wage_type,
-        base_wage: Number(form.base_wage) || 0,
-        wage_payment_date: formatWagePaymentDate(form.wage_payment_day),
-        wage_payment_method: form.wage_payment_method,
-        work_days: form.work_days,
-        start_time: form.start_time,
-        end_time: form.end_time,
-        break_start_time: form.break_start || '00:00',
-        break_end_time: form.break_end || '00:00',
-        weekly_holiday: form.weekly_holiday || undefined,
-        paid_leave_clause: form.paid_leave_clause,
-        pension: form.pension,
-        health_insurance: form.health_insurance,
-        employment_insurance: form.employment_insurance,
-        accident_insurance: form.accident_insurance,
-        social_insurance_clause: form.pension || form.health_insurance || form.employment_insurance || form.accident_insurance,
-        severance_clause: form.severance_clause,
-        employer_signature_data: form.employer_signature_data,
-        status: 'sent',
-      };
-      
+      const contractData = buildContractData(form, businesses[0].id);
+
       if (id) {
         contract = await updateContract(id, contractData);
       } else {
@@ -281,6 +306,8 @@ export function useContractForm() {
     handleChange,
     toggleDay,
     selectWeeklyHoliday,
+    updateDaySchedule,
+    setScheduleMode,
     validateStep,
     handleSubmit,
     setValidationResult,

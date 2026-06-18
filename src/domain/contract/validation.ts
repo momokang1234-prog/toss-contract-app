@@ -76,6 +76,23 @@ export function calcWeeklyWorkHours(
   return (effectiveDailyMinutes * workDaysCount) / 60;
 }
 
+/**
+ * 요일별 스케줄에서 주 근무시간(시간) 합산 — 범용 per-day 계산.
+ * 각 요일의 (근무시간 − 휴게시간)을 합산. 야간 근무(자정 넘김) 지원.
+ */
+export function calcWeeklyHoursFromSchedule(
+  schedule: Record<string, { start: string; end: string; break_start: string; break_end: string }>,
+): number {
+  let totalMinutes = 0;
+  for (const key of Object.keys(schedule)) {
+    const s = schedule[key];
+    if (!s || !s.start || !s.end) continue;
+    const breakMinutes = calcDailyWorkMinutes(s.break_start || '00:00', s.break_end || '00:00');
+    totalMinutes += calcEffectiveWorkMinutes(s.start, s.end, breakMinutes);
+  }
+  return totalMinutes / 60;
+}
+
 // ============================================================
 // Main Validator
 // ============================================================

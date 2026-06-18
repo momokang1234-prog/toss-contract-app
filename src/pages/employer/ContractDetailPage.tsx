@@ -6,6 +6,7 @@ import { generateAndUploadPDF } from '../../utils/pdfGenerator';
 import { josa } from 'es-hangul';
 import { useParams, useNavigate, Navigate } from 'react-router-dom';
 import { useContracts, type Contract } from '../../hooks/useContracts';
+import { shareContract } from '../../api/smart-messenger';
 import { Top, Paragraph, Spacing, Button, Badge, TextButton } from '@toss/tds-mobile';
 import { CONTRACT_TYPE_LABEL, WAGE_TYPE_LABEL, WORK_DAY_LABEL, WAGE_PAYMENT_METHOD_LABEL } from '../../utils/labels';
 import { getContractBadge } from '../../utils/badgeUtils';
@@ -79,11 +80,14 @@ export default function ContractDetailPage() {
 
   const primaryAction = canSend
     ? { label: '근로자에게 전송', action: async () => {
-        try { const u = await sendContract(id); setContract(u); alert('근로자에게 전송되었습니다.'); }
-        catch { alert('전송에 실패했습니다'); }
+        try {
+          const { shared, copied } = await shareContract(id);
+          if (!shared && !copied) return; // 공유 취소 — 상태 변경 없음
+          const u = await sendContract(id); setContract(u); alert('근로자에게 전송되었습니다.');
+        } catch { alert('전송에 실패했습니다'); }
       }}
     : (contract.status === 'sent' || contract.status === 'viewed')
-    ? { label: '서명 요청 재전송', action: () => { alert('근로자에게 서명 요청 알림을 다시 보냈습니다.'); } }
+    ? { label: '서명 요청 재전송', action: () => { shareContract(id); } }
     : canComplete
     ? { label: completing ? '확정 중...' : '계약 확정하기', action: async () => {
         if (!confirm(`${josa('계약', '을/를')} 확정하시겠습니까?\n\n완료된 계약은 변경할 수 없습니다.`)) return;

@@ -7,23 +7,31 @@ export default function WorkerVariantA() {
   return (
     <div style={{ background: '#f2f4f6', minHeight: '100vh', paddingBottom: 24 }}>
       <CommentBoundary name="인사말">
-        <Top title="내 계약 목록" subtitle="A: 바텀시트 중심 (화면 이동 최소화)" />
+        <Top title="내 계약 목록" subtitleBottom="A: 바텀시트 중심 (화면 이동 최소화)" />
         <Spacing size={24} />
         <Paragraph typography="t4" fontWeight="bold" style={{ padding: '0 24px' }}>받은 계약서</Paragraph>
         <Spacing size={16} />
       </CommentBoundary>
       <CommentBoundary name="계약리스트">
         <List>
-          <ListRow 
-            title="토스커피 (강남점)" 
-            subtitle="전송일: 방금 전" 
-            right={<Badge color="blue">서명 대기</Badge>} 
-            onClick={() => setOpen(true)} 
+          <ListRow
+            contents={
+              <div>
+                <Paragraph typography="t5" fontWeight="bold" color="grey-800">토스커피 (강남점)</Paragraph>
+                <Paragraph typography="t7" color="grey-500">전송일: 방금 전</Paragraph>
+              </div>
+            }
+            right={<Badge size="small" variant="fill" color="blue">서명 대기</Badge>}
+            onClick={() => setOpen(true)}
           />
-          <ListRow 
-            title="비바 리퍼블리카" 
-            subtitle="전송일: 2일 전" 
-            right={<Badge color="green">계약 완료</Badge>} 
+          <ListRow
+            contents={
+              <div>
+                <Paragraph typography="t5" fontWeight="bold" color="grey-800">비바 리퍼블리카</Paragraph>
+                <Paragraph typography="t7" color="grey-500">전송일: 2일 전</Paragraph>
+              </div>
+            }
+            right={<Badge size="small" variant="fill" color="green">계약 완료</Badge>}
           />
         </List>
       </CommentBoundary>

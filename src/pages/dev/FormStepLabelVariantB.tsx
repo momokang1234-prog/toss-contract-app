@@ -1,28 +1,20 @@
 /**
- * Step1 기본정보 — Variant C: 원형 숫자 아이콘 스테퍼 + 현재 스텝명 텍스트
- * design session: 20260618_060000
+ * step-label Variant B (확정 디자인): 숫자 아이콘 스테퍼 + 슬라이딩 Badge
+ * 헤더는 공유 컴포넌트(ContractFormProgress)를 사용 → 실제 폼(ContractFormPage)과 동일.
+ * 이 페이지는 8단계 이전/다음 네비게이션으로 헤더 동작을 테스트하기 위한 dev 미리보기.
+ * design session: 20260618_070000
  */
 import { useState } from 'react';
-import { ProgressStepper, ProgressStep, Paragraph, TextField, Spacing } from '@toss/tds-mobile';
+import { TextField, Spacing, Button } from '@toss/tds-mobile';
 import { FunnelQuestion } from '../../components/funnel/FunnelQuestion';
 import { CommentBoundary } from './CommentBoundary';
+import { ContractFormProgress } from '../employer/contract-form/ContractFormProgress';
+import { STEP_ORDER, STEP_LABELS } from '../employer/contract-form/types';
 
-const STEPS = ['기본정보', '근무조건', '근무일정', '임금·보험', '체크리스트', '미리보기', '서명'];
-const STEP_INDEX = 0;
+const STEPS = STEP_ORDER.map((s) => STEP_LABELS[s]);
 
-function NumberIcon({ n, active }: { n: number; active: boolean }) {
-  return (
-    <div style={{
-      width: 20, height: 20, borderRadius: '50%',
-      background: active ? '#3182F6' : '#E5E8EB',
-      display: 'flex', alignItems: 'center', justifyContent: 'center',
-    }}>
-      <span style={{ fontSize: 10, fontWeight: 700, color: active ? '#fff' : '#8B95A1' }}>{n}</span>
-    </div>
-  );
-}
-
-export default function FormVariantC() {
+export default function FormStepLabelVariantB() {
+  const [stepIndex, setStepIndex] = useState(0);
   const [activeField, setActiveField] = useState<'name' | 'phone' | 'address'>('name');
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
@@ -30,27 +22,11 @@ export default function FormVariantC() {
 
   return (
     <div style={{ background: '#fff', minHeight: '100vh', maxWidth: 480, margin: '0 auto' }}>
-      <CommentBoundary name="진행표시-숫자아이콘">
-        <ProgressStepper variant="icon" activeStepIndex={STEP_INDEX} checkForFinish paddingTop="default">
-          {STEPS.map((label, i) => (
-            <ProgressStep
-              key={label}
-              icon={<NumberIcon n={i + 1} active={i === STEP_INDEX} />}
-            />
-          ))}
-        </ProgressStepper>
-        <div style={{ padding: '8px 24px 0', display: 'flex', alignItems: 'center', gap: 8 }}>
-          <Paragraph typography="st5" fontWeight="bold" color="grey-900">
-            {STEPS[STEP_INDEX]}
-          </Paragraph>
-          <Paragraph typography="st7" color="grey-500">
-            {STEP_INDEX + 1}/{STEPS.length}
-          </Paragraph>
-        </div>
-        <Spacing size={20} />
+      <CommentBoundary name="진행표시-스테퍼+슬라이딩배지">
+        <ContractFormProgress currentIndex={stepIndex} labels={STEPS} />
       </CommentBoundary>
 
-      <div style={{ padding: '0 24px 120px' }}>
+      <div style={{ padding: '0 24px 160px' }}>
         <CommentBoundary name="기본정보-이름필드">
           <FunnelQuestion
             title={<>근로자의 이름을<br />입력해주세요</>}
@@ -97,6 +73,23 @@ export default function FormVariantC() {
             </FunnelQuestion>
           </CommentBoundary>
         )}
+      </div>
+
+      {/* 데모용 단계 이동 — 헤더 스테퍼 동작 확인용 */}
+      <div style={{
+        position: 'fixed', bottom: 0, left: '50%', transform: 'translateX(-50%)',
+        width: '100%', maxWidth: 480,
+        padding: '12px 24px 24px', background: '#fff',
+        borderTop: '1px solid #E5E8EB', display: 'flex', gap: 12,
+      }}>
+        <Button color="light" variant="weak" display="block" size="xlarge"
+          disabled={stepIndex === 0} onClick={() => setStepIndex(i => i - 1)}>
+          이전
+        </Button>
+        <Button color="primary" variant="fill" display="block" size="xlarge"
+          disabled={stepIndex === STEPS.length - 1} onClick={() => setStepIndex(i => i + 1)}>
+          다음
+        </Button>
       </div>
     </div>
   );
