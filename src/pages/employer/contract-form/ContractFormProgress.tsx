@@ -9,12 +9,16 @@ import { ProgressStepper, ProgressStep, Badge } from '@toss/tds-mobile';
 function NumberIcon({
   n,
   active,
+  visited,
   dotRef,
 }: {
   n: number;
   active: boolean;
+  visited: boolean;
   dotRef: (el: HTMLDivElement | null) => void;
 }) {
+  const bg = active ? '#3182F6' : visited ? '#BFDFFF' : '#E5E8EB';
+  const fg = active ? '#fff' : visited ? '#1B64DA' : '#8B95A1';
   return (
     <div
       ref={dotRef}
@@ -22,13 +26,14 @@ function NumberIcon({
         width: 20,
         height: 20,
         borderRadius: '50%',
-        background: active ? '#3182F6' : '#E5E8EB',
+        background: bg,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
+        transition: 'background 0.2s',
       }}
     >
-      <span style={{ fontSize: 10, fontWeight: 700, color: active ? '#fff' : '#8B95A1' }}>{n}</span>
+      <span style={{ fontSize: 10, fontWeight: 700, color: fg }}>{n}</span>
     </div>
   );
 }
@@ -36,9 +41,12 @@ function NumberIcon({
 export function ContractFormProgress({
   currentIndex,
   labels,
+  onStepClick,
 }: {
   currentIndex: number;
   labels: readonly string[];
+  /** 과거 단계(이미 방문한) 클릭 시 호출. 현재/미래 단계는 클릭 불가. */
+  onStepClick?: (index: number) => void;
 }) {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const dotRefs = useRef<(HTMLDivElement | null)[]>(new Array(labels.length).fill(null));
@@ -64,21 +72,28 @@ export function ContractFormProgress({
 
   return (
     <div ref={wrapperRef} style={{ position: 'relative', paddingBottom: 36 }}>
-      <ProgressStepper variant="icon" activeStepIndex={currentIndex} checkForFinish paddingTop="default">
-        {labels.map((label, i) => (
-          <ProgressStep
-            key={label}
-            icon={
-              <NumberIcon
-                n={i + 1}
-                active={i === currentIndex}
-                dotRef={(el) => {
-                  dotRefs.current[i] = el;
-                }}
-              />
-            }
-          />
-        ))}
+      <ProgressStepper variant="icon" activeStepIndex={currentIndex} paddingTop="default">
+        {labels.map((label, i) => {
+          const clickable = i < currentIndex && !!onStepClick;
+          return (
+            <ProgressStep
+              key={label}
+              // 과거 단계 클릭 시 이동. ProgressStep은 div HTMLElement이므로 onClick 직접 전달.
+              onClick={clickable ? () => onStepClick!(i) : undefined}
+              style={clickable ? { cursor: 'pointer' } : undefined}
+              icon={
+                <NumberIcon
+                  n={i + 1}
+                  active={i === currentIndex}
+                  visited={i < currentIndex}
+                  dotRef={(el) => {
+                    dotRefs.current[i] = el;
+                  }}
+                />
+              }
+            />
+          );
+        })}
       </ProgressStepper>
 
       {/* 슬라이딩 Badge — dot 실측 좌표 기준 */}

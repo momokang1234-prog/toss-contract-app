@@ -74,17 +74,18 @@ export default function ContractFormPage() {
   return (
     <div className={styles.page}>
       <div className={styles.content}>
-        <div style={{ position: 'relative', marginBottom: 8, overflow: 'hidden' }}>
-        <img src="https://static.toss.im/lotties/point-blue2.png" alt=""
-          style={{ position: 'absolute', top: -30, right: -10, width: 160, height: 160, opacity: 0.3, pointerEvents: 'none' }}
-        />
-        <img src="https://static.toss.im/lotties/point-green2.png" alt=""
-          style={{ position: 'absolute', top: -10, right: 20, width: 120, height: 120, opacity: 0.25, pointerEvents: 'none' }}
-        />
-        <Paragraph typography="st3" fontWeight="bold">근로계약서 작성</Paragraph>
-      </div>
-      <Spacing size={16} />
-      <ContractFormProgress currentIndex={currentIndex} labels={STEP_ORDER.map((s) => STEP_LABELS[s])} />
+        <div style={{ paddingTop: 20 }}>
+          <Paragraph typography="st3" fontWeight="bold">근로계약서 작성</Paragraph>
+        </div>
+        <Spacing size={16} />
+      <ContractFormProgress
+        currentIndex={currentIndex}
+        labels={STEP_ORDER.map((s) => STEP_LABELS[s])}
+        onStepClick={(i) => {
+          // 과거 단계로만 이동 허용. 과거 단계는 이미 검증을 통과했으므로 재검증 생략.
+          if (i < currentIndex) funnel.history.push(STEP_ORDER[i]);
+        }}
+      />
       <Spacing size={8} />
 
       {/* Step content */}
