@@ -6,6 +6,7 @@ import { makeMobileTypographyVariables, makeFixedTypographyVariables, defaultTyp
 import "@toss/tds-colors/colors.css";
 import App from "./App";
 import "./index.css";
+import "./styles/tossface.css";
 
 const globalStyles = css({
   ":root": {

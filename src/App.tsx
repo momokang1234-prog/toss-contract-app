@@ -60,6 +60,7 @@ const ContractListVariantC = lazy(() => import('./pages/dev/ContractListVariantC
 const ContractListVariantD = lazy(() => import('./pages/dev/ContractListVariantD'));
 const ContractListVariantE = lazy(() => import('./pages/dev/ContractListVariantE'));
 
+const IconsCatalogPage = lazy(() => import('./pages/dev/IconsCatalogPage'));
 const FormStepLabelVariantA = lazy(() => import('./pages/dev/FormStepLabelVariantA'));
 const FormStepLabelVariantB = lazy(() => import('./pages/dev/FormStepLabelVariantB'));
 const FormStepLabelVariantC = lazy(() => import('./pages/dev/FormStepLabelVariantC'));
@@ -180,6 +181,7 @@ export default function App() {
                   <Route path="/dev/employer/contracts/new/step-label/variant-a" element={<Lazy><FormStepLabelVariantA /></Lazy>} />
                   <Route path="/dev/employer/contracts/new/step-label/variant-b" element={<Lazy><FormStepLabelVariantB /></Lazy>} />
                   <Route path="/dev/employer/contracts/new/step-label/variant-c" element={<Lazy><FormStepLabelVariantC /></Lazy>} />
+                  <Route path="/dev/icons" element={<Lazy><IconsCatalogPage /></Lazy>} />
                 </>
               )}
 
