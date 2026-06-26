@@ -167,9 +167,8 @@ const ALL_PAGES: PageDef[] = [
   { id: 'business-manage', route: '/employer/business/manage', title: '사업장 관리', emoji: '⚙️', role: 'employer', group: '사장님' },
   { id: 'contracts', route: '/employer/contracts', title: '계약 목록', emoji: '📋', role: 'employer', group: '사장님' },
   { id: 'contract-new', route: '/employer/contracts/new', title: '계약서 작성', emoji: '📝', role: 'employer', group: '사장님' },
-  { id: 'contract-new-stepper', route: '/dev/employer/contracts/new/step-label/variant-b', title: '스텝 표시 확정 (8단계 네비)', emoji: '🔢', role: 'employer', group: '사장님' },
   { id: 'contract-detail', route: '/employer/contracts/mock-1', title: '계약서 상세', emoji: '🔍', role: 'employer', group: '사장님' },
-  { id: 'contract-history', route: '/employer/contracts/mock-1/history', title: '계약 이력', emoji: '📜', role: 'employer', group: '사장님' },
+  { id: 'contract-history', route: '/employer/contracts/mock-1/history', title: '계약서 히스토리', emoji: '📜', role: 'employer', group: '사장님' },
   { id: 'worker-list', route: '/worker/contracts', title: '내 계약 목록', emoji: '📋', role: 'worker', group: '근로자' },
   { id: 'worker-detail', route: '/worker/contracts/mock-1', title: '계약서 검토', emoji: '📄', role: 'worker', group: '근로자' },
   { id: 'worker-sign', route: '/worker/contracts/mock-1/sign', title: '전자서명', emoji: '✍️', role: 'worker', group: '근로자' },
@@ -392,6 +391,18 @@ export default function UXTestPage() {
               onClick={() => setActiveTab('design-history')}
             >
               디자인 히스토리
+            </button>
+            <button
+              className="wk-tab-btn"
+              onClick={() => window.open('/dev/flow-viewer?flow=contract', '_blank')}
+            >
+              계약서 작성 플로우
+            </button>
+            <button
+              className="wk-tab-btn"
+              onClick={() => window.open('/dev/flow-viewer?flow=sign', '_blank')}
+            >
+              전자서명 플로우
             </button>
           </div>
 

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Spacing } from '@toss/tds-mobile';
 import type { ContractFormData, DaySchedule } from '../types';
 import { DAYS, DAY_LABELS, DEFAULT_DAY_SCHEDULE } from '../types';
@@ -99,6 +99,13 @@ export default function Step3WorkSchedule({
   form, errors, toggleDay, selectWeeklyHoliday, updateDaySchedule, setScheduleMode,
 }: Step3WorkScheduleProps) {
   const [activeField, setActiveField] = useState<'days' | 'mode' | 'time' | 'holiday'>('days');
+
+  // "다음" 검증 실패 시 첫 미입력 필드를 자동으로 펼쳐 에러가 보이게 해요.
+  useEffect(() => {
+    if (errors.work_days) setActiveField('days');
+    else if (errors.workSchedule) setActiveField('time');
+    else if (errors.weekly_holiday) setActiveField('holiday');
+  }, [errors.work_days, errors.workSchedule, errors.weekly_holiday]);
   const sched = (day: string): DaySchedule => form.work_schedule[day] ?? DEFAULT_DAY_SCHEDULE;
   const repDay = form.work_days[0] ?? DAYS[0];
   const isSame = form.schedule_mode === 'same';

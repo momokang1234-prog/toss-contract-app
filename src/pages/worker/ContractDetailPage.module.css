@@ -1,5 +1,98 @@
-.page { max-width:480px; margin:0 auto; min-height:100vh; background:#fff; }
-.content { padding:0 20px; }
-.center { text-align:center; padding:0 20px; }
-.card { background:#fff; }
-.row { padding: 12px 0; border-bottom: 1px solid #e5e5ec; display: flex; justify-content: space-between; align-items: center; }
+.page {
+  padding: 0 0 40px;
+  max-width: 480px;
+  margin: 0 auto;
+  background-color: #ffffff;
+  min-height: 100vh;
+}
+
+.center {
+  text-align: center;
+  padding: 0 20px;
+}
+
+.section {
+  padding-top: 20px;
+}
+
+.row {
+  padding: 12px 0;
+  border-bottom: 1px solid #e5e5ec;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.row:last-child {
+  border-bottom: none;
+}
+
+/* Header area */
+.headerArea {
+  padding: 12px 24px 24px;
+}
+
+.headerTop {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.backButton {
+  background: none;
+  border: none;
+  padding: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.headerCard {
+  background: linear-gradient(135deg, #3182F6, #5C95FF);
+  padding: 24px;
+  color: #fff;
+  border-radius: 24px;
+  box-shadow: 0 12px 24px rgba(49, 130, 246, 0.25);
+  position: relative;
+  overflow: hidden;
+}
+
+.headerCard.completed {
+  background: linear-gradient(135deg, #10B981, #34D399);
+  box-shadow: 0 12px 24px rgba(16, 185, 129, 0.25);
+}
+
+.headerCard.rejected {
+  background: linear-gradient(135deg, #6366F1, #818CF8);
+  box-shadow: 0 12px 24px rgba(99, 102, 241, 0.25);
+}
+
+.headerEmoji {
+  position: absolute;
+  font-size: 80px;
+  right: -10px;
+  bottom: -20px;
+  opacity: 0.2;
+  transform: rotate(-15deg);
+  pointer-events: none;
+}
+
+.statusBadge {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+}
+
+.bottomCta {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 480px;
+  padding: 16px 24px 32px;
+  background: linear-gradient(180deg, rgba(255,255,255,0) 0%, #FFFFFF 20%);
+  z-index: 10;
+}

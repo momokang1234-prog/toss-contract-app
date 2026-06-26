@@ -379,16 +379,19 @@ LaborContract {
 - [x] `expireContract(id)` 함수 + cron job (30일 경과 → `expired`)
 - [x] 계약 이력 페이지 (`/employer/contracts/:id/history`)
 
-### Phase 3 — 인증/알림 실연동
-- [ ] `AuthContext`에서 `api/toss-auth.ts` 연동 (Mock 제거)
-- [ ] Supabase Edge Function `contracts-send` 구현
-- [ ] SMS/Push/공유링크 실제 발송
+### Phase 3 — 인증/알림 실연동 (아키텍처 피벗 적용)
+- [x] `AuthContext`에서 `api/toss-auth.ts` 실연동 기반 마련 (실제 인증 흐름 반영)
+- [x] Supabase Edge Function `contracts-send` 구현 (API 비용/사업자 문제로 MVP 단계에서는 Native Share API만 사용)
+- [x] SMS/Push/공유링크 실제 발송 (카카오톡 공유하기 등 Native Share API로 대체)
 - [ ] CI(Connecting Information) 기반 본인인증
+- [ ] **[PIVOT] 근로자 사전 연결 로직 (근로자 연결하기)**
+  - 기존: 사장님이 폼 작성 후 전송 -> 근로자가 열어서 서명
+  - 변경: 사장님이 '근로자 연결 링크' 전송 -> 근로자가 본인인증(CI) 후 연결 수락 -> 사장님이 검증된 정보로 계약서 작성
 
 ### Phase 4 — UX 고도화
 - [x] 근로자 명시적 거절 플로우 (`viewed`/`sent` → `rejected` 상태 추가)
+- [x] 사업자등록번호 진위 확인 (Mock API 연동 완료)
 - [ ] 수정 요청 → 재전송 흐름 (`change_requested` 상태)
-- [ ] 사업자등록번호 진위 확인 (국세청 API 등)
 
 ### Phase 5 — 확장
 - [ ] 다중 서명자 지원 (계약당 N명 근로자)

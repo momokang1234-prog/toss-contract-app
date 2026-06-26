@@ -62,12 +62,9 @@ export default function ContractTimelinePage() {
 
   return (
     <div className={styles.page}>
-      <Top title={workerName || '계약 이력'}>
-        {b && <Badge size="small" variant="weak" color={b.color}>{b.label}</Badge>}
-      </Top>
-
-      <div style={{ padding: '0 24px' }}>
-        <Paragraph typography="t3" fontWeight="bold">계약 진행 이력</Paragraph>
+      <Top title="" />
+      <div style={{ padding: '0 24px', paddingTop: '24px' }}>
+        <Paragraph typography="t3" fontWeight="bold">계약서 히스토리</Paragraph>
         <Spacing size={8} />
         <Paragraph typography="t6" color="grey-500">계약의 상태 변화를 시간순으로 보여드려요</Paragraph>
         <Spacing size={32} />

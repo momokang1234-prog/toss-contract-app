@@ -4,7 +4,7 @@ import { useAuth } from '../../contexts/AuthContext';
 
 export default function DevBypass() {
   const [searchParams] = useSearchParams();
-  const { login } = useAuth();
+  const { login, setRole } = useAuth();
 
   useEffect(() => {
     const role = searchParams.get('role') as 'employer' | 'worker';
@@ -25,7 +25,7 @@ export default function DevBypass() {
         window.location.reload();
         return;
       }
-      login(role).then(() => {
+      login().then(() => setRole(role)).then(() => {
         window.location.replace(finalPath);
       });
     } else if (rawPath) {

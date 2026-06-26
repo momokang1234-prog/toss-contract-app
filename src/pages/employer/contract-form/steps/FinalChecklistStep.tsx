@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { BottomSheet, Button, TextField, TextButton, Switch, Paragraph } from '@toss/tds-mobile';
 import { ContractFormData, type DaySchedule } from '../types';
-import { calcDailyWorkMinutes, calcEffectiveWorkMinutes } from '../../../../domain/contract/validation';
-import { MINIMUM_HOURLY_WAGE_2026 } from '../../../../domain/contract/laborRules';
+import { validateLaborContract } from '../../../../domain/contract/validation';
+import { buildContractData } from '../../../../domain/contract/buildContractData';
 import { CommentBoundary } from '../../../dev/CommentBoundary';
 
 interface FinalChecklistStepProps {
@@ -12,76 +12,74 @@ interface FinalChecklistStepProps {
   onNavigate?: (step: any) => void;
 }
 
+const SUGGESTION_MESSAGES: Record<string, { title: string; desc: string; editStep?: string }> = {
+  BELOW_MINIMUM_WAGE: {
+    title: "최저임금 확인",
+    desc: "올해 최저시급(10,030원) 기준에 맞게 책정되었는지 한 번 더 확인해보세요.",
+    editStep: 'wageTypeAmount'
+  },
+  NEAR_MINIMUM_WAGE: {
+    title: "최저임금 근접",
+    desc: "입력된 시급이 2026년 고시 최저시급(10,030원)과 가깝습니다. 정확히 책정되었는지 챙겨보세요.",
+    editStep: 'wageTypeAmount'
+  },
+  INSUFFICIENT_BREAK: {
+    title: "휴게시간 확인",
+    desc: "4시간 일하면 30분, 8시간 일하면 1시간 이상의 휴게시간이 잘 포함되어 있는지 챙겨보세요.",
+    editStep: 'workTimeNav'
+  },
+  MISSING_WEEKLY_HOLIDAY: {
+    title: "주휴일 확인",
+    desc: "주 15시간 이상 일하는 직원은 개근 시 주휴일(주휴수당)이 발생해요. 설정된 주휴일이 적절한지 챙겨보세요.",
+    editStep: 'workTimeNav'
+  },
+  HOLIDAY_OVERLAP_WORKDAY: {
+    title: "근무일과 주휴일 겹침",
+    desc: "쉬기로 한 주휴일이 일하는 요일에 포함되어 있지 않은지 확인해보세요.",
+    editStep: 'workDays'
+  },
+  SHORT_TIME_WORKER: {
+    title: "단시간 근로자 안내",
+    desc: "주 15시간 미만 일하는 단시간 근로자는 주휴수당 대상에서 제외될 수 있어요.",
+  },
+  MISSING_PAID_LEAVE: {
+    title: "연차 유급휴가 조항",
+    desc: "연차 유급휴가 조항이 누락되지 않았는지 점검해보세요.",
+    editStep: 'wageInsuranceNav'
+  },
+  MISSING_SOCIAL_INSURANCE: {
+    title: "4대보험 조항",
+    desc: "4대보험(국민연금, 건강보험, 고용보험, 산재보험) 조항이 누락되지 않았는지 챙겨보세요.",
+    editStep: 'wageInsuranceNav'
+  },
+  MISSING_SEVERANCE: {
+    title: "퇴직금 조항",
+    desc: "퇴직금 관련 조항이 누락되지 않았는지 점검해보세요.",
+    editStep: 'wageInsuranceNav'
+  }
+};
+
 export function FinalChecklistStep({ form, onChange, toggleDay, onNavigate }: FinalChecklistStepProps) {
   const [editTarget, setEditTarget] = useState<string | null>(null);
-  // 1. 일별 근무시간 집계 (범용 per-day)
-  const dayEntries: DaySchedule[] = form.work_days
-    .map(d => form.work_schedule[d])
-    .filter((s): s is DaySchedule => !!s && !!s.start && !!s.end);
-  let weeklyMinutes = 0;
-  let maxDailyHours = 0;
-  let insufficientBreak = false;
-  for (const s of dayEntries) {
-    const dailyMinutes = calcDailyWorkMinutes(s.start, s.end);
-    const dailyHours = dailyMinutes / 60;
-    const breakMinutes = calcDailyWorkMinutes(s.break_start || '00:00', s.break_end || '00:00');
-    weeklyMinutes += calcEffectiveWorkMinutes(s.start, s.end, breakMinutes);
-    if (dailyHours > maxDailyHours) maxDailyHours = dailyHours;
-    if ((dailyHours >= 4 && breakMinutes < 30) || (dailyHours >= 8 && breakMinutes < 60)) {
-      insufficientBreak = true;
-    }
-  }
-  const weeklyHours = weeklyMinutes / 60;
-  const avgDailyHours = dayEntries.length > 0 ? weeklyHours / dayEntries.length : 0;
 
-  // 2. Calculate duration
-  const start = new Date(form.start_date);
-  let monthsDuration = 999; // indefinitely
-  if (form.end_date) {
-    const end = new Date(form.end_date);
-    monthsDuration = (end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24 * 30.44);
-  }
+  const laborContractInput = buildContractData(form);
 
-  // 3. Calculate hourly wage equivalent
-  let hourlyEquivalent = 0;
-  const baseWage = Number(form.base_wage) || 0;
-  if (baseWage > 0) {
-    switch (form.wage_type) {
-      case 'hourly': hourlyEquivalent = baseWage; break;
-      case 'daily': hourlyEquivalent = avgDailyHours > 0 ? baseWage / avgDailyHours : 0; break;
-      case 'weekly': hourlyEquivalent = weeklyHours > 0 ? baseWage / weeklyHours : 0; break;
-      case 'monthly': hourlyEquivalent = weeklyHours > 0 ? baseWage / (weeklyHours * 4.345) : 0; break;
-    }
-  }
+  const validationRes = validateLaborContract(laborContractInput);
+  console.log("form.base_wage:", form.base_wage, "parsed:", Number(form.base_wage) || 0);
+  console.log("Validation Result:", JSON.stringify(validationRes, null, 2));
 
-  // 4. Build guide items dynamically
   const guideItems: { title: string; desc: string; editStep?: string }[] = [];
+  const addGuide = (code: string) => {
+    if (SUGGESTION_MESSAGES[code]) {
+      // Prevent duplicates if multiple errors return same nuance code
+      if (!guideItems.find(g => g.title === SUGGESTION_MESSAGES[code].title)) {
+        guideItems.push(SUGGESTION_MESSAGES[code]);
+      }
+    }
+  };
 
-  // 최저임금 체크
-  if (hourlyEquivalent > 0 && hourlyEquivalent < MINIMUM_HOURLY_WAGE_2026) {
-    guideItems.push({
-      title: "최저임금 확인",
-      desc: "올해 최저시급(10,030원)에 맞게 잘 책정되었는지 한 번 더 확인 해보세요.",
-      editStep: 'wageTypeAmount'
-    });
-  }
-
-  // 주휴수당 체크
-  if (weeklyHours >= 15) {
-    guideItems.push({
-      title: "주휴수당 확인",
-      desc: "[주휴수당 안내] 주 15시간 이상 일하는 직원은 일주일을 개근하면 주휴수당이 발생해요.",
-      editStep: 'workTimeNav'
-    });
-  }
-
-  // 휴게시간 체크 (일별 순회)
-  if (insufficientBreak) {
-    guideItems.push({
-      title: "휴게시간 확인",
-      desc: "4시간 일하면 30분, 8시간 일하면 1시간의 휴게 시간이 필요해요.",
-    });
-  }
+  validationRes.errors.forEach(err => addGuide(err.code));
+  validationRes.warnings.forEach(warn => addGuide(warn.code));
 
   return (
     <div>
@@ -105,7 +103,9 @@ export function FinalChecklistStep({ form, onChange, toggleDay, onNavigate }: Fi
                     size="small"
                     onClick={() => {
                       if (item.editStep === 'workTimeNav') {
-                        onNavigate?.('workTime');
+                        onNavigate?.('workSchedule');
+                      } else if (item.editStep === 'wageInsuranceNav') {
+                        onNavigate?.('wageInsurance');
                       } else {
                         setEditTarget(item.editStep!);
                       }
@@ -121,6 +121,18 @@ export function FinalChecklistStep({ form, onChange, toggleDay, onNavigate }: Fi
             </div>
           </div>
         ))}
+        {guideItems.length === 0 && (
+          <div style={{ padding: '16px', textAlign: 'center', color: '#8B95A1', fontSize: '14px' }}>
+            아주 좋습니다! 법정 기준에 잘 맞게 작성되었어요.
+          </div>
+        )}
+      </div>
+
+      <div style={{ marginTop: '16px', padding: '12px 16px', backgroundColor: '#F9FAFB', borderRadius: '8px', display: 'flex', gap: '8px', alignItems: 'flex-start' }}>
+        <div style={{ fontSize: '14px', marginTop: '1px' }}>⚠️</div>
+        <div style={{ fontSize: '13px', color: '#505967', lineHeight: 1.5 }}>
+          사장님이 '기타 조건'에 직접 작성하신 특약 내용은 시스템이 자동으로 검증하지 않습니다. 법에 위배되는 내용이 없는지 직접 확인해주세요.
+        </div>
       </div>
 
       {/* 확인 동의 — checklist_agreed (서명 진행 전 필수) */}
@@ -160,7 +172,8 @@ export function FinalChecklistStep({ form, onChange, toggleDay, onNavigate }: Fi
                 <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                   {['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'].map(day => {
                     const isSelected = form.work_days.includes(day);
-                    const label = { mon: '월', tue: '화', wed: '수', thu: '목', fri: '금', sat: '토', sun: '일' }[day];
+                    const labels: Record<string, string> = { mon: '월', tue: '화', wed: '수', thu: '목', fri: '금', sat: '토', sun: '일' };
+                    const label = labels[day];
                     return (
                       <button 
                         key={day}

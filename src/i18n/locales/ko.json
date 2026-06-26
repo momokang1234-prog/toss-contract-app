@@ -1,0 +1,171 @@
+{
+  "common": {
+    "next": "다음",
+    "prev": "이전",
+    "confirm": "확인",
+    "cancel": "취소",
+    "save": "저장",
+    "edit": "수정",
+    "delete": "삭제",
+    "close": "닫기",
+    "loading": "불러오는 중...",
+    "complete": "완료"
+  },
+  "labels": {
+    "contractType": {
+      "fullTime": "정규직",
+      "partTime": "아르바이트",
+      "fixedTerm": "계약직"
+    },
+    "wageType": {
+      "hourly": "시급",
+      "daily": "일급",
+      "weekly": "주급",
+      "monthly": "월급"
+    },
+    "workDay": {
+      "mon": "월요일",
+      "tue": "화요일",
+      "wed": "수요일",
+      "thu": "목요일",
+      "fri": "금요일",
+      "sat": "토요일",
+      "sun": "일요일"
+    },
+    "workDayShort": {
+      "mon": "월",
+      "tue": "화",
+      "wed": "수",
+      "thu": "목",
+      "fri": "금",
+      "sat": "토",
+      "sun": "일"
+    },
+    "paymentMethod": {
+      "bankTransfer": "계좌이체",
+      "cash": "현금",
+      "mixed": "혼합"
+    },
+    "insurance": {
+      "enrolled": "가입",
+      "notEnrolled": "미가입"
+    }
+  },
+  "contract": {
+    "title": "근 로 계 약 서",
+    "statement": "위와 같이 근로계약을 체결하고, 각자 서명·날인합니다.",
+    "disclaimer": "본 계약서는 「근로기준법」 제17조(근로조건의 명시)에 따라 작성되었습니다. 원본(한국어)과 번역문 간 내용이 다를 경우 한국어 원본을 우선합니다.",
+    "section": {
+      "worker": "근로자",
+      "conditions": "근로조건",
+      "wage": "임금",
+      "schedule": "근무시간",
+      "etc": "기타 근로조건",
+      "signature": "서명",
+      "parentConsent": "친권자 동의"
+    },
+    "fields": {
+      "name": "성명",
+      "phone": "연락처",
+      "contractType": "계약 유형",
+      "workplace": "근무 장소",
+      "jobDescription": "직무 내용",
+      "period": "계약 기간",
+      "wageType": "임금 형태",
+      "baseWage": "기본 임금",
+      "paymentMethod": "지급 방법",
+      "payDate": "임금 지급일",
+      "workDays": "근무일",
+      "workTime": "근무 시간",
+      "breakTime": "휴게시간",
+      "weeklyHoliday": "주휴일",
+      "weeklyHolidayNote": "주 1회 유급휴일 (근로기준법 제55조)",
+      "paidLeave": "연차유급휴가",
+      "pension": "국민연금",
+      "healthInsurance": "건강보험",
+      "employmentInsurance": "고용보험",
+      "accidentInsurance": "산재보험",
+      "severance": "퇴직금",
+      "signerEmployer": "사용자",
+      "signerWorker": "근로자",
+      "signPending": "서명 대기",
+      "parentName": "친권자 성명",
+      "parentRelation": "근로자와의 관계",
+      "parentSignature": "동의 서명"
+    },
+    "values": {
+      "paidLeaveApplied": "근로기준법 제60조에 따름",
+      "paidLeaveNone": "미포함",
+      "severanceApplied": "근로자퇴직급여 보장법에 따름",
+      "severanceNone": "해당 없음"
+    },
+    "signatureNote": "서명 / 날인",
+    "signedAt": "서명 완료",
+    "notes": {
+      "socialInsurance": "한국의 법정 4대 사회보험 (외국인 근로자도 원칙적 의무 가입)",
+      "severance": "한국 법정 퇴직금: 근무 연수 1년당 약 30일분 임금, 퇴사 시 지급"
+    },
+    "documents": {
+      "title": "미성년자 필수 서류",
+      "consent": "친권자 동의서",
+      "consentDesc": "전자 서명으로 완료됨",
+      "familyCert": "가족관계증명서",
+      "familyCertDesc": "근로기준법 제66조 — 실물 사업장 비치",
+      "permit": "취직인허증",
+      "permitDesc": "만 15세 미만 — 고용노동부 발급",
+      "pending": "수령 대기",
+      "allReceived": "전부 수령 완료",
+      "received": "수령됨",
+      "receiptBtn": "수령 확인"
+    }
+  },
+  "worker": {
+    "header": {
+      "sent": "{{business}}에서 보낸 근로계약서에요",
+      "sentSub": "서명을 완료하면 계약이 체결됩니다",
+      "signed": "{{business}}과(와) 체결한 근로계약서에요",
+      "signedSub": "계약이 완료되었어요",
+      "rejected": "수정을 요청한 계약서에요",
+      "rejectedSub": "사장님이 확인 후 수정할 수 있어요",
+      "default": "{{business}}의 근로계약서"
+    },
+    "action": {
+      "sign": "서명하기",
+      "rejectPrompt": "계약서 내용이 조금 다른가요?",
+      "rejectPromptSub": "사장님께 수정을 요청할 수 있어요",
+      "rejectTitle": "계약서 거절",
+      "rejectConfirm": "정말 계약 수정을 요청하시겠습니까?",
+      "rejectReasonLabel": "수정 요청 사유 (선택)",
+      "rejectReasonPlaceholder": "예: 근무 시간이 조금 달라요",
+      "rejectSubmit": "수정 요청하기",
+      "rejectProcessing": "처리 중...",
+      "rejectFailed": "수정 요청 처리에 실패했습니다"
+    }
+  },
+  "error": {
+    "loadFailed": "불러오기에 실패했습니다",
+    "loadContractFailed": "계약서를 불러오는데 실패했습니다.",
+    "notFound": "계약서를 찾을 수 없습니다",
+    "noId": "계약서 ID가 없습니다",
+    "network": "네트워크 연결을 확인해주세요.",
+    "authExpired": "인증이 만료되었습니다. 다시 로그인해주세요.",
+    "forbidden": "해당 작업에 대한 권한이 없습니다.",
+    "invalidState": "이 상태에서는 해당 작업을 수행할 수 없습니다.",
+    "unknown": "일시적인 오류가 발생했습니다. 잠시 후 다시 시도해주세요."
+  },
+  "language": {
+    "onboardingTitle": "언어를 선택해주세요",
+    "onboardingSub": "계약서를 내 언어로 볼 수 있어요",
+    "settingsLabel": "언어"
+  },
+  "minor": {
+    "alert": "미성년자",
+    "docWait": "수령 대기 서류",
+    "docFiled": "서류 비치 완료",
+    "under13": "만 13세 미만은 고용할 수 없습니다 (근로기준법 제66조)",
+    "notice": "ⓘ 만 {age}세로 미성년자예요. 다음 단계에서 친권자(법정대리인)의 동의가 필요해요.",
+    "birthTitle": "생년월일을 입력해주세요",
+    "birthSub": "미성년자(만 19세 미만)인지 확인해요",
+    "birthLabel": "생년월일"
+  }
+}

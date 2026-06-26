@@ -62,7 +62,7 @@ serve(async (req) => {
     }
 
     // 상태 검증: draft, sent, viewed, signed 상태에서 취소 가능 (사장님 최종 검토 후 반려 포함)
-    if (!['draft', 'sent', 'viewed', 'signed'].includes(contract.status)) {
+    if (!['draft', 'sent', 'viewed'].includes(contract.status)) {
       return new Response(
         JSON.stringify({ error: `현재 상태(${contract.status})에서는 취소할 수 없습니다.` }),
         { status: 400, headers: corsHeaders(req.headers.get('origin') || '') }

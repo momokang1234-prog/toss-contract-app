@@ -11,6 +11,7 @@ export interface UserProfile {
   name: string;
   phone?: string;
   ci: string;
+  birthday?: string;
 }
 
 interface AuthState {
@@ -20,7 +21,7 @@ interface AuthState {
   userName: string | null;
   ci: string | null;
   userProfile: UserProfile | null;
-  login: (role?: 'employer' | 'worker') => Promise<void>;
+  login: () => Promise<{ isNewUser: boolean; role?: UserRole }>;
   logout: () => void;
   setRole: (role: 'employer' | 'worker') => Promise<void>;
 }
@@ -40,6 +41,7 @@ const MOCK_PROFILES: Record<string, UserProfile & { role: UserRole }> = {
     name: '김알바',
     phone: '01098765432',
     ci: 'mock-ci-worker',
+    birthday: '2010-01-01',
     role: 'worker',
   },
 };
@@ -73,48 +75,56 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (IS_MOCK) {
       const role = sessionStorage.getItem('mock_role') as 'employer' | 'worker' | null;
       const p = role ? MOCK_PROFILES[role] : null;
-      return p ? { userKey: p.userKey, name: p.name, phone: p.phone, ci: p.ci } : null;
+      return p ? { userKey: p.userKey, name: p.name, phone: p.phone, ci: p.ci, birthday: p.birthday } : null;
     }
     return null;
   });
 
-  const login = useCallback(async (role?: 'employer' | 'worker') => {
+  const login = useCallback(async () => {
     setIsLoading(true);
     try {
       if (IS_MOCK) {
         await new Promise(r => setTimeout(r, MOCK_AUTH_DELAY_MS));
-        const selectedRole = role ?? 'employer';
-        const p = MOCK_PROFILES[selectedRole];
-        if (!p) throw new Error('Invalid role');
-        sessionStorage.setItem('mock_role', selectedRole);
-        setIsAuthenticated(true);
-        setUserName(p.name);
-        setCi(p.ci);
-        setUserRole(p.role);
-        setUserProfile({ userKey: p.userKey, name: p.name, phone: p.phone, ci: p.ci });
-        return;
+        const savedRole = sessionStorage.getItem('mock_role') as UserRole;
+        if (savedRole && MOCK_PROFILES[savedRole]) {
+          const p = MOCK_PROFILES[savedRole];
+          setIsAuthenticated(true);
+          setUserName(p.name);
+          setCi(p.ci);
+          setUserRole(p.role);
+          setUserProfile({ userKey: p.userKey, name: p.name, phone: p.phone, ci: p.ci });
+          return { isNewUser: false, role: p.role };
+        }
+        return { isNewUser: true };
       }
 
       // Real Toss Login: appLogin() → Supabase auth-token Edge Function → Custom JWT + 사용자 정보
       const { customToken, user } = await tossLogin();
-      const selectedRole = role ?? 'worker';
 
       // Store custom JWT manually instead of using setSession
-      // because Custom JWTs don't have a GoTrue session in auth.sessions
       sessionStorage.setItem('custom_jwt', customToken);
 
+      // Check DB for existing role (Currently simulated with sessionStorage for MVP)
+      const savedRole = sessionStorage.getItem('user_role') as UserRole;
 
-      sessionStorage.setItem('user_role', selectedRole);
-      setIsAuthenticated(true);
-      setUserName(user.name ?? '사용자');
-      setCi(user.ci);
-      setUserRole(selectedRole);
-      setUserProfile({
-        userKey: String(user.userKey),
-        name: user.name ?? '사용자',
-        phone: user.phone ?? undefined,
-        ci: user.ci ?? '',
-      });
+      if (savedRole) {
+        setIsAuthenticated(true);
+        setUserName(user.name ?? '사용자');
+        setCi(user.ci);
+        setUserRole(savedRole);
+        setUserProfile({
+          userKey: String(user.userKey),
+          name: user.name ?? '사용자',
+          phone: user.phone ?? undefined,
+          ci: user.ci ?? '',
+          birthday: user.birthday ?? undefined,
+        });
+        return { isNewUser: false, role: savedRole };
+      }
+
+      // New User
+      sessionStorage.setItem('temp_user_info', JSON.stringify(user));
+      return { isNewUser: true };
     } catch (err) {
       console.error('[Auth] login failed', err);
       throw err;
@@ -126,6 +136,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = useCallback(async () => {
     sessionStorage.removeItem('mock_role');
     sessionStorage.removeItem('user_role');
+    sessionStorage.removeItem('temp_user_info');
     setIsAuthenticated(false);
     setUserRole(null);
     setUserName(null);
@@ -137,9 +148,35 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const setRole = useCallback(async (role: 'employer' | 'worker') => {
-    setUserRole(role);
     if (IS_MOCK) {
       sessionStorage.setItem('mock_role', role);
+      const p = MOCK_PROFILES[role];
+      if (p) {
+        setIsAuthenticated(true);
+        setUserName(p.name);
+        setCi(p.ci);
+        setUserRole(p.role);
+        setUserProfile({ userKey: p.userKey, name: p.name, phone: p.phone, ci: p.ci });
+      }
+      return;
+    }
+
+    sessionStorage.setItem('user_role', role);
+    const tempUserStr = sessionStorage.getItem('temp_user_info');
+    if (tempUserStr) {
+      const user = JSON.parse(tempUserStr);
+      setIsAuthenticated(true);
+      setUserName(user.name ?? '사용자');
+      setCi(user.ci);
+      setUserRole(role);
+      setUserProfile({
+        userKey: String(user.userKey),
+        name: user.name ?? '사용자',
+        phone: user.phone ?? undefined,
+        ci: user.ci ?? '',
+        birthday: user.birthday ?? undefined,
+      });
+      sessionStorage.removeItem('temp_user_info');
     }
   }, []);
 

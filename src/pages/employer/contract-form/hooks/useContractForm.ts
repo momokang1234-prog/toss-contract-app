@@ -68,9 +68,6 @@ export function useContractForm() {
     }
   }, [businesses, form.workplace]);
 
-  // Session storage persistence
-  useEffect(() => { sessionStorage.setItem('wiz_form', JSON.stringify(form)); }, [form]);
-
   // Restore from session on mount, or load from DB if editing
   const { id } = useParams();
   const { getContract, updateContract } = useContracts();
@@ -123,6 +120,13 @@ export function useContractForm() {
       }
     }
   }, [id, getContract]);
+
+  // Session storage persistence (only after initial load)
+  useEffect(() => { 
+    if (mounted.current) {
+      sessionStorage.setItem('wiz_form', JSON.stringify(form)); 
+    }
+  }, [form]);
 
   // Beforeunload warning
   useEffect(() => {

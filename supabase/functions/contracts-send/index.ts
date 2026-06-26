@@ -61,6 +61,10 @@ serve(async (req) => {
       return new Response(JSON.stringify({ error: 'Contract not found' }), { status: 404, headers: corsHeaders(req.headers.get('origin') || '') });
     }
 
+    // NOTE: 실제 근로자 도달은 사장님이 프론트 공유 시트(share API)로 직접 수행.
+    // 근로자는 아직 userKey가 없어 스마트메시지 API로 도달 불가하므로, 이 함수는
+    // 상태를 'sent'로 표시 + 이력/deliveries 기록 역할만 담당한다. (MVP 결정사항)
+
     // 전달 이력 생성
     const { data: delivery } = await supabase
       .from('deliveries')
@@ -93,12 +97,8 @@ serve(async (req) => {
         details: { method: 'share', delivery_id: delivery?.id },
       });
 
-    // NOTE: 실제 근로자 도달은 사장님이 프론트 공유 시트(share API)로 직접 수행.
-    // 근로자는 아직 userKey가 없어 스마트메시지 API로 도달 불가하므로, 이 함수는
-    // 상태를 'sent'로 표시 + 이력/deliveries 기록 역할만 담당한다.
-
     return new Response(
-      JSON.stringify({ success: true, deliveryId: delivery?.id }),
+      JSON.stringify({ success: true, deliveryId: delivery?.id, method: 'share' }),
       { headers: { ...corsHeaders(req.headers.get('origin') || ''), 'Content-Type': 'application/json' } }
     );
   } catch (error) {

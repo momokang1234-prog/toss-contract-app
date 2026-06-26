@@ -1,0 +1,12 @@
+{
+  "PreInvocation": [
+    {
+      "hooks": [
+        {
+          "type": "command",
+          "command": "node ./scripts/intent_analyzer_pre_invocation.cjs"
+        }
+      ]
+    }
+  ]
+}

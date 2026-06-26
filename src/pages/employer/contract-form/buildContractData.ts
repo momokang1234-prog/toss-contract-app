@@ -4,6 +4,7 @@
  * hook/supabase 의존 없이 단위 테스트로 검증하기 위함(E2E 데이터 무결성).
  */
 import type { ContractFormData, DaySchedule } from './types';
+import { needsParentConsent, isYoungWorker } from '../../../hooks/useContracts';
 
 /** 요일 정규 순서 (대표 요일 선정용) */
 const DAY_ORDER = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
@@ -59,6 +60,13 @@ export interface ContractPayload {
   severance_clause: boolean;
   other_conditions?: string;
   employer_signature_data?: string;
+  worker_birth_date?: string;
+  is_minor?: boolean;
+  is_young_worker?: boolean;
+  parent_consent_data?: string;
+  doc_parent_consent_status?: 'not_required' | 'required' | 'received';
+  doc_family_cert_status?: 'not_required' | 'required' | 'received';
+  doc_employment_permit_status?: 'not_required' | 'required' | 'received';
 }
 
 /**
@@ -98,5 +106,16 @@ export function buildContractData(form: ContractFormData, businessId: string): C
     severance_clause: form.severance_clause,
     other_conditions: form.other_conditions || undefined,
     employer_signature_data: form.employer_signature_data,
+    // 미성년자(만 19세 미만) 감지 — 친권자 동의 트리거 + 서류 추적 상태
+    worker_birth_date: form.worker_birth_date || undefined,
+    is_minor: needsParentConsent(form.worker_birth_date),
+    is_young_worker: isYoungWorker(form.worker_birth_date),
+    parent_consent_data: form.parent_consent_data,
+    doc_parent_consent_status: needsParentConsent(form.worker_birth_date) ? 'required' : 'not_required',
+    doc_family_cert_status: needsParentConsent(form.worker_birth_date) ? 'required' : 'not_required',
+    doc_employment_permit_status: (() => {
+      const age = form.worker_birth_date ? new Date().getFullYear() - new Date(form.worker_birth_date).getFullYear() : 99;
+      return age < 15 ? 'required' : 'not_required';
+    })(),
   };
 }

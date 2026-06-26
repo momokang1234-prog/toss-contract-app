@@ -5,6 +5,7 @@ import { Global, css } from "@emotion/react";
 import { makeMobileTypographyVariables, makeFixedTypographyVariables, defaultTypographyRule } from "@toss/tds-typography";
 import "@toss/tds-colors/colors.css";
 import App from "./App";
+import "./i18n";
 import "./index.css";
 import "./styles/tossface.css";
 

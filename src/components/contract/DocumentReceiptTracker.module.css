@@ -1,0 +1,78 @@
+.container {
+  background: #fff;
+  border: 1px solid #e5e8eb;
+  border-radius: 16px;
+  padding: 20px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: #f9fafb;
+  border-radius: 12px;
+}
+
+.rowMain {
+  flex: 1;
+  min-width: 0;
+}
+
+.rowLabel {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.rowTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: #191f28;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.dot[data-status='required'] {
+  background: #f5a623;
+}
+
+.dot[data-status='received'] {
+  background: #10b981;
+}
+
+.dot[data-status='not_required'] {
+  background: #d1d5db;
+}
+
+.check {
+  color: #10b981;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.receivedLabel {
+  font-size: 12px;
+  color: #10b981;
+  font-weight: 600;
+  white-space: nowrap;
+}

@@ -1,0 +1,56 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid #e5e8eb;
+  border-radius: 12px;
+  background: #fff;
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.option:hover {
+  background: #f9fafb;
+}
+
+.selected {
+  border-color: #3182f6;
+  background: #f0f6ff;
+}
+
+.flag {
+  font-size: 28px;
+  line-height: 1;
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+
+.nativeName {
+  font-size: 15px;
+  font-weight: 700;
+  color: #191f28;
+}
+
+.name {
+  font-size: 12px;
+  color: #8b95a1;
+}
+
+.check {
+  color: #3182f6;
+  font-size: 18px;
+  font-weight: 700;
+}

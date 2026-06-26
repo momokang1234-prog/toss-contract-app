@@ -61,7 +61,7 @@ export default function IconsCatalogPage() {
 
       <TextField
         placeholder="이름으로 검색 (예: arrow, share)"
-        variant="fill"
+        variant="line"
         value={query}
         onChange={(e) => setQuery(e.target.value)}
       />
@@ -130,7 +130,7 @@ export default function IconsCatalogPage() {
           이름 추가 방법
         </Paragraph>
         <Spacing size={4} />
-        <Paragraph typography="c1" color="grey700">
+        <Paragraph typography="t7" color="grey700">
           • App Builder 콘솔 &gt; Asset 패널에서 검색 후 name 복사
           <br />
           • Figma 토스 플러그인에서 아이콘 클릭 시 name 표시

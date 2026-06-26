@@ -370,6 +370,7 @@ router.post("/toss", async (req: Request, res: Response): Promise<void> => {
         name: userProfile.name || 'Unknown',
         phone: userProfile.phone || null,
         ci: userProfile.ci || null,
+        birthday: userProfile.birthday || null,
         updated_at: new Date().toISOString()
       }, { onConflict: 'id' });
       

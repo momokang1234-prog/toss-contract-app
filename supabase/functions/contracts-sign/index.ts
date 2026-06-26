@@ -69,6 +69,13 @@ serve(async (req) => {
         worker_account: workerInfo.account,
         worker_name: workerInfo.name,
         worker_ci: workerInfo.ci,
+        worker_birth_date: workerInfo.worker_birth_date || null,
+        is_minor: workerInfo.is_minor || false,
+        is_young_worker: workerInfo.is_young_worker || false,
+        parent_consent_data: workerInfo.parent_consent_data || null,
+        doc_parent_consent_status: workerInfo.doc_parent_consent_status || 'not_required',
+        doc_family_cert_status: workerInfo.doc_family_cert_status || 'not_required',
+        doc_employment_permit_status: workerInfo.doc_employment_permit_status || 'not_required',
       })
       .eq('id', contractId)
       .eq('worker_user_key', userKey); // ownership check

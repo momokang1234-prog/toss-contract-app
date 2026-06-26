@@ -1,0 +1,171 @@
+{
+  "common": {
+    "next": "下一步",
+    "prev": "上一步",
+    "confirm": "确认",
+    "cancel": "取消",
+    "save": "保存",
+    "edit": "修改",
+    "delete": "删除",
+    "close": "关闭",
+    "loading": "加载中...",
+    "complete": "完成"
+  },
+  "labels": {
+    "contractType": {
+      "fullTime": "全职",
+      "partTime": "兼职",
+      "fixedTerm": "定期合同"
+    },
+    "wageType": {
+      "hourly": "时薪",
+      "daily": "日薪",
+      "weekly": "周薪",
+      "monthly": "月薪"
+    },
+    "workDay": {
+      "mon": "星期一",
+      "tue": "星期二",
+      "wed": "星期三",
+      "thu": "星期四",
+      "fri": "星期五",
+      "sat": "星期六",
+      "sun": "星期日"
+    },
+    "workDayShort": {
+      "mon": "一",
+      "tue": "二",
+      "wed": "三",
+      "thu": "四",
+      "fri": "五",
+      "sat": "六",
+      "sun": "日"
+    },
+    "paymentMethod": {
+      "bankTransfer": "银行转账",
+      "cash": "现金",
+      "mixed": "混合"
+    },
+    "insurance": {
+      "enrolled": "已加入",
+      "notEnrolled": "未加入"
+    }
+  },
+  "contract": {
+    "title": "雇 佣 合 同 书",
+    "statement": "特此按照上述内容签订雇佣合同，双方各自签字、盖章如下。",
+    "disclaimer": "本合同根据《劳动标准法》第17条（劳动条件的明示）编制。原文（韩文）与译文内容不一致时，以韩文原文为准。",
+    "section": {
+      "worker": "劳动者",
+      "conditions": "劳动条件",
+      "wage": "工资",
+      "schedule": "工作时间",
+      "etc": "其他劳动条件",
+      "signature": "签名",
+      "parentConsent": "监护人同意"
+    },
+    "fields": {
+      "name": "姓名",
+      "phone": "联系方式",
+      "contractType": "合同类型",
+      "workplace": "工作地点",
+      "jobDescription": "工作内容",
+      "period": "合同期限",
+      "wageType": "工资形式",
+      "baseWage": "基本工资",
+      "paymentMethod": "支付方式",
+      "payDate": "工资支付日",
+      "workDays": "工作日",
+      "workTime": "工作时间",
+      "breakTime": "休息时间",
+      "weeklyHoliday": "带薪周休日",
+      "weeklyHolidayNote": "韩国法定：每周1天带薪休息（劳动基准法第55条）",
+      "paidLeave": "带薪休假",
+      "pension": "国民年金",
+      "healthInsurance": "健康保险",
+      "employmentInsurance": "雇佣保险",
+      "accidentInsurance": "工伤保险",
+      "severance": "退职金",
+      "signerEmployer": "用人单位",
+      "signerWorker": "劳动者",
+      "signPending": "待签名",
+      "parentName": "监护人姓名",
+      "parentRelation": "与劳动者关系",
+      "parentSignature": "同意签名"
+    },
+    "values": {
+      "paidLeaveApplied": "依据《劳动标准法》第60条",
+      "paidLeaveNone": "不包含",
+      "severanceApplied": "依据《劳动者退职津贴保障法》",
+      "severanceNone": "不适用"
+    },
+    "signatureNote": "签名 / 盖章",
+    "signedAt": "已签名",
+    "notes": {
+      "socialInsurance": "韩国法定四大社会保险（外籍劳动者原则上也须加入）",
+      "severance": "韩国法定退职金：每工作1年约30日工资，离职时支付"
+    },
+    "documents": {
+      "title": "未成年人必备文件",
+      "consent": "监护人同意书",
+      "consentDesc": "电子签名完成",
+      "familyCert": "亲属关系证明",
+      "familyCertDesc": "劳动基准法第66条 — 实物保管于工作场所",
+      "permit": "就业许可证",
+      "permitDesc": "未满15岁 — 由雇佣劳动部颁发",
+      "pending": "待接收",
+      "allReceived": "已全部接收",
+      "received": "已接收",
+      "receiptBtn": "确认接收"
+    }
+  },
+  "worker": {
+    "header": {
+      "sent": "来自{{business}}的雇佣合同",
+      "sentSub": "完成签名后合同即成立",
+      "signed": "与{{business}}签订的雇佣合同",
+      "signedSub": "合同已完成",
+      "rejected": "您要求修改的合同",
+      "rejectedSub": "用人单位审核后可以修改",
+      "default": "{{business}}的雇佣合同"
+    },
+    "action": {
+      "sign": "签名",
+      "rejectPrompt": "合同内容有些不同？",
+      "rejectPromptSub": "您可以向用人单位请求修改",
+      "rejectTitle": "拒绝合同",
+      "rejectConfirm": "确定要请求修改合同吗？",
+      "rejectReasonLabel": "修改请求理由（可选）",
+      "rejectReasonPlaceholder": "例如：工作时间略有不同",
+      "rejectSubmit": "请求修改",
+      "rejectProcessing": "处理中...",
+      "rejectFailed": "修改请求处理失败"
+    }
+  },
+  "error": {
+    "loadFailed": "加载失败",
+    "loadContractFailed": "无法加载合同。",
+    "notFound": "未找到合同",
+    "noId": "无合同编号",
+    "network": "请检查网络连接。",
+    "authExpired": "认证已过期，请重新登录。",
+    "forbidden": "您没有权限执行此操作。",
+    "invalidState": "当前状态下无法执行此操作。",
+    "unknown": "发生临时错误，请稍后重试。"
+  },
+  "language": {
+    "onboardingTitle": "请选择语言",
+    "onboardingSub": "您可以以自己的语言查看合同",
+    "settingsLabel": "语言"
+  },
+  "minor": {
+    "alert": "未成年人",
+    "docWait": "待处理文件",
+    "docFiled": "文件已归档",
+    "under13": "未满13岁不得雇佣（劳动基准法第66条）",
+    "notice": "ⓘ {age}岁（未成年人）。下一步需要监护人同意。",
+    "birthTitle": "请输入出生日期",
+    "birthSub": "用于确认是否未成年人（未满19岁）",
+    "birthLabel": "出生日期"
+  }
+}

@@ -1,0 +1,175 @@
+{
+  "_meta": {
+    "translationStatus": "PLACEHOLDER - needs professional Indonesian translation (legal document)",
+    "reviewRequired": true
+  },
+  "common": {
+    "next": "Berikutnya",
+    "prev": "Sebelumnya",
+    "confirm": "Konfirmasi",
+    "cancel": "Batal",
+    "save": "Simpan",
+    "edit": "Ubah",
+    "delete": "Hapus",
+    "close": "Tutup",
+    "loading": "Memuat...",
+    "complete": "Selesai"
+  },
+  "labels": {
+    "contractType": {
+      "fullTime": "Penuh waktu",
+      "partTime": "Paruh waktu",
+      "fixedTerm": "Berjangka"
+    },
+    "wageType": {
+      "hourly": "Upah per jam",
+      "daily": "Upah harian",
+      "weekly": "Upah mingguan",
+      "monthly": "Gaji bulanan"
+    },
+    "workDay": {
+      "mon": "Senin",
+      "tue": "Selasa",
+      "wed": "Rabu",
+      "thu": "Kamis",
+      "fri": "Jumat",
+      "sat": "Sabtu",
+      "sun": "Minggu"
+    },
+    "workDayShort": {
+      "mon": "Sen",
+      "tue": "Sel",
+      "wed": "Rab",
+      "thu": "Kam",
+      "fri": "Jum",
+      "sat": "Sab",
+      "sun": "Min"
+    },
+    "paymentMethod": {
+      "bankTransfer": "Transfer bank",
+      "cash": "Tunai",
+      "mixed": "Campuran"
+    },
+    "insurance": {
+      "enrolled": "Terdaftar",
+      "notEnrolled": "Tidak terdaftar"
+    }
+  },
+  "contract": {
+    "title": "P E R J A N J I A N   K E R J A",
+    "statement": "Dengan ini kami menyepakati perjanjian kerja sebagaimana di atas dan masing-masing pihak menandatangani/meteraikan di bawah ini.",
+    "disclaimer": "Perjanjian ini disusun berdasarkan Pasal 17 (Penyebutan Kondisi Kerja) Undang-Undang Standar Kerja. Apabila terdapat perbedaan antara naskah asli bahasa Korea dan terjemahannya, naskah asli bahasa Korea yang berlaku.",
+    "section": {
+      "worker": "Pekerja",
+      "conditions": "Kondisi Kerja",
+      "wage": "Upah",
+      "schedule": "Jam Kerja",
+      "etc": "Kondisi Kerja Lainnya",
+      "signature": "Tanda Tangan",
+      "parentConsent": "Persetujuan wali"
+    },
+    "fields": {
+      "name": "Nama",
+      "phone": "Kontak",
+      "contractType": "Jenis Kontrak",
+      "workplace": "Tempat Kerja",
+      "jobDescription": "Deskripsi Pekerjaan",
+      "period": "Jangka Waktu Kontrak",
+      "wageType": "Jenis Upah",
+      "baseWage": "Upah Pokok",
+      "paymentMethod": "Metode Pembayaran",
+      "payDate": "Hari Pembayaran Upah",
+      "workDays": "Hari Kerja",
+      "workTime": "Jam Kerja",
+      "breakTime": "Waktu Istirahat",
+      "weeklyHoliday": "Hari istirahat mingguan berbayar",
+      "weeklyHolidayNote": "Menurut hukum Korea: 1 hari istirahat berbayar per minggu (Pasal 55 UU Standar Kerja)",
+      "paidLeave": "Cuti Berbayar",
+      "pension": "Pensiun Nasional",
+      "healthInsurance": "Asuransi Kesehatan",
+      "employmentInsurance": "Asuransi Ketenagakerjaan",
+      "accidentInsurance": "Asuransi Kecelakaan Kerja",
+      "severance": "Pesangon",
+      "signerEmployer": "Pemberi Kerja",
+      "signerWorker": "Pekerja",
+      "signPending": "Menunggu tanda tangan",
+      "parentName": "Nama Wali",
+      "parentRelation": "Hubungan dengan pekerja",
+      "parentSignature": "Tanda tangan persetujuan"
+    },
+    "values": {
+      "paidLeaveApplied": "Sesuai Pasal 60 Undang-Undang Standar Kerja",
+      "paidLeaveNone": "Tidak termasuk",
+      "severanceApplied": "Sesuai Undang-Undang Jaminan Pesangon Pekerja",
+      "severanceNone": "Tidak berlaku"
+    },
+    "signatureNote": "Tanda Tangan / Meterai",
+    "signedAt": "Ditandatangani",
+    "notes": {
+      "socialInsurance": "4 asuransi sosial wajib Korea (pekerja asing secara prinsip juga wajib terdaftar)",
+      "severance": "Pesangon wajib Korea: ~30 hari upah per tahun masa kerja, dibayar saat mengundurkan diri"
+    },
+    "documents": {
+      "title": "Dokumen wajib (anak di bawah umur)",
+      "consent": "Surat persetujuan wali",
+      "consentDesc": "Selesai dengan tanda tangan elektronik",
+      "familyCert": "Akte keluarga",
+      "familyCertDesc": "Pasal 66 UU Standar Kerja — disimpan di tempat kerja",
+      "permit": "Izin kerja",
+      "permitDesc": "Di bawah 15 tahun — diterbitkan Kementerian Ketenagakerjaan",
+      "pending": "Menunggu penerimaan",
+      "allReceived": "Semua diterima",
+      "received": "Diterima",
+      "receiptBtn": "Konfirmasi penerimaan"
+    }
+  },
+  "worker": {
+    "header": {
+      "sent": "Perjanjian kerja dari {{business}}",
+      "sentSub": "Perjanjian disepakati setelah Anda menandatangani",
+      "signed": "Perjanjian kerja dengan {{business}}",
+      "signedSub": "Perjanjian selesai",
+      "rejected": "Perjanjian yang Anda minta revisi",
+      "rejectedSub": "Pemberi kerja dapat merevisi setelah peninjauan",
+      "default": "Perjanjian kerja {{business}}"
+    },
+    "action": {
+      "sign": "Tanda Tangan",
+      "rejectPrompt": "Perjanjian sedikit berbeda?",
+      "rejectPromptSub": "Anda dapat meminta revisi dari pemberi kerja",
+      "rejectTitle": "Tolak Perjanjian",
+      "rejectConfirm": "Apakah Anda yakin ingin meminta revisi perjanjian?",
+      "rejectReasonLabel": "Alasan permintaan revisi (opsional)",
+      "rejectReasonPlaceholder": "Contoh: Jam kerja sedikit berbeda",
+      "rejectSubmit": "Minta Revisi",
+      "rejectProcessing": "Memproses...",
+      "rejectFailed": "Gagal memproses permintaan revisi"
+    }
+  },
+  "error": {
+    "loadFailed": "Gagal memuat",
+    "loadContractFailed": "Gagal memuat perjanjian.",
+    "notFound": "Perjanjian tidak ditemukan",
+    "noId": "Tidak ada ID perjanjian",
+    "network": "Silakan periksa koneksi jaringan.",
+    "authExpired": "Autentikasi kedaluwarsa. Silakan masuk kembali.",
+    "forbidden": "Anda tidak memiliki izin untuk tindakan ini.",
+    "invalidState": "Tindakan ini tidak dapat dilakukan dalam status saat ini.",
+    "unknown": "Terjadi kesalahan sementara. Silakan coba lagi nanti."
+  },
+  "language": {
+    "onboardingTitle": "Silakan pilih bahasa",
+    "onboardingSub": "Anda dapat melihat perjanjian dalam bahasa Anda",
+    "settingsLabel": "Bahasa"
+  },
+  "minor": {
+    "alert": "Di bawah umur",
+    "docWait": "Dokumen tertunda",
+    "docFiled": "Dokumen lengkap",
+    "under13": "Di bawah 13 tahun tidak boleh dipekerjakan (Pasal 66)",
+    "notice": "ⓘ Usia {age} tahun (di bawah umur). Persetujuan wali diperlukan pada langkah berikutnya.",
+    "birthTitle": "Masukkan tanggal lahir",
+    "birthSub": "Untuk memeriksa status di bawah umur (di bawah 19)",
+    "birthLabel": "Tanggal lahir"
+  }
+}

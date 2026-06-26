@@ -1,3 +1,6 @@
+/* 다국어 폰트 — 베트남어/태국어/크메르어/네팔어/중국어 등 Pretendard 미지원 문자 렌더링 */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;600&family=Noto+Sans+Khmer:wght@400;600&family=Noto+Sans+Devanagari:wght@400;600&family=Noto+Sans+SC:wght@400;600&display=swap');
+
 /* Global reset — TDS 컴포넌트 등에서 여백/레이아웃이 겹치지 않게 기본 브라우저 스타일 초기화 */
 *, *::before, *::after {
   box-sizing: border-box;
@@ -11,8 +14,11 @@ html, body, #root {
   overflow-x: hidden;
   background: #FFFFFF;
   color: #333D4B;
-  /* 'Pretendard Variable'을 제거하고, 이모지 폰트 중첩을 막기 위해 'Tossface'를 추가 */
-  font-family: 'Pretendard', 'Tossface', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans KR', sans-serif;
+  /* 다국어 폰트 폴백 체인: Pretendard(한/영/베트남) → Noto Sans 각 언어 → 시스템 폰트.
+     베트남어 분음부호, 태국어/크메르어/네팔어/우즈베크어/인도네시아어/몽골어 렌더링 대응 */
+  font-family: 'Pretendard', 'Tossface', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
+    'Noto Sans KR', 'Noto Sans Thai', 'Noto Sans Khmer', 'Noto Sans Devanagari', 'Noto Sans SC',
+    sans-serif;
   font-size: 16px;
   line-height: 1.5;
   text-rendering: optimizeLegibility;

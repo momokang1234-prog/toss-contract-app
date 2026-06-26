@@ -1,15 +1,16 @@
 import { useNavigate } from 'react-router-dom';
 import { useContracts } from '../../hooks/useContracts';
+import { Fragment } from 'react';
 import { Top, Paragraph, Spacing, Button, List, ListRow, Badge } from '@toss/tds-mobile';
 import { Suspense, Delay } from '@suspensive/react';
 import { CONTRACT_TYPE_LABEL } from '../../utils/labels';
 import { CommentBoundary } from '../dev/CommentBoundary';
+import { getContractBadge } from '../../utils/badgeUtils';
 import styles from './ContractListPage.module.css';
 
-function ContractListContent({ contracts, navigate, badgeFor }: {
+function ContractListContent({ contracts, navigate }: {
   contracts: any[];
   navigate: (path: string) => void;
-  badgeFor: (status: string) => { label: string; color: 'blue' | 'teal' | 'green' | 'red' | 'yellow' | 'elephant' };
 }) {
   return (
     <div className={styles.content}>
@@ -27,29 +28,60 @@ function ContractListContent({ contracts, navigate, badgeFor }: {
         <CommentBoundary name="계약서-목록">
           <div style={{ margin: '0 -20px' }}>
             <List>
-          {contracts.map(c => (
+          {contracts.map((c, index) => {
+            // 미성년자 계약의 미수령 서류 계산
+            const pendingDocs = [
+              c.doc_parent_consent_status,
+              c.doc_family_cert_status,
+              c.doc_employment_permit_status,
+            ].filter(s => s === 'required').length;
+            return (
+              <Fragment key={c.id}>
             <ListRow
-              key={c.id}
               onClick={() => navigate(`/employer/contracts/${c.id}`)}
               aria-label={c.worker_name}
               contents={
-                <div className={styles.contractRow}>
-                  <Paragraph typography="t5" fontWeight="bold" color="grey-800">
-                    {c.worker_name} ({CONTRACT_TYPE_LABEL[c.contract_type as keyof typeof CONTRACT_TYPE_LABEL]})
+                <div className={pendingDocs > 0 ? styles.contractRowAlert : styles.contractRow}>
+                  <div className={styles.nameRow}>
+                    <Paragraph typography="t5" fontWeight="bold" color="grey-800">
+                      {c.worker_name} ({CONTRACT_TYPE_LABEL[c.contract_type as keyof typeof CONTRACT_TYPE_LABEL]})
+                    </Paragraph>
+                    {c.is_minor && (
+                      <span className={styles.minorTag}>미성년자</span>
+                    )}
+                  </div>
+                  <Spacing size={4} />
+                  <Paragraph typography="t7" color="grey-500">
+                    {c.workplace}
                   </Paragraph>
                   <Spacing size={4} />
                   <Paragraph typography="t7" color="grey-500">
-                    {c.workplace} · {c.start_date}
+                    {c.start_date}
                   </Paragraph>
+                  {c.is_minor && pendingDocs > 0 && (
+                    <>
+                      <Spacing size={6} />
+                      <span className={styles.docAlert}>⚠️ 친권자 동의서 등 필수 수령 대기 서류 {pendingDocs}건</span>
+                    </>
+                  )}
+                  {c.is_minor && pendingDocs === 0 && (
+                    <>
+                      <Spacing size={6} />
+                      <span className={styles.docDone}>✅ 서류 비치 완료</span>
+                    </>
+                  )}
                 </div>
               }
               right={
-                <Badge size="small" variant="fill" color={badgeFor(c.status).color}>
-                  {badgeFor(c.status).label}
+                <Badge size="small" variant="fill" color={getContractBadge(c.status).color}>
+                  {getContractBadge(c.status).label}
                 </Badge>
               }
             />
-          ))}
+              {index < contracts.length - 1 && <div className={styles.divider} />}
+              </Fragment>
+            );
+          })}
         </List>
           </div>
         </CommentBoundary>
@@ -78,15 +110,6 @@ export default function ContractListPage() {
   const navigate = useNavigate();
   const { contracts } = useContracts();
 
-  const badgeFor = (status: string) => {
-    if (status === 'signed' || status === 'completed') {
-      return { label: '완료', color: 'blue' as const };
-    }
-    if (status === 'cancelled' || status === 'expired') {
-      return { label: '만료/취소', color: 'elephant' as const };
-    }
-    return { label: '서명 대기', color: 'yellow' as const };
-  };
   return (
     <div className={styles.page}>
       <Top title="">
@@ -113,7 +136,7 @@ export default function ContractListPage() {
           </Delay>
         }
       >
-        <ContractListContent contracts={contracts} navigate={navigate} badgeFor={badgeFor} />
+        <ContractListContent contracts={contracts} navigate={navigate} />
       </Suspense>
     </div>
   );

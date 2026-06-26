@@ -1,0 +1,171 @@
+{
+  "common": {
+    "next": "Tiếp theo",
+    "prev": "Trước",
+    "confirm": "Xác nhận",
+    "cancel": "Hủy",
+    "save": "Lưu",
+    "edit": "Sửa",
+    "delete": "Xóa",
+    "close": "Đóng",
+    "loading": "Đang tải...",
+    "complete": "Hoàn tất"
+  },
+  "labels": {
+    "contractType": {
+      "fullTime": "Toàn thời gian",
+      "partTime": "Bán thời gian",
+      "fixedTerm": "Có thời hạn"
+    },
+    "wageType": {
+      "hourly": "Lương theo giờ",
+      "daily": "Lương theo ngày",
+      "weekly": "Lương theo tuần",
+      "monthly": "Lương tháng"
+    },
+    "workDay": {
+      "mon": "Thứ Hai",
+      "tue": "Thứ Ba",
+      "wed": "Thứ Tư",
+      "thu": "Thứ Năm",
+      "fri": "Thứ Sáu",
+      "sat": "Thứ Bảy",
+      "sun": "Chủ Nhật"
+    },
+    "workDayShort": {
+      "mon": "T2",
+      "tue": "T3",
+      "wed": "T4",
+      "thu": "T5",
+      "fri": "T6",
+      "sat": "T7",
+      "sun": "CN"
+    },
+    "paymentMethod": {
+      "bankTransfer": "Chuyển khoản",
+      "cash": "Tiền mặt",
+      "mixed": "Kết hợp"
+    },
+    "insurance": {
+      "enrolled": "Đã tham gia",
+      "notEnrolled": "Chưa tham gia"
+    }
+  },
+  "contract": {
+    "title": "H Ợ P Đ Ồ N   L A O Đ Ộ N G",
+    "statement": "Chúng tôi ký kết hợp đồng lao động như trên và mỗi bên ký/đóng dấu dưới đây.",
+    "disclaimer": "Hợp đồng này được lập theo Điều 17 (Quy định điều kiện lao động) của Luật Tiêu chuẩn Lao động. Trong trường hợp có sự khác biệt giữa bản gốc tiếng Hàn và bản dịch, bản gốc tiếng Hàn sẽ được ưu tiên.",
+    "section": {
+      "worker": "Người lao động",
+      "conditions": "Điều kiện lao động",
+      "wage": "Tiền lương",
+      "schedule": "Thời gian làm việc",
+      "etc": "Điều kiện lao động khác",
+      "signature": "Chữ ký",
+      "parentConsent": "Sự đồng ý của người giám hộ"
+    },
+    "fields": {
+      "name": "Họ tên",
+      "phone": "Liên lạc",
+      "contractType": "Loại hợp đồng",
+      "workplace": "Nơi làm việc",
+      "jobDescription": "Mô tả công việc",
+      "period": "Thời hạn hợp đồng",
+      "wageType": "Hình thức lương",
+      "baseWage": "Lương cơ bản",
+      "paymentMethod": "Phương thức trả lương",
+      "payDate": "Ngày trả lương",
+      "workDays": "Ngày làm việc",
+      "workTime": "Giờ làm việc",
+      "breakTime": "Giờ nghỉ",
+      "weeklyHoliday": "Ngày nghỉ có lương trong tuần",
+      "weeklyHolidayNote": "Theo luật Hàn Quốc: 1 ngày nghỉ có lương/tuần (Điều 55 Luật Tiêu chuẩn Lao động)",
+      "paidLeave": "Nghỉ phép có lương",
+      "pension": "Lương hưu quốc dân",
+      "healthInsurance": "Bảo hiểm y tế",
+      "employmentInsurance": "Bảo hiểm việc làm",
+      "accidentInsurance": "Bảo hiểm tai nạn lao động",
+      "severance": "Tiền thôi việc",
+      "signerEmployer": "Người sử dụng lao động",
+      "signerWorker": "Người lao động",
+      "signPending": "Chờ ký",
+      "parentName": "Tên người giám hộ",
+      "parentRelation": "Mối quan hệ với người lao động",
+      "parentSignature": "Chữ ký đồng ý"
+    },
+    "values": {
+      "paidLeaveApplied": "Theo Điều 60 Luật Tiêu chuẩn Lao động",
+      "paidLeaveNone": "Không bao gồm",
+      "severanceApplied": "Theo Luật Bảo đảm Trợ cấp thôi việc",
+      "severanceNone": "Không áp dụng"
+    },
+    "signatureNote": "Chữ ký / Đóng dấu",
+    "signedAt": "Đã ký",
+    "notes": {
+      "socialInsurance": "4 bảo hiểm xã hội bắt buộc của Hàn Quốc (người lao động nước ngoài cũng phải tham gia theo nguyên tắc)",
+      "severance": "Tiền thôi việc theo luật Hàn Quốc: khoảng 30 ngày lương/năm làm việc, trả khi nghỉ việc"
+    },
+    "documents": {
+      "title": "Giấy tờ bắt buộc (người chưa thành niên)",
+      "consent": "Giấy đồng ý của người giám hộ",
+      "consentDesc": "Hoàn tất bằng chữ ký điện tử",
+      "familyCert": "Giấy chứng nhận quan hệ gia đình",
+      "familyCertDesc": "Điều 55 Luật Tiêu chuẩn Lao động — bản gốc lưu tại nơi làm việc",
+      "permit": "Giấy phép lao động",
+      "permitDesc": "Dưới 15 tuổi — do Bộ Lao động cấp",
+      "pending": "Chờ nhận",
+      "allReceived": "Đã nhận đủ",
+      "received": "Đã nhận",
+      "receiptBtn": "Xác nhận đã nhận"
+    }
+  },
+  "worker": {
+    "header": {
+      "sent": "Hợp đồng lao động từ {{business}}",
+      "sentSub": "Hợp đồng được ký kết khi bạn ký tên",
+      "signed": "Hợp đồng lao động với {{business}}",
+      "signedSub": "Hợp đồng đã hoàn tất",
+      "rejected": "Hợp đồng bạn yêu cầu sửa đổi",
+      "rejectedSub": "Người sử dụng lao động có thể sửa đổi sau khi xem xét",
+      "default": "Hợp đồng lao động của {{business}}"
+    },
+    "action": {
+      "sign": "Ký tên",
+      "rejectPrompt": "Hợp đồng có chút khác biệt?",
+      "rejectPromptSub": "Bạn có thể yêu cầu người sử dụng sửa đổi",
+      "rejectTitle": "Từ chối hợp đồng",
+      "rejectConfirm": "Bạn có chắc muốn yêu cầu sửa đổi hợp đồng?",
+      "rejectReasonLabel": "Lý do yêu cầu sửa đổi (tùy chọn)",
+      "rejectReasonPlaceholder": "Ví dụ: Giờ làm việc hơi khác",
+      "rejectSubmit": "Yêu cầu sửa đổi",
+      "rejectProcessing": "Đang xử lý...",
+      "rejectFailed": "Không thể xử lý yêu cầu sửa đổi"
+    }
+  },
+  "error": {
+    "loadFailed": "Tải thất bại",
+    "loadContractFailed": "Không thể tải hợp đồng.",
+    "notFound": "Không tìm thấy hợp đồng",
+    "noId": "Không có mã hợp đồng",
+    "network": "Vui lòng kiểm tra kết nối mạng.",
+    "authExpired": "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.",
+    "forbidden": "Bạn không có quyền thực hiện hành động này.",
+    "invalidState": "Không thể thực hiện hành động này ở trạng thái hiện tại.",
+    "unknown": "Đã xảy ra lỗi tạm thời. Vui lòng thử lại sau."
+  },
+  "language": {
+    "onboardingTitle": "Vui lòng chọn ngôn ngữ",
+    "onboardingSub": "Bạn có thể xem hợp đồng bằng ngôn ngữ của mình",
+    "settingsLabel": "Ngôn ngữ"
+  },
+  "minor": {
+    "alert": "Chưa thành niên",
+    "docWait": "Giấy tờ chờ xử lý",
+    "docFiled": "Đã nộp đủ giấy tờ",
+    "under13": "Dưới 13 tuổi không được tuyển dụng (Điều 66 Luật Tiêu chuẩn Lao động)",
+    "notice": "ⓘ {age} tuổi (chưa thành niên). Cần sự đồng ý của người giám hộ ở bước tiếp theo.",
+    "birthTitle": "Nhập ngày sinh",
+    "birthSub": "Để kiểm tra chưa thành niên (dưới 19 tuổi)",
+    "birthLabel": "Ngày sinh"
+  }
+}

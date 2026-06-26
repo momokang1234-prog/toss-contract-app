@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Spacing, SegmentedControl, Paragraph, Switch } from '@toss/tds-mobile';
 import type { ContractFormData } from '../types';
 import { CommentBoundary } from '../../../dev/CommentBoundary';
@@ -19,6 +19,13 @@ const WAGE_PAYMENT_DAYS = [
 
 export default function Step4WageInsurance({ form, errors, handleChange }: Step4WageInsuranceProps) {
   const [activeField, setActiveField] = useState<'wageType' | 'paymentMethod' | 'paymentDay' | 'paidLeave' | 'insurance'>('wageType');
+
+  // "다음" 검증 실패 시 첫 미입력 필드를 자동으로 펼쳐 에러가 보이게 해요.
+  useEffect(() => {
+    if (errors.base_wage) setActiveField('wageType');
+    else if (errors.wage_payment_day) setActiveField('paymentDay');
+    else if (errors.accident_insurance) setActiveField('insurance');
+  }, [errors.base_wage, errors.wage_payment_day, errors.accident_insurance]);
 
   const wageTypeLabel = form.wage_type === 'hourly' ? '시급' : form.wage_type === 'daily' ? '일급' : form.wage_type === 'weekly' ? '주급' : '월급';
   const wageUnit = form.wage_type === 'hourly' ? '원/시간' : form.wage_type === 'daily' ? '원/일' : form.wage_type === 'weekly' ? '원/주' : '원/월';

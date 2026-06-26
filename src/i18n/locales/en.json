@@ -1,0 +1,171 @@
+{
+  "common": {
+    "next": "Next",
+    "prev": "Previous",
+    "confirm": "Confirm",
+    "cancel": "Cancel",
+    "save": "Save",
+    "edit": "Edit",
+    "delete": "Delete",
+    "close": "Close",
+    "loading": "Loading...",
+    "complete": "Complete"
+  },
+  "labels": {
+    "contractType": {
+      "fullTime": "Full-time",
+      "partTime": "Part-time",
+      "fixedTerm": "Fixed-term"
+    },
+    "wageType": {
+      "hourly": "Hourly wage",
+      "daily": "Daily wage",
+      "weekly": "Weekly wage",
+      "monthly": "Monthly salary"
+    },
+    "workDay": {
+      "mon": "Monday",
+      "tue": "Tuesday",
+      "wed": "Wednesday",
+      "thu": "Thursday",
+      "fri": "Friday",
+      "sat": "Saturday",
+      "sun": "Sunday"
+    },
+    "workDayShort": {
+      "mon": "Mon",
+      "tue": "Tue",
+      "wed": "Wed",
+      "thu": "Thu",
+      "fri": "Fri",
+      "sat": "Sat",
+      "sun": "Sun"
+    },
+    "paymentMethod": {
+      "bankTransfer": "Bank transfer",
+      "cash": "Cash",
+      "mixed": "Mixed"
+    },
+    "insurance": {
+      "enrolled": "Enrolled",
+      "notEnrolled": "Not enrolled"
+    }
+  },
+  "contract": {
+    "title": "E M P L O Y M E N T   C O N T R A C T",
+    "statement": "We hereby conclude the employment contract as above and each party signs/seals below.",
+    "disclaimer": "This contract is prepared in accordance with Article 17 (Specification of Working Conditions) of the Labor Standards Act. In case of any discrepancy between the Korean original and the translation, the Korean original shall prevail.",
+    "section": {
+      "worker": "Employee",
+      "conditions": "Working Conditions",
+      "wage": "Wages",
+      "schedule": "Working Hours",
+      "etc": "Other Working Conditions",
+      "signature": "Signature",
+      "parentConsent": "Parental Consent"
+    },
+    "fields": {
+      "name": "Name",
+      "phone": "Contact",
+      "contractType": "Contract Type",
+      "workplace": "Workplace",
+      "jobDescription": "Job Description",
+      "period": "Contract Period",
+      "wageType": "Wage Type",
+      "baseWage": "Base Wage",
+      "paymentMethod": "Payment Method",
+      "payDate": "Pay Day",
+      "workDays": "Working Days",
+      "workTime": "Working Hours",
+      "breakTime": "Break Time",
+      "weeklyHoliday": "Paid weekly rest day",
+      "weeklyHolidayNote": "Korean law: 1 paid day off per week (Labor Standards Act Art. 55)",
+      "paidLeave": "Paid Leave",
+      "pension": "National Pension",
+      "healthInsurance": "Health Insurance",
+      "employmentInsurance": "Employment Insurance",
+      "accidentInsurance": "Industrial Accident Insurance",
+      "severance": "Severance Pay",
+      "signerEmployer": "Employer",
+      "signerWorker": "Employee",
+      "signPending": "Awaiting signature",
+      "parentName": "Parent Name",
+      "parentRelation": "Relationship to Worker",
+      "parentSignature": "Consent Signature"
+    },
+    "values": {
+      "paidLeaveApplied": "In accordance with Article 60 of the Labor Standards Act",
+      "paidLeaveNone": "Not included",
+      "severanceApplied": "In accordance with the Act on the Guarantee of Workers' Retirement Benefits",
+      "severanceNone": "Not applicable"
+    },
+    "signatureNote": "Signature / Seal",
+    "signedAt": "Signed",
+    "notes": {
+      "socialInsurance": "Korea's 4 mandatory social insurances (foreign workers generally must also enroll)",
+      "severance": "Korea's statutory severance pay: ~30 days' wages per year of service, paid on resignation"
+    },
+    "documents": {
+      "title": "Required Documents (Minor)",
+      "consent": "Parental Consent Form",
+      "consentDesc": "Completed by electronic signature",
+      "familyCert": "Family Relationship Certificate",
+      "familyCertDesc": "Labor Standards Act Art. 66 — physical copy kept at workplace",
+      "permit": "Employment Permit",
+      "permitDesc": "Under age 15 — issued by Ministry of Employment and Labor",
+      "pending": "Awaiting receipt",
+      "allReceived": "All received",
+      "received": "Received",
+      "receiptBtn": "Confirm receipt"
+    }
+  },
+  "worker": {
+    "header": {
+      "sent": "Employment contract from {{business}}",
+      "sentSub": "The contract is concluded once you sign",
+      "signed": "Employment contract with {{business}}",
+      "signedSub": "The contract is complete",
+      "rejected": "A contract for which you requested revision",
+      "rejectedSub": "Your employer can revise it after review",
+      "default": "{{business}} employment contract"
+    },
+    "action": {
+      "sign": "Sign",
+      "rejectPrompt": "Is the contract slightly different?",
+      "rejectPromptSub": "You can request a revision from your employer",
+      "rejectTitle": "Reject Contract",
+      "rejectConfirm": "Are you sure you want to request a revision?",
+      "rejectReasonLabel": "Reason for revision (optional)",
+      "rejectReasonPlaceholder": "e.g. The working hours are slightly different",
+      "rejectSubmit": "Request Revision",
+      "rejectProcessing": "Processing...",
+      "rejectFailed": "Failed to process the revision request"
+    }
+  },
+  "error": {
+    "loadFailed": "Failed to load",
+    "loadContractFailed": "Failed to load the contract.",
+    "notFound": "Contract not found",
+    "noId": "No contract ID",
+    "network": "Please check your network connection.",
+    "authExpired": "Authentication expired. Please log in again.",
+    "forbidden": "You do not have permission for this action.",
+    "invalidState": "This action cannot be performed in the current state.",
+    "unknown": "A temporary error occurred. Please try again later."
+  },
+  "language": {
+    "onboardingTitle": "Please select a language",
+    "onboardingSub": "You can view the contract in your language",
+    "settingsLabel": "Language"
+  },
+  "minor": {
+    "alert": "Minor",
+    "docWait": "Pending documents",
+    "docFiled": "Documents filed",
+    "under13": "Under age 13 cannot be employed (Labor Standards Act Art. 66)",
+    "notice": "ⓘ Age {age} (minor). Parental (legal representative) consent is required in the next step.",
+    "birthTitle": "Enter date of birth",
+    "birthSub": "To check if a minor (under 19)",
+    "birthLabel": "Date of birth"
+  }
+}

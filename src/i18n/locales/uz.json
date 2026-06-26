@@ -1,0 +1,175 @@
+{
+  "_meta": {
+    "translationStatus": "PLACEHOLDER - needs professional Uzbek translation (legal document)",
+    "reviewRequired": true
+  },
+  "common": {
+    "next": "Keyingi",
+    "prev": "Oldingi",
+    "confirm": "Tasdiqlash",
+    "cancel": "Bekor qilish",
+    "save": "Saqlash",
+    "edit": "Tahrirlash",
+    "delete": "O'chirish",
+    "close": "Yopish",
+    "loading": "Yuklanmoqda...",
+    "complete": "Tugatish"
+  },
+  "labels": {
+    "contractType": {
+      "fullTime": "To'liq stavkali",
+      "partTime": "Yarim stavkali",
+      "fixedTerm": "Muddatli"
+    },
+    "wageType": {
+      "hourly": "Soatlik ish haqi",
+      "daily": "Kunlik ish haqi",
+      "weekly": "Haftalik ish haqi",
+      "monthly": "Oylik maosh"
+    },
+    "workDay": {
+      "mon": "Dushanba",
+      "tue": "Seshanba",
+      "wed": "Chorshanba",
+      "thu": "Payshanba",
+      "fri": "Juma",
+      "sat": "Shanba",
+      "sun": "Yakshanba"
+    },
+    "workDayShort": {
+      "mon": "Du",
+      "tue": "Se",
+      "wed": "Cho",
+      "thu": "Pa",
+      "fri": "Ju",
+      "sat": "Sha",
+      "sun": "Ya"
+    },
+    "paymentMethod": {
+      "bankTransfer": "Bank o'tkazmasi",
+      "cash": "Naqd",
+      "mixed": "Aralash"
+    },
+    "insurance": {
+      "enrolled": "A'zo bo'lgan",
+      "notEnrolled": "A'zo emas"
+    }
+  },
+  "contract": {
+    "title": "M E H N A T   S H A R T N O M A S I",
+    "statement": "Biz yuqoridagidek mehnat shartnomasini tuzdik va har bir tomon quyida imzo/tamg'a bosadi.",
+    "disclaimer": "Ushbu shartneta Mehnat standartlari to'g'risidagi qonunning 17-moddasi (Mehnat shartlarini ko'rsatish)ga muvofiq tuzilgan. Koreyscha asl nusxa va tarjima o'rtasida farq bo'lganda, koreyscha asl nusxa ustivor bo'ladi.",
+    "section": {
+      "worker": "Ishchi",
+      "conditions": "Mehnat shartlari",
+      "wage": "Ish haqi",
+      "schedule": "Ish vaqti",
+      "etc": "Boshqa mehnat shartlari",
+      "signature": "Imzo",
+      "parentConsent": "Vasiylarning roziligi"
+    },
+    "fields": {
+      "name": "Ism",
+      "phone": "Aloqa",
+      "contractType": "Shartnoma turi",
+      "workplace": "Ish joyi",
+      "jobDescription": "Lavozim tavsifi",
+      "period": "Shartnoma muddati",
+      "wageType": "Ish haqi turi",
+      "baseWage": "Asosiy ish haqi",
+      "paymentMethod": "To'lov usuli",
+      "payDate": "Ish haqi to'lash kuni",
+      "workDays": "Ish kunlari",
+      "workTime": "Ish vaqti",
+      "breakTime": "Tanaffus vaqti",
+      "weeklyHoliday": "Haftalik haqli dam olish kuni",
+      "weeklyHolidayNote": "Koreys qonuniga ko'ra: haftada 1 haqli dam olish kuni (Mehnat standartlari qonuni 55-modda)",
+      "paidLeave": "Haqli ta'til",
+      "pension": "Milliy nafaqa",
+      "healthInsurance": "Sog'liqni saqlash sug'urtasi",
+      "employmentInsurance": "Bandlik sug'urtasi",
+      "accidentInsurance": "Ish baxtsiz hodisa sug'urtasi",
+      "severance": "Ishdan bo'shash nafaqasi",
+      "signerEmployer": "Ish beruvchi",
+      "signerWorker": "Ishchi",
+      "signPending": "Imzo kutmoqda",
+      "parentName": "Vasiy ismi",
+      "parentRelation": "Ishchi bilan aloqasi",
+      "parentSignature": "Rozilik imzosi"
+    },
+    "values": {
+      "paidLeaveApplied": "Mehnat standartlari qonunining 60-moddasiga muvofiq",
+      "paidLeaveNone": "Kiritilmagan",
+      "severanceApplied": "Ishchilarni ishdan bo'shash nafaqasi kafolatlari to'g'risidagi qonunga muvofiq",
+      "severanceNone": "Tatbiq etilmaydi"
+    },
+    "signatureNote": "Imzo / Tamg'a",
+    "signedAt": "Imzolandi",
+    "notes": {
+      "socialInsurance": "Koreyaning 4 ta majburiy ijtimoiy sug'urtasi (xorijiy ishchilar ham qoidaga ko'ra a'zo bo'lishi kerak)",
+      "severance": "Koreyaning qonuniy ishdan bo'shash nafaqasi: har xizmat yili uchun ~30 kunlik ish haqi, ishdan ketganda to'lanadi"
+    },
+    "documents": {
+      "title": "Zarur hujjatlar (voyaga yetmagan)",
+      "consent": "Vasiy rozilik xati",
+      "consentDesc": "Elektron imzo bilan yakunlandi",
+      "familyCert": "Oila munosabatlari guvohnomasi",
+      "familyCertDesc": "Mehnat standartlari qonuni 55-modda — ish joyida saqlanadi",
+      "permit": "Ishga ruxsatnoma",
+      "permitDesc": "15 yoshgacha — Mehnat vazirligi beradi",
+      "pending": "Qabul qilinishi kutilmoqda",
+      "allReceived": "Barchasi qabul qilindi",
+      "received": "Qabul qilindi",
+      "receiptBtn": "Qabulni tasdiqlash"
+    }
+  },
+  "worker": {
+    "header": {
+      "sent": "{{business}}dan mehnat shartnomasi",
+      "sentSub": "Imzo chekkaningizda shartnoma tuzilgan hisoblanadi",
+      "signed": "{{business}}bilan mehnat shartnomasi",
+      "signedSub": "Shartnoma yakunlandi",
+      "rejected": "Siz o'zgartirish so'ragan shartnoma",
+      "rejectedSub": "Ish beruvchi ko'rib chiqqandan keyin o'zgartirishi mumkin",
+      "default": "{{business}}ning mehnat shartnomasi"
+    },
+    "action": {
+      "sign": "Imzolash",
+      "rejectPrompt": "Shartnoma biroz boshqacha?",
+      "rejectPromptSub": "Ish beruvchidan o'zgartirish so'rashingiz mumkin",
+      "rejectTitle": "Shartnomani rad etish",
+      "rejectConfirm": "Shartnomani o'zgartirishni so'rashga ishonchingiz komilmi?",
+      "rejectReasonLabel": "O'zgartirish sababi (ixtiyoriy)",
+      "rejectReasonPlaceholder": "Misol: Ish vaqti biroz boshqacha",
+      "rejectSubmit": "O'zgartirish so'rovi",
+      "rejectProcessing": "Jarayonda...",
+      "rejectFailed": "O'zgartirish so'rovini qayta ishlash amalga oshmadi"
+    }
+  },
+  "error": {
+    "loadFailed": "Yuklash amalga oshmadi",
+    "loadContractFailed": "Shartnomani yuklab bo'lmadi.",
+    "notFound": "Shartnoma topilmadi",
+    "noId": "Shartnoma ID yo'q",
+    "network": "Iltimos, tarmoq aloqasini tekshiring.",
+    "authExpired": "Autentifikatsiya muddati tugagan. Qayta kiring.",
+    "forbidden": "Ushbu amalga ruxsatingiz yo'q.",
+    "invalidState": "Joriy holatda bu amalni bajarib bo'lmaydi.",
+    "unknown": "Vaqtinchalik xatolik yuz berdi. Keyinroq qayta urinib ko'ring."
+  },
+  "language": {
+    "onboardingTitle": "Iltimos, tilni tanlang",
+    "onboardingSub": "Shartnomani o'z tilingizda ko'rishingiz mumkin",
+    "settingsLabel": "Til"
+  },
+  "minor": {
+    "alert": "Voyaga yetmagan",
+    "docWait": "Kutilayotgan hujjatlar",
+    "docFiled": "Hujjatlar to'liq",
+    "under13": "13 yoshgacha bo'lganlar ishga olinmaydi (55-modda)",
+    "notice": "ⓘ {age} yoshda (voyaga yetmagan). Keyingi bosqichda vasiy roziligi kerak.",
+    "birthTitle": "Tug'ilgan sanani kiriting",
+    "birthSub": "Voyaga yetmaganligini tekshirish uchun (19 yoshgacha)",
+    "birthLabel": "Tug'ilgan sana"
+  }
+}

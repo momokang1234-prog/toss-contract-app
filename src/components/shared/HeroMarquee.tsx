@@ -1,14 +1,15 @@
 import styles from './HeroMarquee.module.css';
 
+// 토스 공식 2D 이모지(static.toss.im/2d-emojis). 규정 준수 + 브라우저/런타임 모두 렌더.
 const IMAGES = [
-  '/assets/marquee/contract_doc_1781603373026_transparent.png',
-  '/assets/marquee/digital_sign_1781603405614_transparent.png',
-  '/assets/marquee/handshake_deal_1781603394558_transparent.png',
-  '/assets/marquee/salary_coins_1781603382673_transparent.png',
-  '/assets/marquee/contract_doc_1781603373026_transparent.png',
-  '/assets/marquee/digital_sign_1781603405614_transparent.png',
-  '/assets/marquee/handshake_deal_1781603394558_transparent.png',
-  '/assets/marquee/salary_coins_1781603382673_transparent.png'
+  'https://static.toss.im/2d-emojis/png/4x/u1F4C4.png', // 📄 계약서
+  'https://static.toss.im/2d-emojis/png/4x/u270D.png',  // ✍️ 서명
+  'https://static.toss.im/2d-emojis/png/4x/u1F91D.png', // 🤝 악수
+  'https://static.toss.im/2d-emojis/png/4x/u1F4B0.png', // 💰 급여
+  'https://static.toss.im/2d-emojis/png/4x/u1F4C4.png',
+  'https://static.toss.im/2d-emojis/png/4x/u270D.png',
+  'https://static.toss.im/2d-emojis/png/4x/u1F91D.png',
+  'https://static.toss.im/2d-emojis/png/4x/u1F4B0.png',
 ];
 
 export function HeroMarquee() {

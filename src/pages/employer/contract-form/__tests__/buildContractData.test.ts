@@ -1,4 +1,10 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
+
+vi.mock('../../../../api/supabase', () => ({
+  supabase: {},
+  IS_MOCK: true,
+}));
+
 import { buildContractData, formatWagePaymentDate, wagePaymentDayLabel } from '../buildContractData';
 import { DEFAULT_FORM, type ContractFormData, type DaySchedule } from '../types';
 import { calcWeeklyHoursFromSchedule } from '../../../../domain/contract/validation';
@@ -132,6 +138,46 @@ describe('buildContractData — 폼→저장 페이로드 매핑 (E2E 데이터 
     expect(wagePaymentDayLabel('last')).toBe('말일');
     expect(formatWagePaymentDate('25')).toBe('매월 25일');
     expect(formatWagePaymentDate('last')).toBe('매월 말일');
+  });
+
+  it('미성년자(만 19세 미만) 판별 및 서류 필수 상태 바인딩', () => {
+    // 2026-06-24 기준 만 17세 (2009년생)
+    const minorForm = {
+      ...fullForm,
+      worker_birth_date: '2009-05-15',
+    };
+    const p = buildContractData(minorForm, 'biz-1');
+    expect(p.is_minor).toBe(true);
+    expect(p.is_young_worker).toBe(true); // 만 18세 미만
+    expect(p.doc_parent_consent_status).toBe('required');
+    expect(p.doc_family_cert_status).toBe('required');
+    expect(p.doc_employment_permit_status).toBe('not_required');
+  });
+
+  it('만 15세 미만 아동의 경우 취직인허증 필수 상태 바인딩', () => {
+    // 2026-06-24 기준 만 12세 (2014년생)
+    const childForm = {
+      ...fullForm,
+      worker_birth_date: '2014-03-10',
+    };
+    const p = buildContractData(childForm, 'biz-1');
+    expect(p.is_minor).toBe(true);
+    expect(p.is_young_worker).toBe(true);
+    expect(p.doc_employment_permit_status).toBe('required');
+  });
+
+  it('성인(만 19세 이상)의 경우 친권자 동의 상태 불필요', () => {
+    // 2026-06-24 기준 만 26세 (2000년생)
+    const adultForm = {
+      ...fullForm,
+      worker_birth_date: '2000-01-01',
+    };
+    const p = buildContractData(adultForm, 'biz-1');
+    expect(p.is_minor).toBe(false);
+    expect(p.is_young_worker).toBe(false);
+    expect(p.doc_parent_consent_status).toBe('not_required');
+    expect(p.doc_family_cert_status).toBe('not_required');
+    expect(p.doc_employment_permit_status).toBe('not_required');
   });
 });
 

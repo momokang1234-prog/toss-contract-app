@@ -2,13 +2,17 @@ import { useRef, useEffect, useState } from 'react';
 import { Button, Spacing } from '@toss/tds-mobile';
 
 interface SignaturePadProps {
-  onSign: (signatureData: string) => void;
-  onClear?: () => void;
-  title?: string;
+  /** 서명이 바뀔 때마다(한 획 끝/지우기) dataURL 또는 null을 알려줘요. */
+  onChange?: (dataUrl: string | null) => void;
 }
 
-export default function SignaturePad({ onSign, onClear, title = "서명해 주세요" }: SignaturePadProps) {
+/**
+ * 서명 캔버스 + "다시 쓰기" 버튼만 렌더해요.
+ * 타이틀/서브타이틄은 위자드 다른 단계와 동일하게 `FunnelQuestion`이 제공해요.
+ */
+export default function SignaturePad({ onChange }: SignaturePadProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const hasDrawnRef = useRef(false);
   const [isDrawing, setIsDrawing] = useState(false);
   const [hasSignature, setHasSignature] = useState(false);
 
@@ -17,17 +21,17 @@ export default function SignaturePad({ onSign, onClear, title = "서명해 주�
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
-    
-    // Set proper resolution for high DPI displays
+
+    // 고해상도 디스플레이 대응
     const rect = canvas.getBoundingClientRect();
     canvas.width = rect.width * window.devicePixelRatio;
     canvas.height = rect.height * window.devicePixelRatio;
     ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
-    
+
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
     ctx.lineWidth = 3;
-    ctx.strokeStyle = '#000';
+    ctx.strokeStyle = '#191F28';
   }, []);
 
   const getCoordinates = (e: React.MouseEvent | React.TouchEvent) => {
@@ -44,6 +48,11 @@ export default function SignaturePad({ onSign, onClear, title = "서명해 주�
       x: e.nativeEvent.offsetX,
       y: e.nativeEvent.offsetY,
     };
+  };
+
+  const emit = () => {
+    const canvas = canvasRef.current;
+    if (canvas) onChange?.(canvas.toDataURL('image/png'));
   };
 
   const startDrawing = (e: React.MouseEvent | React.TouchEvent) => {
@@ -65,82 +74,80 @@ export default function SignaturePad({ onSign, onClear, title = "서명해 주�
     if (ctx) {
       ctx.lineTo(x, y);
       ctx.stroke();
-      if (!hasSignature) setHasSignature(true);
+      if (!hasDrawnRef.current) {
+        hasDrawnRef.current = true;
+        setHasSignature(true);
+      }
     }
   };
 
   const stopDrawing = () => {
+    if (!isDrawing) return;
     setIsDrawing(false);
+    if (hasDrawnRef.current) emit();
   };
 
   const handleClear = () => {
     const canvas = canvasRef.current;
     if (canvas) {
-      const ctx = canvas.getContext('2d');
-      if (ctx) {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-      }
+      canvas.getContext('2d')?.clearRect(0, 0, canvas.width, canvas.height);
     }
+    hasDrawnRef.current = false;
     setHasSignature(false);
-    onClear?.();
-  };
-
-  const handleConfirm = () => {
-    const canvas = canvasRef.current;
-    if (canvas && hasSignature) {
-      const dataUrl = canvas.toDataURL('image/png');
-      onSign(dataUrl);
-    }
+    onChange?.(null);
   };
 
   return (
-    <div style={{ padding: '0 24px', display: 'flex', flexDirection: 'column', height: '100%' }}>
-      <div style={{ flex: 1 }}>
-        <h2 style={{ fontSize: 24, fontWeight: 700, margin: '24px 0 16px' }}>{title}</h2>
-        <div style={{
+    <>
+      <div
+        style={{
           border: '1px solid #E5E8EB',
           borderRadius: 16,
           overflow: 'hidden',
           background: '#F9FAFB',
           height: 300,
-          position: 'relative'
-        }}>
-          <canvas
-            ref={canvasRef}
-            style={{ width: '100%', height: '100%', touchAction: 'none' }}
-            onMouseDown={startDrawing}
-            onMouseMove={draw}
-            onMouseUp={stopDrawing}
-            onMouseLeave={stopDrawing}
-            onTouchStart={startDrawing}
-            onTouchMove={draw}
-            onTouchEnd={stopDrawing}
-          />
-          {!hasSignature && (
-            <div style={{
-              position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
-              color: '#B0B8C1', pointerEvents: 'none', fontSize: 16
-            }}>
-              여기에 서명해 주세요
-            </div>
-          )}
-        </div>
-        <Spacing size={16} />
-        <Button size="medium" variant="weak" onClick={handleClear} disabled={!hasSignature} style={{ width: '100%' }}>
-          다시 쓰기
-        </Button>
+          position: 'relative',
+        }}
+      >
+        <canvas
+          ref={canvasRef}
+          style={{ width: '100%', height: '100%', touchAction: 'none' }}
+          onMouseDown={startDrawing}
+          onMouseMove={draw}
+          onMouseUp={stopDrawing}
+          onMouseLeave={stopDrawing}
+          onTouchStart={startDrawing}
+          onTouchMove={draw}
+          onTouchEnd={stopDrawing}
+        />
+        {!hasSignature && (
+          <div
+            style={{
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              color: '#B0B8C1',
+              pointerEvents: 'none',
+              fontSize: 16,
+            }}
+          >
+            여기에 서명해 주세요
+          </div>
+        )}
       </div>
-      
-      <div style={{ padding: '24px 0', marginTop: 'auto' }}>
-        <Button
-          size="large"
-          style={{ width: '100%' }}
-          disabled={!hasSignature}
-          onClick={handleConfirm}
-        >
-          서명 완료
-        </Button>
-      </div>
-    </div>
+
+      <Spacing size={16} />
+
+      <Button
+        size="medium"
+        variant="weak"
+        display="block"
+        disabled={!hasSignature}
+        onClick={handleClear}
+      >
+        다시 쓰기
+      </Button>
+    </>
   );
 }

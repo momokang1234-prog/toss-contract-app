@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { useFunnel } from '@use-funnel/browser';
 import { useContractForm } from './contract-form/hooks/useContractForm';
 import { Button, Paragraph, Spacing } from '@toss/tds-mobile';
@@ -11,7 +12,6 @@ import Step5OtherConditions from './contract-form/steps/Step5OtherConditions';
 import { FinalChecklistStep } from './contract-form/steps/FinalChecklistStep';
 import Step6Preview from './contract-form/steps/Step6Preview';
 import { ContractFormProgress } from './contract-form/ContractFormProgress';
-import SignaturePad from '../../components/SignaturePad';
 
 export default function ContractFormPage() {
   const {
@@ -32,6 +32,13 @@ export default function ContractFormPage() {
     navigate,
   } = useContractForm();
 
+  const isDevMock = sessionStorage.getItem('force_mock') === 'true';
+  const searchParams = new URLSearchParams(window.location.search);
+  const requestedStep = searchParams.get('contract-form-wizard') as ContractFormStep | null;
+  const initialStep = (isDevMock && requestedStep && STEP_ORDER.includes(requestedStep)) 
+    ? requestedStep 
+    : 'basicInfo';
+
   const funnel = useFunnel<{
     basicInfo: NonNullable<unknown>;
     workConditions: NonNullable<unknown>;
@@ -40,20 +47,27 @@ export default function ContractFormPage() {
     otherConditions: NonNullable<unknown>;
     finalChecklist: NonNullable<unknown>;
     preview: NonNullable<unknown>;
-    employerSignature: NonNullable<unknown>;
   }>({
     id: 'contract-form-wizard',
-    initial: { step: 'basicInfo', context: {} },
+    initial: { step: initialStep, context: {} },
   });
 
   const currentStep = funnel.step as ContractFormStep;
-  const currentIndex = STEP_ORDER.indexOf(currentStep);
-  const isLastStep = currentIndex === TOTAL_STEPS - 1;
+  const isValidStep = STEP_ORDER.includes(currentStep);
+  const effectiveSteps = STEP_ORDER;
+  const currentIndex = effectiveSteps.indexOf(currentStep);
+  const isLastStep = currentIndex === effectiveSteps.length - 1;
   const isValidationStep = currentStep === 'finalChecklist';
+
+  useEffect(() => {
+    if (!isValidStep) {
+      funnel.history.push('basicInfo');
+    }
+  }, [isValidStep, funnel.history]);
 
   const goNext = (nextStep: ContractFormStep) => {
     if (!validateStep(currentStep)) return;
-    funnel.history.push(nextStep);
+    funnel.history.push(nextStep as 'basicInfo');
   };
 
   const goBack = () => {
@@ -68,7 +82,7 @@ export default function ContractFormPage() {
   const onSubmit = async () => {
     const contract = await handleSubmit();
     if (!contract) return;
-    navigate(`/employer/contracts/${contract.id}`);
+    navigate(`/employer/contracts/${contract.id}`, { state: { justCreated: true } });
   };
 
   return (
@@ -80,71 +94,61 @@ export default function ContractFormPage() {
         <Spacing size={16} />
       <ContractFormProgress
         currentIndex={currentIndex}
-        labels={STEP_ORDER.map((s) => STEP_LABELS[s])}
+        labels={effectiveSteps.map((s) => STEP_LABELS[s])}
         onStepClick={(i) => {
           // 과거 단계로만 이동 허용. 과거 단계는 이미 검증을 통과했으므로 재검증 생략.
-          if (i < currentIndex) funnel.history.push(STEP_ORDER[i]);
+          if (i < currentIndex) funnel.history.push(effectiveSteps[i] as 'basicInfo');
         }}
       />
       <Spacing size={8} />
 
       {/* Step content */}
-      <funnel.Render
-        basicInfo={() => (
-          <Step1BasicInfo form={form} errors={errors} handleChange={handleChange} />
-        )}
-        workConditions={() => (
-          <Step2WorkConditions form={form} errors={errors} handleChange={handleChange} />
-        )}
-        workSchedule={() => (
-          <Step3WorkSchedule
-            form={form}
-            errors={errors}
-            handleChange={handleChange}
-            toggleDay={toggleDay}
-            selectWeeklyHoliday={selectWeeklyHoliday}
-            updateDaySchedule={updateDaySchedule}
-            setScheduleMode={setScheduleMode}
-          />
-        )}
-        wageInsurance={() => (
-          <Step4WageInsurance form={form} errors={errors} handleChange={handleChange} />
-        )}
-        otherConditions={() => (
-          <Step5OtherConditions form={form} handleChange={handleChange} />
-        )}
-        finalChecklist={() => (
-          <FinalChecklistStep 
-            form={form} 
-            onChange={handleChange}
-            toggleDay={toggleDay}
-            onNavigate={(step) => funnel.history.push(step as any)}
-          />
-        )}
-        preview={() => (
-          <div>
-            <Spacing size={24} />
-            <Step6Preview
+      {isValidStep && (
+        <funnel.Render
+          basicInfo={() => (
+            <Step1BasicInfo form={form} errors={errors} handleChange={handleChange} />
+          )}
+          workConditions={() => (
+            <Step2WorkConditions form={form} errors={errors} handleChange={handleChange} />
+          )}
+          workSchedule={() => (
+            <Step3WorkSchedule
               form={form}
-              warnings={warnings}
-              computeBreakMinutes={computeBreakMinutes}
-              formatWagePaymentDate={formatWagePaymentDate}
+              errors={errors}
+              handleChange={handleChange}
+              toggleDay={toggleDay}
+              selectWeeklyHoliday={selectWeeklyHoliday}
+              updateDaySchedule={updateDaySchedule}
+              setScheduleMode={setScheduleMode}
             />
-          </div>
-        )}
-        employerSignature={() => (
-          <div style={{ height: 'calc(100vh - 200px)', display: 'flex', flexDirection: 'column' }}>
-            <Spacing size={24} />
-            <SignaturePad 
-              title="사장님 서명"
-              onSign={async (data) => {
-                handleChange('employer_signature_data', data);
-                setTimeout(() => onSubmit(), 50);
-              }} 
+          )}
+          wageInsurance={() => (
+            <Step4WageInsurance form={form} errors={errors} handleChange={handleChange} />
+          )}
+          otherConditions={() => (
+            <Step5OtherConditions form={form} handleChange={handleChange} />
+          )}
+          finalChecklist={() => (
+            <FinalChecklistStep 
+              form={form} 
+              onChange={handleChange}
+              toggleDay={toggleDay}
+              onNavigate={(step) => funnel.history.push(step as any)}
             />
-          </div>
-        )}
-      />
+          )}
+          preview={() => (
+            <div>
+              <Spacing size={24} />
+              <Step6Preview
+                form={form}
+                warnings={warnings}
+                computeBreakMinutes={computeBreakMinutes}
+                formatWagePaymentDate={formatWagePaymentDate}
+              />
+            </div>
+          )}
+        />
+      )}
       </div>
 
       {/* Navigation */}
@@ -169,7 +173,7 @@ export default function ContractFormPage() {
                 if (isValidationStep) {
                   onValidationRun();
                 } else {
-                  goNext(STEP_ORDER[currentIndex + 1]);
+                  goNext(effectiveSteps[currentIndex + 1]);
                 }
               }}
             >
@@ -185,9 +189,8 @@ export default function ContractFormPage() {
               size="xlarge"
               loading={submitting}
               onClick={onSubmit}
-              disabled={true} // will auto-submit on signature
             >
-              서명을 완료해주세요
+              저장 및 다음
             </Button>
           </div>
         )}

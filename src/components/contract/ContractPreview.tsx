@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { Button, Paragraph, Spacing, Border, Top } from '@toss/tds-mobile';
+import { Button, Paragraph, Spacing, Top } from '@toss/tds-mobile';
 import type { Contract } from '../../hooks/useContracts';
-import { formatWorkScheduleForDisplay } from '../../pages/employer/contract-form/formatSchedule';
+import { ContractDocumentView } from './ContractDocumentView';
 
 interface ContractPreviewProps {
   contract: Contract;
@@ -23,21 +23,6 @@ export function ContractPreview({ contract }: ContractPreviewProps) {
     }
   };
 
-  const wageLabel = contract.wage_type === 'hourly' ? '시급'
-    : contract.wage_type === 'daily' ? '일급'
-    : contract.wage_type === 'weekly' ? '주급'
-    : '월급';
-
-  const contractTypeLabel = contract.contract_type === 'partTime' ? '단시간'
-    : contract.contract_type === 'fullTime' ? '정규직'
-    : '기간제';
-
-  const dayLabels: Record<string, string> = {
-    mon: '월', tue: '화', wed: '수', thu: '목', fri: '금', sat: '토', sun: '일',
-  };
-  const workDaysStr = contract.work_days.map(d => dayLabels[d] ?? d).join(', ');
-  const scheduleEntries = formatWorkScheduleForDisplay(contract);
-
   return (
     <div>
       <Top title="근로계약서" />
@@ -45,71 +30,12 @@ export function ContractPreview({ contract }: ContractPreviewProps) {
       <div style={{ padding: '0 24px' }}>
         <Paragraph typography="t3" fontWeight="bold">근로계약서 미리보기</Paragraph>
       </div>
-
       <Spacing size={16} />
 
-      <SectionTitle>1. 근로자</SectionTitle>
-      <InfoRow label="성명" value={contract.worker_name} />
-      <InfoRow label="연락처" value={contract.worker_phone} />
-
-      <SectionTitle>2. 근로조건</SectionTitle>
-      <InfoRow label="계약 유형" value={contractTypeLabel} />
-      <InfoRow label="근무 장소" value={contract.workplace} />
-      <InfoRow label="직무 내용" value={contract.job_description} />
-      <InfoRow label="시작일" value={contract.start_date} />
-      {contract.end_date && <InfoRow label="종료일" value={contract.end_date} />}
-      <SectionTitle>3. 임금</SectionTitle>
-      <InfoRow label="급여 형태" value={wageLabel} />
-      <InfoRow label="기본급" value={`${contract.base_wage.toLocaleString()}원`} />
-      <InfoRow label="지급일" value={contract.wage_payment_date} />
-      <SectionTitle>4. 근무 시간</SectionTitle>
-      <InfoRow label="근무일" value={workDaysStr} />
-      {scheduleEntries.length <= 1 ? (
-        (() => {
-          const e = scheduleEntries[0] ?? { workTime: `${contract.start_time} ~ ${contract.end_time}`, breakTime: `${contract.break_start_time} ~ ${contract.break_end_time}` };
-          return (
-            <>
-              <InfoRow label="근무 시간" value={e.workTime} />
-              {e.breakTime && <InfoRow label="휴게시간" value={e.breakTime} />}
-            </>
-          );
-        })()
-      ) : (
-        scheduleEntries.map((e, i) => (
-          <InfoRow key={i} label={`${e.label} 근무`} value={e.breakTime ? `${e.workTime} (휴게 ${e.breakTime})` : e.workTime} />
-        ))
-      )}
-      {contract.weekly_holiday && (
-        <InfoRow label="주휴일" value={dayLabels[contract.weekly_holiday] ?? contract.weekly_holiday} />
-      )}
-
-      <SectionTitle>5. 기타 근로조건</SectionTitle>
-      <InfoRow label="연차유급휴가" value={contract.paid_leave_clause ? '근로기준법에 따름' : '미포함'} />
-      <InfoRow label="사회보험" value={contract.social_insurance_clause ? '4대보험 적용' : '미적용'} />
-      <InfoRow label="퇴직금" value={contract.severance_clause ? '퇴직급여 보장법에 따름' : '해당 없음'} />
-
-      {contract.worker_signature_data && (
-        <>
-          <Spacing size={24} />
-          <div style={{ height: 1, backgroundColor: '#e5e5ec', margin: '0 24px' }} />
-          <Spacing size={20} />
-          <div style={{ padding: '0 24px' }}>
-            <Paragraph typography="t5" fontWeight="bold">근로자 서명</Paragraph>
-            <Spacing size={16} />
-            <div style={{ textAlign: 'center' }}>
-              <img src={contract.worker_signature_data} alt="근로자 서명" style={{ maxHeight: 100, border: '1px solid #E5E8EB', borderRadius: 8, padding: 8 }} />
-              {contract.worker_signed_at && (
-                <>
-                  <Spacing size={8} />
-                  <Paragraph typography="t7" color="grey-500">
-                    {new Date(contract.worker_signed_at).toLocaleString('ko-KR')} 서명 완료
-                  </Paragraph>
-                </>
-              )}
-            </div>
-          </div>
-        </>
-      )}
+      {/* 단일 렌더링 엔진(template.ts)을 사용하는 뷰어로 교체 */}
+      <div style={{ padding: '0 16px' }}>
+        <ContractDocumentView contract={contract} />
+      </div>
 
       <Spacing size={24} />
       <div style={{ padding: '0 24px 40px' }}>
@@ -123,33 +49,6 @@ export function ContractPreview({ contract }: ContractPreviewProps) {
         >
           📄 {downloading ? 'PDF 생성 중...' : 'PDF 다운로드'}
         </Button>
-      </div>
-    </div>
-  );
-}
-
-function SectionTitle({ children }: { children: React.ReactNode }) {
-  return (
-    <div style={{ padding: '0 24px' }}>
-      <Spacing size={32} />
-      <Paragraph typography="t5" fontWeight="bold">{children}</Paragraph>
-      <Spacing size={16} />
-    </div>
-  );
-}
-
-function InfoRow({ label, value }: { label: string; value: string }) {
-  return (
-    <div style={{
-      padding: '0 24px',
-      marginBottom: 16,
-      display: 'flex',
-      justifyContent: 'space-between',
-      alignItems: 'flex-start',
-    }}>
-      <Paragraph typography="t6" color="grey-500">{label}</Paragraph>
-      <div style={{ textAlign: 'right', maxWidth: '60%' }}>
-        <Paragraph typography="t5">{value}</Paragraph>
       </div>
     </div>
   );

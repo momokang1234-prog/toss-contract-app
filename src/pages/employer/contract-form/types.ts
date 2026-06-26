@@ -53,6 +53,8 @@ export interface ContractFormData {
   checklist_agreed: boolean;
   other_conditions: string;
   employer_signature_data?: string;
+  worker_birth_date?: string;
+  parent_consent_data?: string;
 }
 
 export type ContractFormStep =
@@ -62,8 +64,7 @@ export type ContractFormStep =
   | 'wageInsurance'
   | 'otherConditions'
   | 'finalChecklist'
-  | 'preview'
-  | 'employerSignature';
+  | 'preview';
 
 export const STEP_LABELS: Record<ContractFormStep, string> = {
   basicInfo: '근로자 정보',
@@ -73,7 +74,6 @@ export const STEP_LABELS: Record<ContractFormStep, string> = {
   otherConditions: '기타 조건',
   finalChecklist: '체크리스트',
   preview: '최종 확인',
-  employerSignature: '사장님 서명',
 };
 
 export const STEP_ORDER: ContractFormStep[] = [
@@ -84,7 +84,6 @@ export const STEP_ORDER: ContractFormStep[] = [
   'otherConditions',
   'finalChecklist',
   'preview',
-  'employerSignature',
 ];
 
 export const TOTAL_STEPS = STEP_ORDER.length;

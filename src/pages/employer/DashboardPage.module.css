@@ -127,6 +127,15 @@
   font-weight: 600;
 }
 
+.badgeRed {
+  background-color: rgba(240, 68, 82, 0.1);
+  color: #f04452;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
 .emptyState {
   display: flex;
   flex-direction: column;

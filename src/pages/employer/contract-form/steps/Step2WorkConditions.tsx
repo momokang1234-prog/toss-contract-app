@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { SegmentedControl, WheelDatePicker } from '@toss/tds-mobile';
 import type { ContractFormData } from '../types';
 import { CommentBoundary } from '../../../dev/CommentBoundary';
@@ -12,6 +12,14 @@ interface Step2WorkConditionsProps {
 
 export default function Step2WorkConditions({ form, errors, handleChange }: Step2WorkConditionsProps) {
   const [activeField, setActiveField] = useState<'type' | 'workplace' | 'job' | 'startDate' | 'endDate'>('type');
+
+  // "다음" 검증 실패 시 첫 미입력 필드를 자동으로 펼쳐 에러가 보이게 해요.
+  useEffect(() => {
+    if (errors.contract_type) setActiveField('type');
+    else if (errors.workplace) setActiveField('workplace');
+    else if (errors.job_description) setActiveField('job');
+    else if (errors.start_date) setActiveField('startDate');
+  }, [errors.contract_type, errors.workplace, errors.job_description, errors.start_date]);
 
   return (
     <div>

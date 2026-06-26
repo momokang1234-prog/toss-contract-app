@@ -25,13 +25,38 @@ export default function BusinessFormPage() {
   const [businessNumber, setBusinessNumber] = useState('');
   const [form, setForm] = useState({ business_name: '', representative: '', address: '', phone: '' });
   const [submitting, setSubmitting] = useState(false);
+  
+  const [isValidating, setIsValidating] = useState(false);
+  const [validationError, setValidationError] = useState<string | null>(null);
 
   const handleKeypad = (key: string) => {
+    setValidationError(null); // Clear error on typing
     if (key === '⌫') setBusinessNumber(p => formatNumber(p.replace(/\D/g, '').slice(0, -1)));
     else setBusinessNumber(p => formatNumber(p.replace(/\D/g, '') + key));
   };
 
   const canNext = /^\d{3}-\d{2}-\d{5}$/.test(businessNumber);
+
+  const handleVerifyBusinessNumber = async () => {
+    setIsValidating(true);
+    setValidationError(null);
+    try {
+      const { validateBusinessNumber } = await import('../../api/businessValidator');
+      const res = await validateBusinessNumber(businessNumber);
+      if (res.success) {
+        if (res.companyName) {
+          setForm(p => ({ ...p, business_name: res.companyName! }));
+        }
+        setStep('info');
+      } else {
+        setValidationError(res.message || '인증에 실패했습니다.');
+      }
+    } catch (err) {
+      setValidationError('서버 에러가 발생했습니다.');
+    } finally {
+      setIsValidating(false);
+    }
+  };
 
   const handleSubmit = async () => {
     setSubmitting(true);
@@ -98,7 +123,7 @@ export default function BusinessFormPage() {
         <Paragraph typography="t3" fontWeight="bold">입력해주세요</Paragraph>
         <Spacing size={32} />
         <TextField variant="line" labelOption="sustain" label="사업자등록번호"
-          placeholder="000-00-00000" value={businessNumber} readOnly />
+          placeholder="000-00-00000" value={businessNumber} readOnly hasError={!!validationError} help={validationError || '테스트: 000-00-00000 (위반), 123-45-67890 (폐업)'} />
         <Spacing size={40} />
         <div className={styles.keypad}>
           {KEYPAD.map((row, i) => (
@@ -106,7 +131,7 @@ export default function BusinessFormPage() {
               {row.map((key) => (
                 <button key={key || `empty-${i}`}
                   className={`${styles.keypadBtn} ${!key ? styles.keypadEmpty : ''}`}
-                  type="button" onClick={() => key && handleKeypad(key)} disabled={!key}>
+                  type="button" onClick={() => key && handleKeypad(key)} disabled={!key || isValidating}>
                   {key}
                 </button>
               ))}
@@ -115,8 +140,8 @@ export default function BusinessFormPage() {
         </div>
         <Spacing size={32} />
         <Button color="primary" variant="fill" display="block" size="xlarge"
-          onClick={() => setStep('info')} disabled={!canNext}>
-          확인
+          onClick={handleVerifyBusinessNumber} disabled={!canNext || isValidating}>
+          {isValidating ? '확인 중...' : '확인'}
         </Button>
       </div>
     </div>
