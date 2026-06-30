@@ -6,6 +6,9 @@ sources:
   - 9b988031-11a0-4515-b783-eda40dc57456
   - 2cb2bc2e-14e2-4e79-beaf-9a4a3a959e94
   - 33aaaa89-6581-4baa-a5b8-ac27a63cb5d6
+  - eac871be-3429-4958-916d-0dddabf8fa2a
+  - 0688defe-ad02-49c2-8f85-e1985c081066
+  - 4e1e67ff-18b4-49b3-b437-df0ef921595c
 tags:
   - research-team
   - agy-cli
@@ -174,4 +177,65 @@ VoI 판단 기준: "이 정보가 결론 도출에 결정적인가? 아직 출�
 ```
 /root/research-team/
   upgrade_final_report.md   # 3단계 업그레이드 로드맵 최종 리포트 (세션 33aaaa89 산출물)
+```
+
+---
+
+## research-team 워크스페이스 구조 업그레이드 분석 (2026-06-30)
+
+세션 `eac871be` (오케스트레이터)가 `/research-plugin:research-orchestrator` 스킬로
+`/root/research-team` 디렉토리 구조 자체의 개선 방안을 리서치했다.
+서브에이전트 `0688defe`가 3개 도메인 리포트를 종합해
+`/root/research-team/_workspace/reports/final_upgrade_report.md`를 생성한 후,
+부모 오케스트레이터에게 `send_message`로 납품.
+
+> ⚠️ 이 리포트는 A2A 파이프라인 아키텍처 업그레이드(`upgrade_final_report.md`)와 별개.
+> 코드/디렉토리 조직 구조 개선이 주제.
+
+### 식별된 기술 부채 (Current Technical Debt)
+
+| 문제 | 설명 |
+|------|------|
+| **빌드 스크립트 충돌** | `build_agents.py`와 `build_pyramid.py`가 서로의 출력을 덮어씀 → 예측 불가한 시스템 상태 |
+| **숨은 의존성** | `build_pyramid.py`가 암묵적으로 생성된 `analyst` 에이전트에 의존 |
+| **데드 코드** | `generate_skills.py`가 한국어 스킬을 생성하지만 `update_skills.py`가 즉시 덮어씀 |
+| **아키텍처 불일치** | 11개 핵심 데이터 스킬이 `.agents/skills/` (전역)에 위치 → 의도된 플러그인 캡슐화(`.agents/plugins/research-plugin/skills/`)를 위반 |
+| **하드코딩된 절대경로** | 빌드 스크립트에 절대경로 사용 → 이식성 저하 |
+| **루트 디렉토리 오염** | 실행 출력물, 프로젝트 문서, `.obsidian/` 에디터 아티팩트가 루트에 혼재 |
+
+### 목표 아키텍처 — 4단계 마이그레이션 플랜
+
+참고 프레임워크: CrewAI, AutoGen, LangGraph 디렉토리 관행.
+
+#### Phase 1 — Repository Cleanup & Clutter Reduction
+- 리서치 출력물·기획 문서 → `_workspace/docs/`, `_workspace/reports/`로 이동
+- `.gitignore` 도입 (`.obsidian/` 제외)
+- 표준 디렉토리 스캐폴딩: `config/`, `src/`, `scripts/`, `tests/`
+
+#### Phase 2 — Build Script 통합 & 리팩토링
+- `generate_skills.py` 데드 코드 제거
+- `update_skills.py` → `scripts/deploy_skills.py`로 이름 변경·이동
+- `build_agents.py` + `build_pyramid.py` → `scripts/build_research_system.py`로 통합 (숨은 의존성 해소)
+- 반복 파일 연산 추상화 → `scripts/utils.py`
+- 하드코딩된 절대경로 → 상대경로로 교체
+
+#### Phase 3 — 아키텍처 정렬 (Architectural Alignment)
+- 11개 핵심 데이터 스킬: `.agents/skills/` → `.agents/plugins/research-plugin/skills/`로 마이그레이션
+- 에이전트 프롬프트·정체성: `config/agents.yaml`로 추출 (선언적 설정 분리)
+- 워크플로우 라우팅: `src/orchestrator/`로 중앙화
+
+#### Phase 4 — Shared Workspace & State Management
+- 모든 에이전트 I/O → `_workspace/` 디렉토리로 표준화
+- 엄격한 글로벌 상태 스키마 구현: `src/state.py` (에이전트 핸드오프 시 컨텍스트 환각 방지)
+
+### 산출 파일
+
+```
+/root/research-team/
+  _workspace/
+    reports/
+      current_structure_analysis.md  # 도메인1: 현재 구조 분석 (세션 eac871be 서브에이전트)
+      best_practices.md               # 도메인2: CrewAI/AutoGen/LangGraph 모범 사례
+      migration_plan.md               # 도메인3: 마이그레이션 플랜
+      final_upgrade_report.md         # 최종 종합 리포트 (세션 0688defe 산출물)
 ```

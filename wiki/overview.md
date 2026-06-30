@@ -12,6 +12,8 @@ sources:
   - 9b988031-11a0-4515-b783-eda40dc57456
   - 2cb2bc2e-14e2-4e79-beaf-9a4a3a959e94
   - 33aaaa89-6581-4baa-a5b8-ac27a63cb5d6
+  - eac871be-3429-4958-916d-0dddabf8fa2a
+  - 0688defe-ad02-49c2-8f85-e1985c081066
 tags:
   - overview
 ---
@@ -45,6 +47,7 @@ tags:
 | 2026-06-26 | 2-Step WebP 캡처 Zero-Dependency 아키텍처 의도 문서화 (`wsl-interop-examples.md`) | `0d0f0381` |
 | 2026-06-30 | research-team A2A 파이프라인 개선: seCall 절대경로 픽스, visual-architect 한국어 고정, VoI 기반 도메인 매니저 업그레이드, MAS 평가 트렌드 리서치 | `9b988031`, `2cb2bc2e` |
 | 2026-06-30 | research-team 업그레이드 최종 리포트 합성: 3개 도메인 리포트 → `upgrade_final_report.md` (DAG 아키텍처·MCP·Guardrails 3단계 로드맵) | `33aaaa89` |
+| 2026-06-30 | research-team **워크스페이스 구조** 분석 및 4단계 마이그레이션 플랜 합성: 기술 부채(빌드 스크립트 충돌·데드 코드·절대경로) 식별 → `_workspace/reports/final_upgrade_report.md` 생성 | `eac871be`, `0688defe` |
 
 ## 위키 구조
 
