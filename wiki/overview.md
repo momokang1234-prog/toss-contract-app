@@ -19,6 +19,7 @@ sources:
   - 541c1dc6-480a-45b4-906d-7ca80467d5d0
   - 552d1bb7-2c55-4d49-8a2d-ad725746eb0a
   - 5ee60f73-b3b7-4142-83f0-9eedb49c95fa
+  - 6c3d999e-1205-4324-b022-4eacfe4183a2
 tags:
   - overview
 ---
@@ -48,6 +49,7 @@ tags:
 | 2026-06-18 | mTLS/알림 구현 이어서, Tossface 폰트 연동, CLAUDE.md 생성 | `6f153450` |
 | 2026-06-22 | 근로자 알림 방식 조사 → share API 확정 | `df398adb` |
 | 2026-06-24~25 | 계약서 폼 UX 개선, 퍼널 스텝, 계약서 Document/Preview | `dd07e058`, `3c64e530`, `d2a15b64`, `352c6aa2` |
+| 2026-06-26 | 계약서 폼 UX 개선: 근로자 주소 제거(Step1), 임금지급방법·주휴요일 BottomSheet 전환(Step3/4), FunnelQuestion active/completed 시각 구분 | `6c3d999e` |
 | 2026-06-26 | Desktop RPA WSL-Windows 인터롭 테스트 (`rpa_test.sh` 실행) | `02446945` |
 | 2026-06-26 | 2-Step WebP 캡처 Zero-Dependency 아키텍처 의도 문서화 (`wsl-interop-examples.md`) | `0d0f0381` |
 | 2026-06-30 | research-team A2A 파이프라인 개선: seCall 절대경로 픽스, visual-architect 한국어 고정, VoI 기반 도메인 매니저 업그레이드, MAS 평가 트렌드 리서치 | `9b988031`, `2cb2bc2e` |
