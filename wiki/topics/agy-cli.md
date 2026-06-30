@@ -124,3 +124,4 @@ agy [flags] [subcommand]
 
 - [[research-team-pipeline]] — agy-cli 피라미드 A2A 리서치 파이프라인
 - [[agent-setup]] — Claude Code 에이전트 설정 (agy-helper 에이전트 포함)
+- [[secall]] — seCall 세션 검색엔진 (agy ingest 보류 이유 포함)
