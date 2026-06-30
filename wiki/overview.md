@@ -17,6 +17,7 @@ sources:
   - 4e1e67ff-18b4-49b3-b437-df0ef921595c
   - 0b7ddfd9-e32e-4434-877a-6db20499b91c
   - 541c1dc6-480a-45b4-906d-7ca80467d5d0
+  - 552d1bb7-2c55-4d49-8a2d-ad725746eb0a
 tags:
   - overview
 ---
@@ -54,6 +55,7 @@ tags:
 | 2026-06-30 | Gemini 인프라 도메인 리서치 (Domain 3): Colossus 분산 스토리지·TPU 아키텍처·벡터 임베딩 DB → `gemini_domain3_infrastructure.md` 생성 | `4e1e67ff` |
 | 2026-06-30 | research-team 디렉토리 구조 분석: `plan.md`(초기 3에이전트 설계), `skill_authoring_plan.md`(11개 데이터 스킬 상세 계획), 샘플 출력물(AU/NZ 상업용 기기 컴플라이언스) 확인 → `a102cb5c`에 보고 | `0b7ddfd9` |
 | 2026-06-30 | research-team **Advanced Multi-Agent Testing & Chaos Engineering** 도메인 리서치: `test_domain1_chaos.md` 생성 후 부모 `9b988031`에게 납품 | `541c1dc6` |
+| 2026-06-30 | agy hook 설정 파일 경로 조회: 글로벌 `~/.gemini/config/hooks.json`, 워크스페이스 `.agents/hooks.json` 확인 | `552d1bb7` |
 
 ## 위키 구조
 
@@ -71,6 +73,7 @@ wiki/
     agent-setup.md              # .claude/ 에이전트/커맨드 설정
     desktop-rpa.md             # WSL-Windows 인터롭, PowerShell RPA
     research-team-pipeline.md  # agy-cli 피라미드 A2A 리서치 파이프라인
+    agy-cli.md                 # agy CLI 설정 경로, hooks, 플래그, TUI 명령어
   decisions/
     2026-06-17-migrate-omp-to-claude.md       # OMP → Claude 마이그레이션
     2026-06-22-worker-notification-share-api.md  # 근로자 알림 방식
