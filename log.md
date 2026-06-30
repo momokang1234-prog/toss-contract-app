@@ -340,3 +340,123 @@ updated_at: 2026-06-26
 - turns: 6, tokens: 0k
 - file: raw/.sessions/2026-06-30/agy-cli_c80ca46d-1a54-4426-a32d-77a6a5c3da65_c80ca46d.md
 
+## [2026-06-30] ingest | claude-code unknown 세션
+- session: fd7c14c9
+- turns: 0, tokens: 0k
+- file: raw/.sessions/2026-06-30/claude-code_unknown_fd7c14c9.md
+
+## [2026-06-30] ingest | claude-code unknown 세션
+- session: 6ec95f0b
+- turns: 0, tokens: 0k
+- file: raw/.sessions/2026-06-30/claude-code_unknown_6ec95f0b.md
+
+## [2026-06-30] ingest | claude-code unknown 세션
+- session: a2532129
+- turns: 0, tokens: 0k
+- file: raw/.sessions/2026-06-30/claude-code_unknown_a2532129.md
+
+## [2026-06-30] ingest | claude-code unknown 세션
+- session: 6726d6c8
+- turns: 0, tokens: 0k
+- file: raw/.sessions/2026-06-30/claude-code_unknown_6726d6c8.md
+
+## [2026-06-30] ingest | claude-code unknown 세션
+- session: journal
+- turns: 0, tokens: 0k
+- file: raw/.sessions/2026-06-30/claude-code_unknown_journal.md
+
+## [2026-06-30] ingest | claude-code unknown 세션
+- session: journal
+- turns: 0, tokens: 0k
+- file: raw/.sessions/2026-06-30/claude-code_unknown_journal.md
+
+## [2026-06-30] ingest | agy-cli 15f2832d-2955-4411-81a0-aa217ffbc113 세션
+- session: 15f2832d
+- turns: 6, tokens: 0k
+- file: raw/.sessions/2026-06-30/agy-cli_15f2832d-2955-4411-81a0-aa217ffbc113_15f2832d.md
+
+## [2026-06-30] ingest | agy-cli 44362e12-be4b-404a-9bad-ab67ce6b4f22 세션
+- session: 44362e12
+- turns: 22, tokens: 0k
+- file: raw/.sessions/2026-06-30/agy-cli_44362e12-be4b-404a-9bad-ab67ce6b4f22_44362e12.md
+
+## [2026-06-30] ingest | agy-cli 5cbd6acd-7aa4-416e-b98f-dc6728995517 세션
+- session: 5cbd6acd
+- turns: 11, tokens: 0k
+- file: raw/.sessions/2026-06-30/agy-cli_5cbd6acd-7aa4-416e-b98f-dc6728995517_5cbd6acd.md
+
+## [2026-06-30] ingest | agy-cli 5eb1596b-7d9a-4387-b2c5-491eaaeae4e6 세션
+- session: 5eb1596b
+- turns: 16, tokens: 0k
+- file: raw/.sessions/2026-06-30/agy-cli_5eb1596b-7d9a-4387-b2c5-491eaaeae4e6_5eb1596b.md
+
+## [2026-06-30] ingest | agy-cli 5f3f981b-31a9-42a4-8f35-fa7b0462e2b4 세션
+- session: 5f3f981b
+- turns: 37, tokens: 0k
+- file: raw/.sessions/2026-06-30/agy-cli_5f3f981b-31a9-42a4-8f35-fa7b0462e2b4_5f3f981b.md
+
+## [2026-06-30] ingest | agy-cli 653c1f2c-fed7-40db-afc5-f360bc5b4506 세션
+- session: 653c1f2c
+- turns: 2, tokens: 0k
+- file: raw/.sessions/2026-06-30/agy-cli_653c1f2c-fed7-40db-afc5-f360bc5b4506_653c1f2c.md
+
+## [2026-06-30] ingest | agy-cli 6faaea7a-8c20-47b7-81d0-fc92c5208510 세션
+- session: 6faaea7a
+- turns: 9, tokens: 0k
+- file: raw/.sessions/2026-06-30/agy-cli_6faaea7a-8c20-47b7-81d0-fc92c5208510_6faaea7a.md
+
+## [2026-06-30] ingest | agy-cli 74583e3c-f95a-4413-8ad2-ebf52b6e9964 세션
+- session: 74583e3c
+- turns: 28, tokens: 0k
+- file: raw/.sessions/2026-06-30/agy-cli_74583e3c-f95a-4413-8ad2-ebf52b6e9964_74583e3c.md
+
+## [2026-06-30] ingest | agy-cli 8281ef84-b2aa-42ad-b101-6a5f4795bc60 세션
+- session: 8281ef84
+- turns: 9, tokens: 0k
+- file: raw/.sessions/2026-06-30/agy-cli_8281ef84-b2aa-42ad-b101-6a5f4795bc60_8281ef84.md
+
+## [2026-06-30] ingest | agy-cli 94c87105-3846-4cd7-a754-1cc9c63cd0c1 세션
+- session: 94c87105
+- turns: 15, tokens: 0k
+- file: raw/.sessions/2026-06-30/agy-cli_94c87105-3846-4cd7-a754-1cc9c63cd0c1_94c87105.md
+
+## [2026-06-30] ingest | agy-cli 99f966cc-1ae4-4dbb-9488-9aabc14bade5 세션
+- session: 99f966cc
+- turns: 18, tokens: 0k
+- file: raw/.sessions/2026-06-30/agy-cli_99f966cc-1ae4-4dbb-9488-9aabc14bade5_99f966cc.md
+
+## [2026-06-30] ingest | agy-cli a3bb1c65-9879-420a-be03-d828ec00417d 세션
+- session: a3bb1c65
+- turns: 26, tokens: 0k
+- file: raw/.sessions/2026-06-30/agy-cli_a3bb1c65-9879-420a-be03-d828ec00417d_a3bb1c65.md
+
+## [2026-06-30] ingest | agy-cli a5739e2d-ac02-4300-8eac-27191c5966b2 세션
+- session: a5739e2d
+- turns: 43, tokens: 0k
+- file: raw/.sessions/2026-06-30/agy-cli_a5739e2d-ac02-4300-8eac-27191c5966b2_a5739e2d.md
+
+## [2026-06-30] ingest | agy-cli bca655b9-a526-48fb-95f5-d97915ad88ca 세션
+- session: bca655b9
+- turns: 25, tokens: 0k
+- file: raw/.sessions/2026-06-30/agy-cli_bca655b9-a526-48fb-95f5-d97915ad88ca_bca655b9.md
+
+## [2026-06-30] ingest | agy-cli cbb75c39-909f-4d21-9795-a599194fe2a2 세션
+- session: cbb75c39
+- turns: 19, tokens: 0k
+- file: raw/.sessions/2026-06-30/agy-cli_cbb75c39-909f-4d21-9795-a599194fe2a2_cbb75c39.md
+
+## [2026-06-30] ingest | agy-cli e6de6d71-8ea7-4065-aef0-9ae1ea2b08a0 세션
+- session: e6de6d71
+- turns: 32, tokens: 0k
+- file: raw/.sessions/2026-06-30/agy-cli_e6de6d71-8ea7-4065-aef0-9ae1ea2b08a0_e6de6d71.md
+
+## [2026-06-30] ingest | agy-cli e7386501-092d-4ac8-ac2f-4dd53ec4de0b 세션
+- session: e7386501
+- turns: 9, tokens: 0k
+- file: raw/.sessions/2026-06-30/agy-cli_e7386501-092d-4ac8-ac2f-4dd53ec4de0b_e7386501.md
+
+## [2026-06-30] ingest | agy-cli f7ff2581-b368-41d1-a904-c79b3abaf305 세션
+- session: f7ff2581
+- turns: 9, tokens: 0k
+- file: raw/.sessions/2026-06-30/agy-cli_f7ff2581-b368-41d1-a904-c79b3abaf305_f7ff2581.md
+

@@ -7,6 +7,34 @@ updated_at: 2026-06-26
 
 ## Sessions
 
+- [[raw/.sessions/2026-06-30/agy-cli_f7ff2581-b368-41d1-a904-c79b3abaf305_f7ff2581|Untitled Session]] — 9턴, agy-cli, 19:02
+- [[raw/.sessions/2026-06-30/agy-cli_e7386501-092d-4ac8-ac2f-4dd53ec4de0b_e7386501|Untitled Session]] — 9턴, agy-cli, 19:02
+- [[raw/.sessions/2026-06-30/agy-cli_e6de6d71-8ea7-4065-aef0-9ae1ea2b08a0_e6de6d71|<USER_REQUEST>
+Please search the internal secall d...]] — 32턴, agy-cli, 19:00
+- [[raw/.sessions/2026-06-30/agy-cli_cbb75c39-909f-4d21-9795-a599194fe2a2_cbb75c39|<USER_REQUEST>
+Investigate the toss-contract-app c...]] — 19턴, agy-cli, 19:02
+- [[raw/.sessions/2026-06-30/agy-cli_bca655b9-a526-48fb-95f5-d97915ad88ca_bca655b9|<USER_REQUEST>
+Investigate 'Accessibility (a11y)' ...]] — 25턴, agy-cli, 19:02
+- [[raw/.sessions/2026-06-30/agy-cli_a5739e2d-ac02-4300-8eac-27191c5966b2_a5739e2d|Untitled Session]] — 43턴, agy-cli, 19:07
+- [[raw/.sessions/2026-06-30/agy-cli_a3bb1c65-9879-420a-be03-d828ec00417d_a3bb1c65|Untitled Session]] — 26턴, agy-cli, 19:06
+- [[raw/.sessions/2026-06-30/agy-cli_99f966cc-1ae4-4dbb-9488-9aabc14bade5_99f966cc|Untitled Session]] — 18턴, agy-cli, 18:54
+- [[raw/.sessions/2026-06-30/agy-cli_94c87105-3846-4cd7-a754-1cc9c63cd0c1_94c87105|Untitled Session]] — 15턴, agy-cli, 19:05
+- [[raw/.sessions/2026-06-30/agy-cli_8281ef84-b2aa-42ad-b101-6a5f4795bc60_8281ef84|Untitled Session]] — 9턴, agy-cli, 19:03
+- [[raw/.sessions/2026-06-30/agy-cli_74583e3c-f95a-4413-8ad2-ebf52b6e9964_74583e3c|Untitled Session]] — 28턴, agy-cli, 19:05
+- [[raw/.sessions/2026-06-30/agy-cli_6faaea7a-8c20-47b7-81d0-fc92c5208510_6faaea7a|Untitled Session]] — 9턴, agy-cli, 19:02
+- [[raw/.sessions/2026-06-30/agy-cli_653c1f2c-fed7-40db-afc5-f360bc5b4506_653c1f2c|Untitled Session]] — 2턴, agy-cli, 19:07
+- [[raw/.sessions/2026-06-30/agy-cli_5f3f981b-31a9-42a4-8f35-fa7b0462e2b4_5f3f981b|<USER_REQUEST>
+Investigate Mock-to-Real Data Misma...]] — 37턴, agy-cli, 19:03
+- [[raw/.sessions/2026-06-30/agy-cli_5eb1596b-7d9a-4387-b2c5-491eaaeae4e6_5eb1596b|Untitled Session]] — 16턴, agy-cli, 19:03
+- [[raw/.sessions/2026-06-30/agy-cli_5cbd6acd-7aa4-416e-b98f-dc6728995517_5cbd6acd|Untitled Session]] — 11턴, agy-cli, 19:02
+- [[raw/.sessions/2026-06-30/agy-cli_44362e12-be4b-404a-9bad-ab67ce6b4f22_44362e12|Untitled Session]] — 22턴, agy-cli, 19:07
+- [[raw/.sessions/2026-06-30/agy-cli_15f2832d-2955-4411-81a0-aa217ffbc113_15f2832d|Untitled Session]] — 6턴, agy-cli, 19:06
+- [[raw/.sessions/2026-06-30/claude-code_unknown_journal|Untitled Session]] — 0턴, claude-code, 19:07
+- [[raw/.sessions/2026-06-30/claude-code_unknown_journal|Untitled Session]] — 0턴, claude-code, 19:07
+- [[raw/.sessions/2026-06-30/claude-code_unknown_6726d6c8|Untitled Session]] — 0턴, claude-code, 19:07
+- [[raw/.sessions/2026-06-30/claude-code_unknown_a2532129|Untitled Session]] — 0턴, claude-code, 19:07
+- [[raw/.sessions/2026-06-30/claude-code_unknown_6ec95f0b|Untitled Session]] — 0턴, claude-code, 19:07
+- [[raw/.sessions/2026-06-30/claude-code_unknown_fd7c14c9|Untitled Session]] — 0턴, claude-code, 19:07
 - [[raw/.sessions/2026-06-30/agy-cli_c80ca46d-1a54-4426-a32d-77a6a5c3da65_c80ca46d|Untitled Session]] — 6턴, agy-cli, 18:41
 - [[raw/.sessions/2026-06-30/agy-cli_babe3aa9-78dd-49a3-9a27-def1df2e7360_babe3aa9|Untitled Session]] — 6턴, agy-cli, 18:39
 - [[raw/.sessions/2026-06-30/agy-cli_99f966cc-1ae4-4dbb-9488-9aabc14bade5_99f966cc|Untitled Session]] — 5턴, agy-cli, 18:39
