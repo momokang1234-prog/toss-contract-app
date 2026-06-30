@@ -101,6 +101,19 @@ granite.config.ts          # 미니앱 설정
 | `robustness-auditor` | 엣지케이스 |
 | `code-structure-analyzer` | 코드 구조 분석 |
 
+## Mock 모드 (IS_MOCK) 현황 — 2026-06-26 스캔
+
+MVP 단계로 백엔드 미연동 기능 4가지가 Mock 처리 중:
+
+| 기능 | 파일 | Mock 방식 |
+|------|------|-----------|
+| 로그인/인증 | `src/contexts/AuthContext.tsx` | `sessionStorage` 가짜 세션 |
+| 계약서 저장/조회 | `src/hooks/useContracts.ts` | `MockContractService` (메모리 배열) |
+| 사업장 관리 | `src/hooks/useBusiness.ts` | 로컬 배열 저장 |
+| 카카오 초대/공유 | `src/api/smart-messenger.ts` | `alert()` 팝업 |
+
+→ 세부 내용: [[mock-mode]]
+
 ## 관련 페이지
 
 - [[supabase]] — DB/Auth/Edge Functions 세부
@@ -108,5 +121,6 @@ granite.config.ts          # 미니앱 설정
 - [[contract-form]] — 퍼널 폼 세부
 - [[tds-mini-app]] — Granite/TDS 세부
 - [[agent-setup]] — .claude/ 에이전트 설정
+- [[mock-mode]] — IS_MOCK 플래그 전체 스캔 및 Un-mocking 로드맵
 - [[2026-06-17-migrate-omp-to-claude]] — OMP→Claude 결정
 - [[2026-06-22-worker-notification-share-api]] — 근로자 알림 결정
