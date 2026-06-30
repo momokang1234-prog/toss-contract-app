@@ -368,3 +368,24 @@ VoI 판단 기준: "이 정보가 결론 도출에 결정적인가? 아직 출�
 | 물·에너지 효율: WELS/MEPS | **TRUE** — EU 기준과 AU 기준(AS/NZS 2007.1:2021) 상이, 별도 인증 랩 테스팅 필수 |
 | 스마트 기기 보안 | **부분 TRUE** — ACMA가 아닌 호주 내무부(Home Affairs) 소관, 2026-03-04 발효; 3대 요건: ①기본 비밀번호 금지 ②취약점 보고 ③보안 업데이트 투명성 |
 | 현지 법적 대리인 | **TRUE** — EESS 외국 제조사 직접 등록 불가; ABN/NZ IRD 보유 현지 법인 또는 수입업자 지정 필수 |
+
+---
+
+## Advanced Multi-Agent Testing & Chaos Engineering 도메인 리서치 (2026-06-30)
+
+세션 `541c1dc6` — agy-cli 서브에이전트 (Leaf 리서처 역할)가 부모 오케스트레이터 `9b988031`의
+VoI 기반 위임을 받아 **Advanced Multi-Agent Testing & Chaos Engineering** 도메인을 리서치.
+결과를 `/root/research-team/test_domain1_chaos.md`로 저장 후 `send_message`로 부모에게 납품.
+
+### 주요 특이점
+
+- 파일명 접두어 `test_`: 파이프라인 테스트 실행(Dry-run) 산출물이거나 도메인 번호 명명(domain1)
+- 조사 주제: **멀티에이전트 시스템의 Chaos Engineering 적용** — 에이전트 간 통신 장애, 서브에이전트 실패, 오케스트레이터 다운 등 장애 주입(Fault Injection) 시나리오
+- 기존 `2025~2026 MAS 평가 트렌드` 섹션(세션 `9b988031`)의 후속 심화 리서치로 추정
+
+### 산출 파일
+
+```
+/root/research-team/
+  test_domain1_chaos.md   # Chaos Engineering 도메인 리서치 (세션 541c1dc6 산출물)
+```
