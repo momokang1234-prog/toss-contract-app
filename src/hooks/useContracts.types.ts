@@ -10,6 +10,7 @@ export interface Contract {
   worker_ci?: string;
   contract_type: string;
   status: string;
+  template_name?: string;
   start_date: string;
   end_date?: string;
   workplace: string;
@@ -89,6 +90,8 @@ export interface ContractService {
   fetchContracts(userKey: string, userRole: 'employer' | 'worker', phone?: string): Promise<Contract[]>;
   getContract(id: string): Promise<Contract | null>;
   createContract(input: Partial<Contract> & { business_id: string }, userKey: string): Promise<Contract>;
+  inviteWorker(business_id: string, employerKey: string): Promise<Contract>;
+  acceptInvite(id: string, workerInfo: { name: string; phone: string; ci?: string; ciHash?: string }): Promise<Contract>;
   updateContract(id: string, input: Partial<Contract>): Promise<Contract>;
   sendContract(id: string): Promise<Contract>;
   signContract(id: string, workerInfo: any): Promise<Contract>;
@@ -98,5 +101,6 @@ export interface ContractService {
   viewContract(id: string): Promise<Contract>;
   markDocumentReceived(id: string, docType: 'parent_consent' | 'family_cert' | 'employment_permit'): Promise<Contract>;
   rejectContract(id: string, reason?: string): Promise<Contract>;
+  requestChangeContract(id: string, reason: string): Promise<Contract>;
   getHistory(contractId: string): Promise<any[]>;
 }

@@ -1,7 +1,8 @@
-import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useFunnel } from '@use-funnel/browser';
 import { useContractForm } from './contract-form/hooks/useContractForm';
-import { Button, Paragraph, Spacing } from '@toss/tds-mobile';
+import { useContracts } from '../../hooks/useContracts';
+import { Button, Paragraph, Spacing, BottomSheet, TextField } from '@toss/tds-mobile';
 import styles from './ContractFormPage.module.css';
 import { type ContractFormStep, STEP_LABELS, STEP_ORDER, TOTAL_STEPS } from './contract-form/types';
 import Step1BasicInfo from './contract-form/steps/Step1BasicInfo';
@@ -14,8 +15,16 @@ import Step6Preview from './contract-form/steps/Step6Preview';
 import { ContractFormProgress } from './contract-form/ContractFormProgress';
 
 export default function ContractFormPage() {
+  const [isTemplateSheetOpen, setIsTemplateSheetOpen] = useState(false);
+  const [isLoadTemplateSheetOpen, setIsLoadTemplateSheetOpen] = useState(false);
+  const [templateName, setTemplateName] = useState('');
+  
+  const { contracts } = useContracts();
+  const templates = contracts.filter(c => c.status === 'template');
+  
   const {
     form,
+    saveAsTemplate,
     errors,
     warnings,
     validationResult,
@@ -32,7 +41,7 @@ export default function ContractFormPage() {
     navigate,
   } = useContractForm();
 
-  const isDevMock = sessionStorage.getItem('force_mock') === 'true';
+  const isDevMock = sessionStorage.getItem('mock_role') !== null || sessionStorage.getItem('force_mock') === 'true';
   const searchParams = new URLSearchParams(window.location.search);
   const requestedStep = searchParams.get('contract-form-wizard') as ContractFormStep | null;
   const initialStep = (isDevMock && requestedStep && STEP_ORDER.includes(requestedStep)) 
@@ -65,6 +74,14 @@ export default function ContractFormPage() {
     }
   }, [isValidStep, funnel.history]);
 
+  useEffect(() => {
+    if (isDevMock) {
+      (window as any).__MOCK_SET_FORM_AGREED = () => {
+        handleChange('checklist_agreed', true);
+      };
+    }
+  }, [isDevMock, handleChange]);
+
   const goNext = (nextStep: ContractFormStep) => {
     if (!validateStep(currentStep)) return;
     funnel.history.push(nextStep as 'basicInfo');
@@ -75,7 +92,8 @@ export default function ContractFormPage() {
   };
 
   const onValidationRun = () => {
-    if (validateStep('finalChecklist')) {
+    const passed = validateStep('finalChecklist');
+    if (passed) {
       funnel.history.push('preview');
     }
   };
@@ -88,8 +106,22 @@ export default function ContractFormPage() {
   return (
     <div className={styles.page}>
       <div className={styles.content}>
-        <div style={{ paddingTop: 20 }}>
+        <div style={{ paddingTop: 20, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <Paragraph typography="st3" fontWeight="bold">근로계약서 작성</Paragraph>
+          <div style={{ display: 'flex', gap: 16 }}>
+            <div 
+              style={{ color: '#8b95a1', fontWeight: 600, fontSize: 15, cursor: 'pointer', padding: '8px 0' }}
+              onClick={() => setIsLoadTemplateSheetOpen(true)}
+            >
+              양식 불러오기
+            </div>
+            <div 
+              style={{ color: '#3182F6', fontWeight: 600, fontSize: 15, cursor: 'pointer', padding: '8px 0' }}
+              onClick={() => setIsTemplateSheetOpen(true)}
+            >
+              양식 저장
+            </div>
+          </div>
         </div>
         <Spacing size={16} />
       <ContractFormProgress
@@ -196,6 +228,90 @@ export default function ContractFormPage() {
         )}
         </div>
       </div>
+
+      <BottomSheet
+        open={isTemplateSheetOpen}
+        onClose={() => setIsTemplateSheetOpen(false)}
+      >
+        <BottomSheet.Content>
+          <Paragraph typography="t4" fontWeight="bold">
+            어떤 이름으로 양식을 저장할까요?
+          </Paragraph>
+          <Spacing size={8} />
+          <Paragraph typography="t6" color="grey-600">
+            직무나 근무 시간표를 알아보기 쉬운 이름으로 저장해두면, 나중에 직원 이름만 바꿔서 다시 사용할 수 있어요.
+          </Paragraph>
+          <Spacing size={24} />
+          <TextField
+            variant="line"
+            labelOption="sustain"
+            label="양식 이름"
+            placeholder="예: 주말 홀 서빙 알바"
+            value={templateName}
+            onChange={(e) => setTemplateName(e.target.value)}
+          />
+          <Spacing size={40} />
+          <Button
+            size="large"
+            color="primary"
+            disabled={!templateName.trim() || submitting}
+            loading={submitting}
+            onClick={async () => {
+              const contract = await saveAsTemplate(templateName);
+              if (contract) {
+                setIsTemplateSheetOpen(false);
+                alert('양식이 저장되었습니다.');
+                navigate('/employer/dashboard');
+              }
+            }}
+            style={{ width: '100%' }}
+          >
+            양식 저장하기
+          </Button>
+        </BottomSheet.Content>
+      </BottomSheet>
+
+      <BottomSheet
+        open={isLoadTemplateSheetOpen}
+        onClose={() => setIsLoadTemplateSheetOpen(false)}
+        header={<BottomSheet.Header>양식 불러오기</BottomSheet.Header>}
+      >
+        <div style={{ padding: '0 24px 24px' }}>
+          {templates.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '40px 0' }}>
+              <Paragraph typography="t5" color="grey-600">저장된 양식이 없습니다.</Paragraph>
+              <Spacing size={8} />
+              <Paragraph typography="t7" color="grey-500">지금 작성 중인 계약서를 양식으로 저장해보세요.</Paragraph>
+              <Spacing size={24} />
+              <Button size="large" variant="fill" color="primary" onClick={() => setIsLoadTemplateSheetOpen(false)}>
+                계속 작성하기
+              </Button>
+            </div>
+          ) : (
+            <div>
+              <Paragraph typography="t6" color="grey-600" style={{ marginBottom: 16 }}>
+                기존 양식을 불러오면 현재 작성 중인 내용은 모두 덮어씌워집니다.
+              </Paragraph>
+              {templates.map(t => (
+                <Button
+                  key={t.id}
+                  size="large"
+                  variant="weak"
+                  color="dark"
+                  style={{ width: '100%', marginBottom: 12, justifyContent: 'flex-start', paddingLeft: 20 }}
+                  onClick={() => {
+                    setIsLoadTemplateSheetOpen(false);
+                    // Just navigate with templateId, this triggers useContractForm to reload the data!
+                    window.location.href = `/employer/contracts/new?templateId=${t.id}`;
+                  }}
+                >
+                  <span style={{ fontSize: 20, marginRight: 12 }}>📄</span> {t.template_name || '이름 없는 양식'}
+                </Button>
+              ))}
+            </div>
+          )}
+        </div>
+      </BottomSheet>
     </div>
   );
 }

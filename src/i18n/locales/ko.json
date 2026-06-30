@@ -133,13 +133,22 @@
       "sign": "서명하기",
       "rejectPrompt": "계약서 내용이 조금 다른가요?",
       "rejectPromptSub": "사장님께 수정을 요청할 수 있어요",
-      "rejectTitle": "계약서 거절",
+      "rejectTitle": "계약 수정 요청",
       "rejectConfirm": "정말 계약 수정을 요청하시겠습니까?",
       "rejectReasonLabel": "수정 요청 사유 (선택)",
       "rejectReasonPlaceholder": "예: 근무 시간이 조금 달라요",
       "rejectSubmit": "수정 요청하기",
       "rejectProcessing": "처리 중...",
-      "rejectFailed": "수정 요청 처리에 실패했습니다"
+      "rejectFailed": "수정 요청 처리에 실패했습니다",
+      "rejectHardPrompt": "계약을 진행하고 싶지 않으신가요?",
+      "rejectHardPromptSub": "계약을 완전히 거절할 수 있어요",
+      "rejectHardTitle": "계약 거절",
+      "rejectHardConfirm": "정말 계약을 거절하시겠습니까? 거절 후에는 되돌릴 수 없습니다.",
+      "rejectHardReasonLabel": "거절 사유 (선택)",
+      "rejectHardReasonPlaceholder": "예: 조건이 맞지 않습니다",
+      "rejectHardSubmit": "거절하기",
+      "rejectHardProcessing": "처리 중...",
+      "rejectHardFailed": "거절 처리에 실패했습니다"
     }
   },
   "error": {

@@ -7,7 +7,7 @@ import { useParams, useNavigate, Navigate, useLocation } from 'react-router-dom'
 import { useContracts, type Contract } from '../../hooks/useContracts';
 import { useBusiness } from '../../hooks/useBusiness';
 import { shareContract } from '../../api/smart-messenger';
-import { Top, Paragraph, Spacing, Button, Badge, TextButton, BottomSheet } from '@toss/tds-mobile';
+import { Top, Paragraph, Spacing, Button, Badge, TextButton, BottomSheet, TextField } from '@toss/tds-mobile';
 import { getContractBadge } from '../../utils/badgeUtils';
 import { ContractDocumentView } from '../../components/contract/ContractDocumentView';
 import { DocumentReceiptTracker } from '../../components/contract/DocumentReceiptTracker';
@@ -18,7 +18,7 @@ export default function ContractDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
-  const { getContract, sendContract, completeContract, cancelContract, markDocumentReceived, getHistory } = useContracts();
+  const { getContract, sendContract, completeContract, cancelContract, markDocumentReceived, getHistory, createContract } = useContracts();
   const { businesses } = useBusiness();
   const [contract, setContract] = useState<Contract | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -27,6 +27,26 @@ export default function ContractDetailPage() {
   const [isSignatureSheetOpen, setIsSignatureSheetOpen] = useState(false);
   const [employerSignature, setEmployerSignature] = useState('');
   const [isCompletionModalOpen, setIsCompletionModalOpen] = useState(location.state?.justCreated === true);
+
+  const [isTemplateSheetOpen, setIsTemplateSheetOpen] = useState(false);
+  const [templateName, setTemplateName] = useState('');
+  const [savingTemplate, setSavingTemplate] = useState(false);
+
+  const handleSaveAsTemplate = async () => {
+    if (!contract || !templateName.trim()) return;
+    setSavingTemplate(true);
+    try {
+      const templateData = { ...contract, status: 'template', template_name: templateName, id: undefined, created_at: undefined, updated_at: undefined };
+      await createContract(templateData as any);
+      setIsTemplateSheetOpen(false);
+      alert('양식이 성공적으로 저장되었습니다!');
+    } catch (e) {
+      console.error(e);
+      alert('양식 저장에 실패했습니다.');
+    } finally {
+      setSavingTemplate(false);
+    }
+  };
 
   useEffect(() => {
     if (location.state?.justCreated) {
@@ -115,7 +135,7 @@ export default function ContractDetailPage() {
   const b = getContractBadge(contract.status);
   const canSend = contract.status === 'draft';
   const canComplete = contract.status === 'signed';
-  const canEdit = contract.status === 'draft' || contract.status === 'rejected';
+  const canEdit = contract.status === 'draft' || contract.status === 'rejected' || contract.status === 'change_requested';
 
   const primaryAction = canSend
     ? { label: '근로자에게 공유하기', action: async () => {
@@ -294,6 +314,15 @@ export default function ContractDetailPage() {
             </div>
           )}
           {contract.status === 'rejected' && (
+            <div style={{ backgroundColor: '#FFF0F0', padding: 20, borderRadius: 16, marginBottom: 24, border: '1px solid #FFD4D4' }}>
+              <Paragraph typography="t5" fontWeight="bold" color="red-500">🚫 근로자가 계약을 거절했습니다</Paragraph>
+              <Spacing size={8} />
+              <div style={{ backgroundColor: '#fff', padding: 16, borderRadius: 12 }}>
+                <Paragraph typography="t7" color="red-500">거절 사유: {contract.rejection_reason || '사유 없음'}</Paragraph>
+              </div>
+            </div>
+          )}
+          {contract.status === 'change_requested' && (
             <div style={{ backgroundColor: '#E8F3FF', padding: 20, borderRadius: 16, marginBottom: 24, border: '1px solid #D1E4FF' }}>
               <Paragraph typography="t5" fontWeight="bold" color="blue-500">💬 근로자가 계약 수정을 요청했습니다</Paragraph>
               <Spacing size={8} />
@@ -331,10 +360,16 @@ export default function ContractDetailPage() {
                   {primaryAction.label}
                 </Button>
               </div>
-              <Spacing size={100} />
             </>
           )}
 
+          {contract.status !== 'cancelled' && contract.status !== 'template' && (
+            <div style={{ marginTop: primaryAction ? 16 : 0, paddingBottom: 40, textAlign: 'center' }}>
+              <TextButton size="large" onClick={() => setIsTemplateSheetOpen(true)}>
+                이 계약서를 양식으로 저장
+              </TextButton>
+            </div>
+          )}
         </CommentBoundary>
 
         {/* 계약서 히스토리 (인라인) */}

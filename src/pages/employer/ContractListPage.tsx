@@ -8,9 +8,13 @@ import { CommentBoundary } from '../dev/CommentBoundary';
 import { getContractBadge } from '../../utils/badgeUtils';
 import styles from './ContractListPage.module.css';
 
-function ContractListContent({ contracts, navigate }: {
+import { InviteWorkerSheet } from '../../components/delivery/InviteWorkerSheet';
+import { useState } from 'react';
+
+function ContractListContent({ contracts, navigate, onNewContract }: {
   contracts: any[];
   navigate: (path: string) => void;
+  onNewContract: () => void;
 }) {
   return (
     <div className={styles.content}>
@@ -96,7 +100,7 @@ function ContractListContent({ contracts, navigate }: {
           </Paragraph>
           <Spacing size={24} />
           <Button color="primary" variant="fill" size="large"
-            onClick={() => navigate('/employer/contracts/new')}>
+            onClick={onNewContract}>
             계약서 작성하기
           </Button>
         </div>
@@ -109,12 +113,16 @@ function ContractListContent({ contracts, navigate }: {
 export default function ContractListPage() {
   const navigate = useNavigate();
   const { contracts } = useContracts();
+  const [isInviteSheetOpen, setIsInviteSheetOpen] = useState(false);
+
+  // Filter out templates from the general list
+  const activeContracts = contracts.filter(c => c.status !== 'template');
 
   return (
     <div className={styles.page}>
       <Top title="">
         <Button color="primary" variant="weak" size="small"
-          onClick={() => navigate('/employer/contracts/new')}>
+          onClick={() => setIsInviteSheetOpen(true)}>
           + 새 계약서
         </Button>
       </Top>
@@ -136,8 +144,10 @@ export default function ContractListPage() {
           </Delay>
         }
       >
-        <ContractListContent contracts={contracts} navigate={navigate} />
+        <ContractListContent contracts={activeContracts} navigate={navigate} onNewContract={() => setIsInviteSheetOpen(true)} />
       </Suspense>
+
+      <InviteWorkerSheet open={isInviteSheetOpen} onClose={() => setIsInviteSheetOpen(false)} />
     </div>
   );
 }

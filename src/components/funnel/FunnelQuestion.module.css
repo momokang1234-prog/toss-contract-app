@@ -1,5 +1,23 @@
 .boardRowWrapper {
   margin-bottom: 8px;
+  border-radius: 16px;
+  transition: all 0.3s ease;
+}
+
+.active {
+  background-color: white;
+  padding: 16px;
+  margin: 16px 0;
+  border: 1px solid #e5e8eb;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+.completed {
+  opacity: 0.6;
+}
+
+.completed:hover {
+  opacity: 1;
 }
 
 .boardRow {

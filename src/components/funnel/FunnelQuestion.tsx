@@ -31,15 +31,16 @@ export function FunnelQuestion({ title, subtitle, isActive, onEnter, summary, ch
   if (!isActive && !summary) return null;
 
   // 헤더에는 summary(예: "이름: 홍길동")만 노출해 접힌 상태를 표현해요.
-  // 활성 질문의 큰 title(24px)은 항상 본문(.title)에 렌더해 폰트 크기를 유지해요.
-  const headerTitle = summary ?? '';
+  // 활성 상태일 때는 중복을 피하기 위해 헤더를 비웁니다.
+  const headerTitle = !isActive && summary ? summary : '';
+  const prefix = !isActive && summary ? <BoardRow.Prefix>✓</BoardRow.Prefix> : undefined;
 
   return (
-    <div ref={containerRef} className={styles.boardRowWrapper}>
+    <div ref={containerRef} className={`${styles.boardRowWrapper} ${isActive ? styles.active : styles.completed}`}>
       <BoardRow
         isOpened={isActive}
         onOpen={onEnter}
-        prefix={summary ? <BoardRow.Prefix>✓</BoardRow.Prefix> : undefined}
+        prefix={prefix}
         title={headerTitle}
         className={styles.boardRow}
       >

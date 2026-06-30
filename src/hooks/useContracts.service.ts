@@ -1,10 +1,23 @@
 import { Contract, DocStatus, ContractService } from './useContracts.types';
 import { MOCK_CONTRACTS, generateContractHtml } from './useContracts.mock';
 
-export let mockContractStore = [...MOCK_CONTRACTS];
+let initialStore = [...MOCK_CONTRACTS];
+if (typeof window !== 'undefined') {
+  const saved = localStorage.getItem('MOCK_CONTRACTS_STORE');
+  if (saved) {
+    try { initialStore = JSON.parse(saved); } catch (e) {}
+  } else {
+    localStorage.setItem('MOCK_CONTRACTS_STORE', JSON.stringify(initialStore));
+  }
+}
+
+export let mockContractStore = initialStore;
 
 export function setMockContractStore(newStore: Contract[]) {
   mockContractStore = newStore;
+  if (typeof window !== 'undefined') {
+    localStorage.setItem('MOCK_CONTRACTS_STORE', JSON.stringify(mockContractStore));
+  }
 }
 
 /** Mock 계약서 신규 조립 로직 */
@@ -121,6 +134,52 @@ export class MockContractService implements ContractService {
     return newContract;
   }
 
+  async inviteWorker(business_id: string, employerKey: string): Promise<Contract> {
+    const newContract: Contract = {
+      id: `mock-contract-${Date.now()}`,
+      business_id,
+      employer_user_key: employerKey,
+      worker_name: '',
+      worker_phone: '',
+      contract_type: 'fullTime',
+      status: 'invited',
+      start_date: '',
+      workplace: '',
+      job_description: '',
+      wage_type: 'hourly',
+      base_wage: 0,
+      wage_payment_date: '',
+      wage_payment_method: 'bankTransfer',
+      work_days: [],
+      start_time: '',
+      end_time: '',
+      break_start_time: '',
+      break_end_time: '',
+      paid_leave_clause: true,
+      pension: true,
+      health_insurance: true,
+      employment_insurance: true,
+      accident_insurance: true,
+      social_insurance_clause: true,
+      severance_clause: true,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    };
+    setMockContractStore([newContract, ...mockContractStore]);
+    return newContract;
+  }
+
+  async acceptInvite(id: string, workerInfo: { name: string; phone: string; ci?: string; ciHash?: string }): Promise<Contract> {
+    const contract = mockContractStore.find(c => c.id === id);
+    if (!contract) throw new Error('초대장을 찾을 수 없습니다.');
+    return this.updateContract(id, { 
+      status: 'connected',
+      worker_name: workerInfo.name,
+      worker_phone: workerInfo.phone,
+      worker_ci: workerInfo.ci,
+    });
+  }
+
   async updateContract(id: string, input: Partial<Contract>): Promise<Contract> {
     setMockContractStore(mockContractStore.map(c => c.id === id ? { ...c, ...input, updated_at: new Date().toISOString() } : c));
     return mockContractStore.find(c => c.id === id)!;
@@ -173,6 +232,10 @@ export class MockContractService implements ContractService {
 
   async rejectContract(id: string, reason?: string): Promise<Contract> {
     return this.updateContract(id, { status: 'rejected', rejection_reason: reason });
+  }
+
+  async requestChangeContract(id: string, reason: string): Promise<Contract> {
+    return this.updateContract(id, { status: 'change_requested', rejection_reason: reason });
   }
 
   async getHistory(contractId: string): Promise<any[]> {

@@ -19,6 +19,7 @@ import {
   formatWagePaymentDate,
   wagePaymentDayLabel,
 } from '../buildContractData';
+import { buildContractData as buildDomainContractData } from '../../../../domain/contract/buildContractData';
 
 function mapFieldPath(path: string): string {
   const parts = path.split('.');
@@ -68,26 +69,32 @@ export function useContractForm() {
     }
   }, [businesses, form.workplace]);
 
-  // Restore from session on mount, or load from DB if editing
+  // Restore from session on mount, or load from DB if editing/template
   const { id } = useParams();
+  const searchParams = new URLSearchParams(window.location.search);
+  const templateId = searchParams.get('templateId');
   const { getContract, updateContract } = useContracts();
   const mounted = useRef(false);
   useEffect(() => {
     if (mounted.current) return;
     mounted.current = true;
     
-    if (id) {
-      getContract(id).then(c => {
+    if (id || templateId) {
+      const loadId = id || templateId!;
+      getContract(loadId).then(c => {
         if (c) {
-          if (c.status !== 'draft' && c.status !== 'rejected') {
+          if (id && c.status !== 'draft' && c.status !== 'rejected' && c.status !== 'change_requested' && c.status !== 'template') {
             alert('발송되었거나 서명이 완료된 계약은 수정할 수 없습니다.');
             navigate(`/employer/contracts/${c.id}`, { replace: true });
             return;
           }
+          
+          const isTemplate = !!templateId || c.status === 'template';
+          
           setForm({
-            worker_name: c.worker_name,
-            worker_phone: c.worker_phone,
-            worker_address: c.worker_address || '',
+            worker_name: isTemplate ? '' : c.worker_name,
+            worker_phone: isTemplate ? '' : c.worker_phone,
+            worker_address: isTemplate ? '' : (c.worker_address || ''),
             contract_type: c.contract_type as any,
             workplace: c.workplace,
             job_description: c.job_description,
@@ -107,7 +114,7 @@ export function useContractForm() {
             employment_insurance: c.employment_insurance,
             accident_insurance: c.accident_insurance,
             severance_clause: c.severance_clause,
-            checklist_agreed: false,
+            checklist_agreed: isTemplate ? false : false,
             other_conditions: c.other_conditions || '',
             employer_signature_data: c.employer_signature_data,
           });
@@ -268,7 +275,12 @@ export function useContractForm() {
           navigate('/employer/business/new');
           return false;
         }
-        if (!form.checklist_agreed) {
+        
+        const contractData = buildDomainContractData(form);
+        const vr = validateLaborContract(contractData);
+        if (!vr.valid && vr.errors.length > 0) {
+          e.checklist_agreed = '법적 기준에 미달하는 항목이 있습니다. 위 안내된 항목을 수정해주세요.';
+        } else if (!form.checklist_agreed) {
           e.checklist_agreed = '체크리스트 확인에 동의해주세요';
         }
         break;
@@ -286,7 +298,7 @@ export function useContractForm() {
       const contractData = buildContractData(form, businesses[0].id);
 
       if (id) {
-        contract = await updateContract(id, contractData);
+        contract = await updateContract(id, { ...contractData, status: 'draft', rejection_reason: "" });
       } else {
         contract = await createContract(contractData);
       }
@@ -299,9 +311,31 @@ export function useContractForm() {
       setSubmitting(false);
     }
   };
+  const saveAsTemplate = async (templateName: string) => {
+    if (businesses.length === 0) { alert('먼저 사업장을 등록해주세요.'); return null; }
+    setSubmitting(true);
+    try {
+      let contract;
+      const contractData = buildContractData(form, businesses[0].id);
+
+      if (id) {
+        contract = await updateContract(id, { ...contractData, status: 'template', template_name: templateName, rejection_reason: "" });
+      } else {
+        contract = await createContract({ ...contractData, status: 'template', template_name: templateName });
+      }
+      return contract;
+    } catch (err) {
+      console.error(err);
+      alert('템플릿 저장에 실패했습니다.');
+      return null;
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   return {
     form,
+    saveAsTemplate,
     errors,
     warnings,
     validationResult,

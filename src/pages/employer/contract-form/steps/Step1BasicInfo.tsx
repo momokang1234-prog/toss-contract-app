@@ -74,26 +74,38 @@ export default function Step1BasicInfo({ form, errors, handleChange }: Step1Basi
       </CommentBoundary>
       )}
 
-      {/* Show address field if phone is filled or address is active */}
+      {/* Show address field if phone is filled or address is already active */}
       {(form.worker_phone.length >= 10 || activeField === 'address') && (
       <CommentBoundary name="기본정보-주소필드">
       <FunnelQuestion
-        title={<>{form.worker_name}님의 주소를<br/>입력해주세요</>}
-        subtitle="선택사항이며 나중에 적어도 돼요"
+        title={<>{form.worker_name}님의 주소를<br/>알려주세요</>}
+        subtitle="선택입력 사항입니다"
         isActive={activeField === 'address'}
         onEnter={() => setActiveField('address')}
         summary={form.worker_address ? `주소: ${form.worker_address}` : undefined}
       >
-        <label className="funnel-label">근로자 주소 (선택)</label>
+        <label className="funnel-label">주소</label>
         <input
           className="funnel-huge-input"
-          placeholder="서울특별시 강남구..."
-          value={form.worker_address}
+          type="text"
+          placeholder="예: 서울특별시 강남구 테헤란로 142"
+          value={form.worker_address || ''}
           onChange={e => handleChange('worker_address', e.target.value)}
+          onKeyDown={e => {
+            if (e.key === 'Enter') {
+              e.currentTarget.blur();
+            }
+          }}
         />
+        {errors.worker_address && (
+          <div style={{ color: '#f04452', fontSize: '13px', marginTop: '8px' }}>
+            {errors.worker_address}
+          </div>
+        )}
       </FunnelQuestion>
       </CommentBoundary>
       )}
+
     </div>
   );
 }

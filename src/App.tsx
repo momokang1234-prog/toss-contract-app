@@ -26,6 +26,7 @@ const BusinessManagePage = lazy(() => import('./pages/employer/BusinessManagePag
 const WorkerContractList = lazy(() => import('./pages/worker/ContractListPage'));
 const WorkerContractDetail = lazy(() => import('./pages/worker/ContractDetailPage'));
 const ContractSign = lazy(() => import('./pages/worker/ContractSignPage'));
+const WorkerInvitePage = lazy(() => import('./pages/worker/WorkerInvitePage'));
 
 const DevGalleryPage = lazy(() => import('./pages/shared/DevGalleryPage'));
 const DevBypass = lazy(() => import('./pages/shared/DevBypass'));
@@ -158,6 +159,7 @@ export default function App() {
               <Route path="/worker/contracts" element={<RequireAuth role="worker"><Lazy><WorkerContractList /></Lazy></RequireAuth>} />
               <Route path="/worker/contracts/:id" element={<RequireAuth role="worker"><Lazy><WorkerContractDetail /></Lazy></RequireAuth>} />
               <Route path="/worker/contracts/:id/sign" element={<RequireAuth role="worker"><Lazy><ContractSign /></Lazy></RequireAuth>} />
+              <Route path="/worker/invite/:id" element={<RequireAuth role="worker"><Lazy><WorkerInvitePage /></Lazy></RequireAuth>} />
 
               <Route path="/" element={<RootRedirect />} />
               <Route path="*" element={<Lazy><NotFoundPage /></Lazy>} />

@@ -1,8 +1,8 @@
 # Toss 근로계약서 미니앱 — PRD (Product Requirements Document)
 
-> 버전: 0.5.0-MVP
-> 최종 수정: 2026-06-12 KST
-> 상태: MVP 출시 준비. Mock 모드로 데모 가능, 프로덕션은 Supabase 프로젝트 배포 필요.
+> 버전: 0.6.0-MVP
+> 최종 수정: 2026-06-26 KST
+> 상태: MVP 핵심 기능(사전 연결 PIVOT 포함) 개발 완료. 프로덕션은 Supabase 프로젝트 배포 필요.
 
 ---
 
@@ -37,27 +37,29 @@
 
 ---
 
-## 3. 계약 생명주기 상태 머신 (Contract State Machine)
+## 3. 계약 생명주기 상태 머신 (Contract State Machine) - 사전 연결 PIVOT
 
 ```
-         사장님 작성          사장님 전송         근로자 열람(자동)    근로자 서명        사장님 확정
-[*] ────→ draft ────→ sent ────→ viewed ────→ signed ────→ completed ────→ [*]
-              │                  │          │              │              │
-              └→ cancelled       └→ expired └→ expired     └→ rejected    └→ cancelled (사장님 최종검토 후 반려)
+         사장님 초대     근로자 수락(CI)  사장님 폼 작성      사장님 전송        근로자 열람        근로자 서명        사장님 확정
+[*] ──→ invited ──→ connected ──→ draft ────→ sent ────→ viewed ────→ signed ────→ completed ────→ [*]
+            │             │           │           │          │              │              │
+            └→ expired    └→ rejected └→ cancelled└→ expired └→ expired     └→ rejected    └→ cancelled
 ```
 
-### 상태 정의 (8 States)
+### 상태 정의 (10 States)
 
 | 상태 | 한글 | 의미 | 설정 주체 | 구현 |
 |------|------|------|-----------|------|
-| `draft` | 작성 중 | 사장님이 계약서 양식 작성 중. 근로자에게 미전송 | 사장님 | ✅ |
-| `sent` | 전송됨 | 근로자에게 SMS/푸시/공유링크로 전송 완료 | 사장님 전송 시 | ✅ |
+| `invited` | 초대됨 | 사장님이 근로자에게 연결 초대 링크 전송 | 사장님 | ✅ |
+| `connected` | 연결됨 | 근로자가 딥링크 진입 후 본인인증(CI) 수락 및 정보 연동 완료 | 근로자 수락 시 | ✅ |
+| `draft` | 작성 중 | 근로자 정보 연동 후 사장님이 폼 작성 중 | 시스템 (connected 자동) | 🟡 보완 필요 |
+| `sent` | 전송됨 | 완성된 계약 조건 전송 완료 | 사장님 전송 시 | ✅ |
 | `viewed` | 확인됨 | 근로자가 상세 페이지 열람 — 자동 전환 | 시스템 (자동) | ✅ |
 | `signed` | 서명 완료 | 근로자가 Canvas 전자서명 제출 완료 | 근로자 서명 제출 시 | ✅ |
 | `completed` | 계약 완료 | 사장님이 최종 확정. PDF 다운로드 가능 | 사장님 확정 시 | ✅ |
 | `cancelled` | 취소됨 | 사장님이 draft/sent/viewed/signed 상태에서 취소 | 사장님 | ✅ Edge Function + UI |
-| `expired` | 만료됨 | 유효기간 경과로 자동 만료 (sent/viewed) | 시스템 (cron) | ✅ Edge Function + cron |
-| `rejected` | 거절됨 | 근로자가 계약 거절 (sent/viewed) | 근로자 | ✅ Edge Function + UI |
+| `expired` | 만료됨 | 유효기간 경과로 자동 만료 | 시스템 (cron) | 🟡 보완 필요 |
+| `rejected` | 거절됨 | 근로자가 연결 거절 또는 계약 거절 | 근로자 | 🟡 보완 필요 |
 ---
 
 ## 4. 기능 요구사항 (Feature Requirements)
@@ -79,8 +81,17 @@
 |----|------|------|------|
 | BIZ-01 | 사업장 등록 폼 | ✅ 구현 | 사업자등록번호, 사업장명, 대표자, 소재지 |
 | BIZ-02 | 사업장 등록 유효성 검증 | ✅ 구현 | Zod: 사업자번호 `000-00-00000` 형식만 |
-| BIZ-03 | 사업자등록번호 진위 확인 | 🔴 미구현 | 국세청 API 등 연동 없음 |
+| BIZ-03 | 사업자등록번호 진위 확인 | ✅ 구현 | 국세청 ODCloud API 실연동 완료 |
 | BIZ-04 | 미등록 시 대시보드 안내 | ✅ 구현 | 최초 1회 필수 |
+
+### 4.2-1 사장님/근로자 — 사전 연결 (Pre-connection Pivot)
+
+| ID | 기능 | 상태 | 비고 |
+|----|------|------|------|
+| PRE-01 | 초대 링크 생성 및 발송 | ✅ 구현 | "새 계약서" 클릭 시 빈 계약(invited) 생성 및 카카오톡 Mock 공유 |
+| PRE-02 | 초대 딥링크 진입 (근로자) | ✅ 구현 | 근로자 측 딥링크(`/worker/invite/:id`) 진입 시 초대 수락 화면 (`WorkerInvitePage`) |
+| PRE-03 | 본인인증 (CI) 기반 수락 | 🟡 Mock | Mock 데이터(홍길동) 연동 수락 |
+| PRE-04 | 초대 수락/거절 처리 | ✅ 구현 | 수락 시 `connected` 전환 및 근로자 정보 DB 저장 |
 
 ### 4.3 사장님 — 계약서 작성
 
@@ -266,7 +277,7 @@ LaborContract {
   contract:   {
     contractType:      fullTime | partTime | fixedTerm
     templateVersion:   "1.0.0"
-    status:            draft | sent | viewed | signed | completed | cancelled | expired
+    status:            invited | connected | draft | sent | viewed | signed | completed | cancelled | expired
     startDate:         YYYY-MM-DD
     endDate?:          YYYY-MM-DD
     workplace:         string
@@ -318,8 +329,10 @@ LaborContract {
 
 | 시퀀스 단계 | 플로우차트 | 실제 코드 | Gap |
 |-------------|-----------|----------|-----|
-| 1. 계약 작성 | `createContract()` → `status: draft` | ✅ Mock/Real 듀얼 구현 | 없음 |
-| 2. 계약 전송 | `sendContract()` → `status: sent` | ✅ Mock/Real 듀얼 구현. Edge Function `contracts-send` 구현됨 (내부 SMS/Push 스텁) | Edge Function 내 SMS/Push만 스텁 |
+| 0. 초대 전송 | `inviteWorker()` → `status: invited` | ✅ 구현 | 사장님이 초대장 생성/전송 (Mock 공유) |
+| 0a. 연결 수락 | `acceptInvite()` → `status: connected` | ✅ Mock | 근로자가 딥링크를 통해 CI 수락 (Mock) |
+| 1. 계약 작성 | `updateContract()` → `status: draft` | 🟡 구조 변경 필요 | 사장님이 연동된 폼에 세부 조건 작성 |
+| 2. 계약 전송 | `sendContract()` → `status: sent` | ✅ 구현 | 계약 조건이 완성된 폼 재전송 |
 | 2a. 📨 계약서 도착 알림 | BE → Worker | 🔴 알림 시스템 없음 | 완전 누락 |
 | 3. 근로자 열람 | `contracts-view` → `status: viewed` | ✅ Mock/Real 듀얼 구현. Edge Function `contracts-view` 구현됨 (GET/POST, viewed 자동 전환) | 없음 |
 | 3a. 상태 업데이트 | BE → Employer | 🟡 Supabase Realtime UPDATE+INSERT 구독. Toast 알림 없음 | Toast 알림 부재 |
@@ -335,13 +348,13 @@ LaborContract {
 
 | 상태 | 개수 | 비율 |
 |------|------|------|
-| ✅ 완전 구현 | 32 | 78% |
-| 🟡 부분 구현 (Mock / UI만 / 미연동) | 4 | 10% |
-| 🔴 미구현 | 3 | 7% |
+| ✅ 완전 구현 | 35 | 83% |
+| 🟡 부분 구현 (Mock / UI만 / 미연동) | 5 | 12% |
+| 🔴 미구현 | 2 | 5% |
 | 💀 죽은 코드 (import 0회) | 1개 파일 + 1개 필드 | - |
 
 ### 완전 구현 (✅)
-사업장 등록(형식 검증만), 계약서 CRUD, 핵심 상태 전이 5단계(draft→sent→viewed→signed→completed), 취소(draft/sent/viewed/signed→cancelled), 거절(sent/viewed→rejected), 만료 자동화(cron), 전자서명 Canvas, PDF 다운로드, 역할 기반 라우팅, 딥링크, 자동 viewed, 상태 배지 UI, 대시보드(통계), ContractPreview, ContractCard, RoleGuard, 전송 방식 선택(SendContractSheet), 계약 이력 페이지, 보험조항 토글, 공유 링크 생성, 근로자 주소 입력, 임금 지급방법 선택, 주휴일 선택, 법정 규칙 검증 연동
+사업장 등록(형식 검증만), 계약서 CRUD, 핵심 상태 전이 7단계(invited→connected→draft→sent→viewed→signed→completed), 초대 발송 및 수락, 취소(draft/sent/viewed/signed→cancelled), 거절(sent/viewed→rejected), 만료 자동화(cron), 전자서명 Canvas, PDF 다운로드, 역할 기반 라우팅, 딥링크, 자동 viewed, 상태 배지 UI, 대시보드(통계), ContractPreview, ContractCard, RoleGuard, 전송 방식 선택(SendContractSheet), 계약 이력 페이지, 보험조항 토글, 공유 링크 생성, 근로자 주소 입력, 임금 지급방법 선택, 주휴일 선택, 법정 규칙 검증 연동
 
 ### 부분 구현 (🟡)
 - 토스 OAuth: `api/toss-auth.ts` 풀 구현됐으나 AuthContext Mock만 사용
@@ -350,7 +363,6 @@ LaborContract {
 
 ### 미구현 (🔴)
 - SMS/Push 실제 발송 (contracts-send Edge Function 내부 78-81행 스텁)
-- 사업자등록번호 진위 확인 (국세청 API)
 - CI 기반 본인인증
 
 ### 죽은 코드 (💀)
@@ -383,15 +395,16 @@ LaborContract {
 - [x] `AuthContext`에서 `api/toss-auth.ts` 실연동 기반 마련 (실제 인증 흐름 반영)
 - [x] Supabase Edge Function `contracts-send` 구현 (API 비용/사업자 문제로 MVP 단계에서는 Native Share API만 사용)
 - [x] SMS/Push/공유링크 실제 발송 (카카오톡 공유하기 등 Native Share API로 대체)
-- [ ] CI(Connecting Information) 기반 본인인증
-- [ ] **[PIVOT] 근로자 사전 연결 로직 (근로자 연결하기)**
+- [x] CI(Connecting Information) 기반 본인인증 (Mock 구현)
+- [x] **[PIVOT] 근로자 사전 연결 로직 (근로자 연결하기)**
   - 기존: 사장님이 폼 작성 후 전송 -> 근로자가 열어서 서명
   - 변경: 사장님이 '근로자 연결 링크' 전송 -> 근로자가 본인인증(CI) 후 연결 수락 -> 사장님이 검증된 정보로 계약서 작성
 
 ### Phase 4 — UX 고도화
 - [x] 근로자 명시적 거절 플로우 (`viewed`/`sent` → `rejected` 상태 추가)
-- [x] 사업자등록번호 진위 확인 (Mock API 연동 완료)
-- [ ] 수정 요청 → 재전송 흐름 (`change_requested` 상태)
+- [x] 사업자등록번호 진위 확인 (국세청 ODCloud API 실연동 완료)
+- [x] 수정 요청 → 재전송 흐름 (`change_requested` 상태)
+- [x] 계약서 양식(템플릿) 저장 및 불러오기 기능 추가
 
 ### Phase 5 — 확장
 - [ ] 다중 서명자 지원 (계약당 N명 근로자)

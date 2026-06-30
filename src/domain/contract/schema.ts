@@ -63,6 +63,8 @@ export const ContractSchema = z.object({
   templateVersion: z.string().default("1.0.0"),
   status: z
     .enum([
+      "invited",
+      "connected",
       "draft",
       "sent",
       "viewed",
@@ -70,8 +72,12 @@ export const ContractSchema = z.object({
       "completed",
       "cancelled",
       "expired",
+      "rejected",
+      "change_requested",
+      "template",
     ])
-    .default("draft"),
+    .default("invited"),
+  templateName: z.string().optional(),
   startDate: z
     .string()
     .regex(/^\d{4}-\d{2}-\d{2}$/, "날짜 형식: YYYY-MM-DD"),

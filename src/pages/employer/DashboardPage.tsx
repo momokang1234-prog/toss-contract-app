@@ -39,11 +39,15 @@ export default function DashboardPage() {
   const inProgressCount = businessContracts.filter(c => c.status === 'sent' || c.status === 'viewed').length;
   const signedCount = businessContracts.filter(c => c.status === 'signed' || c.status === 'completed').length;
   
+  const templates = businessContracts.filter(c => c.status === 'template');
+
   // 진행 중인 계약 최상단 노출
   const pendingContracts = businessContracts.filter(c => c.status === 'sent' || c.status === 'viewed').slice(0, 3);
   
   // 진행 중인 계약이 없다면 가장 최근 계약들
-  const recentContracts = pendingContracts.length > 0 ? pendingContracts : businessContracts.slice(0, 3);
+  const recentContracts = pendingContracts.length > 0 
+    ? pendingContracts 
+    : businessContracts.filter(c => c.status !== 'template').slice(0, 3);
 
   const getStatusBadge = (status: string) => {
     switch(status) {
@@ -51,6 +55,7 @@ export default function DashboardPage() {
       case 'viewed': return <div className={styles.badgeBlue}>서명 대기</div>;
       case 'signed':
       case 'completed': return <div className={styles.badgeGreen}>완료</div>;
+      case 'template': return <div className={styles.badgeGrey}>양식</div>;
       default: return <div className={styles.badgeGrey}>{status}</div>;
     }
   };
@@ -134,6 +139,24 @@ export default function DashboardPage() {
           </div>
         </div>
       </div>
+
+      {templates.length > 0 && (
+        <div className={styles.urgentList} style={{ marginBottom: 16 }}>
+          <Paragraph typography="t4" fontWeight="bold" style={{ marginBottom: '16px' }}>
+            내 양식함
+          </Paragraph>
+          {templates.map(t => (
+            <div key={t.id} className={styles.contractRow} onClick={() => navigate(`/employer/contracts/new?templateId=${t.id}`)}>
+              <div>
+                <Paragraph typography="t5" fontWeight="bold">{t.template_name || '이름 없는 양식'}</Paragraph>
+                <Spacing size={4} />
+                <Paragraph typography="t7" color="grey-500">이 양식으로 새 계약서 작성하기</Paragraph>
+              </div>
+              <div style={{ color: '#3182f6', fontSize: 20 }}>+</div>
+            </div>
+          ))}
+        </div>
+      )}
 
       {recentContracts.length > 0 ? (
         <div className={styles.urgentList}>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Spacing } from '@toss/tds-mobile';
+import { Spacing, BottomSheet } from '@toss/tds-mobile';
 import type { ContractFormData, DaySchedule } from '../types';
 import { DAYS, DAY_LABELS, DEFAULT_DAY_SCHEDULE } from '../types';
 import { CommentBoundary } from '../../../dev/CommentBoundary';
@@ -99,6 +99,7 @@ export default function Step3WorkSchedule({
   form, errors, toggleDay, selectWeeklyHoliday, updateDaySchedule, setScheduleMode,
 }: Step3WorkScheduleProps) {
   const [activeField, setActiveField] = useState<'days' | 'mode' | 'time' | 'holiday'>('days');
+  const [holidaySheetOpen, setHolidaySheetOpen] = useState(false);
 
   // "다음" 검증 실패 시 첫 미입력 필드를 자동으로 펼쳐 에러가 보이게 해요.
   useEffect(() => {
@@ -206,13 +207,33 @@ export default function Step3WorkSchedule({
             onEnter={() => setActiveField('holiday')}
             summary={form.weekly_holiday ? `주휴일: ${DAY_LABELS[form.weekly_holiday]}` : undefined}
           >
-            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-              {DAYS.map((day) => (
-                <button key={day} onClick={() => selectWeeklyHoliday(day)} style={pillStyle(form.weekly_holiday === day)}>
-                  {DAY_LABELS[day]}
-                </button>
-              ))}
-            </div>
+            <button
+              className="funnel-huge-input"
+              style={{ textAlign: 'left', cursor: 'pointer', paddingBottom: '8px', color: form.weekly_holiday ? '#333D4B' : '#d1d6db' }}
+              onClick={() => setHolidaySheetOpen(true)}
+            >
+              {form.weekly_holiday ? `${DAY_LABELS[form.weekly_holiday]}요일` : '선택해주세요'}
+            </button>
+            <BottomSheet
+              open={holidaySheetOpen}
+              onClose={() => setHolidaySheetOpen(false)}
+              header={<BottomSheet.Header>주휴일 선택</BottomSheet.Header>}
+            >
+              <div style={{ display: 'flex', flexDirection: 'column', padding: '0 24px 24px', gap: '8px', maxHeight: '60vh', overflowY: 'auto' }}>
+                {DAYS.map((day) => {
+                  const isSelected = form.weekly_holiday === day;
+                  return (
+                    <button
+                      key={day}
+                      style={{ padding: '16px', background: isSelected ? '#F2F4F6' : 'transparent', border: 'none', borderRadius: '12px', textAlign: 'left', fontSize: '16px', fontWeight: 600, color: isSelected ? '#3182F6' : '#333D4B' }}
+                      onClick={() => { selectWeeklyHoliday(day); setHolidaySheetOpen(false); }}
+                    >
+                      {DAY_LABELS[day]}요일
+                    </button>
+                  );
+                })}
+              </div>
+            </BottomSheet>
             {errors.weekly_holiday && <div style={{ color: '#FF5252', fontSize: 13, marginTop: 8 }}>{errors.weekly_holiday}</div>}
           </FunnelQuestion>
         </CommentBoundary>

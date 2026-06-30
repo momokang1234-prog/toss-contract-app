@@ -41,6 +41,50 @@ export class SupabaseContractService implements ContractService {
     return data;
   }
 
+  async inviteWorker(business_id: string, employerKey: string): Promise<Contract> {
+    const { data: business } = await supabase
+      .from('businesses')
+      .select('id')
+      .eq('id', business_id)
+      .eq('owner_user_key', employerKey)
+      .single();
+    if (!business) throw new Error('사업장을 찾을 수 없거나 접근 권한이 없습니다.');
+
+    const { data, error } = await supabase
+      .from('contracts')
+      .insert({ business_id, employer_user_key: employerKey, status: 'invited' })
+      .select()
+      .single();
+    if (error) throw error;
+    return data;
+  }
+
+  async acceptInvite(id: string, workerInfo: { name: string; phone: string; ci?: string; ciHash?: string }): Promise<Contract> {
+    const { data: existing, error: fetchError } = await supabase
+      .from('contracts')
+      .select('status')
+      .eq('id', id)
+      .single();
+    if (fetchError) throw fetchError;
+    if (existing.status !== 'invited') {
+      throw new Error('초대된 계약서가 아닙니다.');
+    }
+
+    const { data, error } = await supabase
+      .from('contracts')
+      .update({
+        status: 'connected',
+        worker_name: workerInfo.name,
+        worker_phone: workerInfo.phone,
+        worker_ci: workerInfo.ci,
+      })
+      .eq('id', id)
+      .select()
+      .single();
+    if (error) throw error;
+    return data;
+  }
+
   async updateContract(id: string, input: Partial<Contract>): Promise<Contract> {
     const { data: existing, error: fetchError } = await supabase
       .from('contracts')
@@ -48,7 +92,7 @@ export class SupabaseContractService implements ContractService {
       .eq('id', id)
       .single();
     if (fetchError) throw fetchError;
-    if (existing.status !== 'draft' && existing.status !== 'rejected') {
+    if (existing.status !== 'draft' && existing.status !== 'rejected' && existing.status !== 'connected' && existing.status !== 'invited' && existing.status !== 'change_requested') {
       throw new Error('이 상태에서는 수정할 수 없습니다.');
     }
 
@@ -121,6 +165,15 @@ export class SupabaseContractService implements ContractService {
 
   async rejectContract(id: string, reason?: string): Promise<Contract> {
     const { data, error } = await supabase.rpc('reject_contract', {
+      p_contract_id: id,
+      p_reason: reason,
+    });
+    if (error) throw error;
+    return data;
+  }
+
+  async requestChangeContract(id: string, reason: string): Promise<Contract> {
+    const { data, error } = await supabase.rpc('request_change_contract', {
       p_contract_id: id,
       p_reason: reason,
     });

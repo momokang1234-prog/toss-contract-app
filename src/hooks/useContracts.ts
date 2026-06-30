@@ -66,6 +66,19 @@ export function useContracts() {
     return data;
   };
 
+  const inviteWorker = async (business_id: string) => {
+    if (!userProfile) throw new Error('Not authenticated');
+    const data = await contractService.inviteWorker(business_id, userProfile.userKey);
+    await fetchContracts();
+    return data;
+  };
+
+  const acceptInvite = async (id: string, workerInfo: { name: string; phone: string; ci?: string; ciHash?: string }) => {
+    const data = await contractService.acceptInvite(id, workerInfo);
+    await fetchContracts();
+    return data;
+  };
+
   const updateContract = async (id: string, input: Partial<Contract>) => {
     const data = await contractService.updateContract(id, input);
     await fetchContracts();
@@ -138,11 +151,19 @@ export function useContracts() {
     return data;
   };
 
+  const requestChangeContract = async (id: string, reason: string) => {
+    const data = await contractService.requestChangeContract(id, reason);
+    await fetchContracts();
+    return data;
+  };
+
   return {
     contracts,
     loading,
     getContract,
     createContract,
+    inviteWorker,
+    acceptInvite,
     updateContract,
     sendContract,
     signContract,
@@ -152,6 +173,7 @@ export function useContracts() {
     getHistory: (contractId: string) => contractService.getHistory(contractId),
     viewContract,
     rejectContract,
+    requestChangeContract,
     markDocumentReceived,
     refetch: fetchContracts,
   };

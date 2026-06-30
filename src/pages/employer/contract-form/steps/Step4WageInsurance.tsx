@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Spacing, SegmentedControl, Paragraph, Switch } from '@toss/tds-mobile';
+import { Spacing, SegmentedControl, Paragraph, Switch, BottomSheet } from '@toss/tds-mobile';
 import type { ContractFormData } from '../types';
 import { CommentBoundary } from '../../../dev/CommentBoundary';
 import { FunnelQuestion } from '../../../../components/funnel/FunnelQuestion';
@@ -19,6 +19,7 @@ const WAGE_PAYMENT_DAYS = [
 
 export default function Step4WageInsurance({ form, errors, handleChange }: Step4WageInsuranceProps) {
   const [activeField, setActiveField] = useState<'wageType' | 'paymentMethod' | 'paymentDay' | 'paidLeave' | 'insurance'>('wageType');
+  const [paymentMethodOpen, setPaymentMethodOpen] = useState(false);
 
   // "다음" 검증 실패 시 첫 미입력 필드를 자동으로 펼쳐 에러가 보이게 해요.
   useEffect(() => {
@@ -92,15 +93,33 @@ export default function Step4WageInsurance({ form, errors, handleChange }: Step4
             onEnter={() => setActiveField('paymentMethod')}
             summary={form.wage_payment_method ? (form.wage_payment_method === 'bankTransfer' ? '계좌이체' : form.wage_payment_method === 'cash' ? '현금' : '혼합') : undefined}
           >
-            <SegmentedControl
-              value={form.wage_payment_method}
-              onChange={v => { handleChange('wage_payment_method', v); }}
-              size="large"
+            <button
+              className="funnel-huge-input"
+              style={{ textAlign: 'left', cursor: 'pointer', paddingBottom: '8px', color: form.wage_payment_method ? '#333D4B' : '#d1d6db' }}
+              onClick={() => setPaymentMethodOpen(true)}
             >
-              <SegmentedControl.Item value="bankTransfer">계좌이체</SegmentedControl.Item>
-              <SegmentedControl.Item value="cash">현금</SegmentedControl.Item>
-              <SegmentedControl.Item value="mixed">혼합</SegmentedControl.Item>
-            </SegmentedControl>
+              {form.wage_payment_method ? (form.wage_payment_method === 'bankTransfer' ? '계좌이체' : form.wage_payment_method === 'cash' ? '현금' : '혼합') : '선택해주세요'}
+            </button>
+            <BottomSheet
+              open={paymentMethodOpen}
+              onClose={() => setPaymentMethodOpen(false)}
+              header={<BottomSheet.Header>임금 지급 방법</BottomSheet.Header>}
+            >
+              <div style={{ display: 'flex', flexDirection: 'column', padding: '0 24px 24px', gap: '8px' }}>
+                <button
+                  style={{ padding: '16px', background: form.wage_payment_method === 'bankTransfer' ? '#F2F4F6' : 'transparent', border: 'none', borderRadius: '12px', textAlign: 'left', fontSize: '16px', fontWeight: 600, color: form.wage_payment_method === 'bankTransfer' ? '#3182F6' : '#333D4B' }}
+                  onClick={() => { handleChange('wage_payment_method', 'bankTransfer'); setPaymentMethodOpen(false); }}
+                >계좌이체</button>
+                <button
+                  style={{ padding: '16px', background: form.wage_payment_method === 'cash' ? '#F2F4F6' : 'transparent', border: 'none', borderRadius: '12px', textAlign: 'left', fontSize: '16px', fontWeight: 600, color: form.wage_payment_method === 'cash' ? '#3182F6' : '#333D4B' }}
+                  onClick={() => { handleChange('wage_payment_method', 'cash'); setPaymentMethodOpen(false); }}
+                >현금</button>
+                <button
+                  style={{ padding: '16px', background: form.wage_payment_method === 'mixed' ? '#F2F4F6' : 'transparent', border: 'none', borderRadius: '12px', textAlign: 'left', fontSize: '16px', fontWeight: 600, color: form.wage_payment_method === 'mixed' ? '#3182F6' : '#333D4B' }}
+                  onClick={() => { handleChange('wage_payment_method', 'mixed'); setPaymentMethodOpen(false); }}
+                >혼합 (계좌이체 + 현금)</button>
+              </div>
+            </BottomSheet>
           </FunnelQuestion>
           </CommentBoundary>
 

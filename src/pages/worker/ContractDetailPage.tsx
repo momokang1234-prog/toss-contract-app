@@ -81,13 +81,16 @@ export default function WorkerContractDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const { getContract, viewContract, rejectContract } = useContracts();
+  const { getContract, viewContract, rejectContract, requestChangeContract } = useContracts();
   const { businesses } = useBusiness();
   const [contract, setContract] = useState<Contract | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [rejectionReason, setRejectionReason] = useState('');
   const [rejecting, setRejecting] = useState(false);
   const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false);
+  const [rejectHardReason, setRejectHardReason] = useState('');
+  const [rejectingHard, setRejectingHard] = useState(false);
+  const [isHardRejectBottomSheetOpen, setIsHardRejectBottomSheetOpen] = useState(false);
   const [isConsentBottomSheetOpen, setIsConsentBottomSheetOpen] = useState(false);
   const [parentPhone, setParentPhone] = useState('');
   const [sendingConsent, setSendingConsent] = useState(false);
@@ -106,6 +109,21 @@ export default function WorkerContractDetailPage() {
       }
     }).catch(() => setError('불러오기에 실패했습니다'));
   }, [id]);
+
+  const handleChangeRequest = async () => {
+    if (!contract || (contract.status !== 'sent' && contract.status !== 'viewed')) return;
+    if (!confirm(t('worker.action.rejectConfirm'))) return;
+    setRejecting(true);
+    try {
+      const updated = await requestChangeContract(id!, rejectionReason || '수정 요청');
+      setContract(updated);
+      setIsBottomSheetOpen(false);
+    } catch {
+      alert(t('worker.action.rejectFailed'));
+    } finally {
+      setRejecting(false);
+    }
+  };
 
   // Realtime: 페이지 열려 있는 동안 계약 상태 변경 자동 반영
   useEffect(() => {
@@ -200,12 +218,7 @@ export default function WorkerContractDetailPage() {
                 headerDescription={<BottomSheet.HeaderDescription>{t('worker.action.rejectPromptSub')}</BottomSheet.HeaderDescription>}
                 cta={
                   <BottomSheet.CTA>
-                    <Button color="primary" variant="fill" size="xlarge" disabled={rejecting} onClick={async () => {
-                      if (!confirm(t('worker.action.rejectConfirm'))) return;
-                      setRejecting(true);
-                      try { const updated = await rejectContract(id, rejectionReason || undefined); setContract(updated); setIsBottomSheetOpen(false); }
-                      catch { alert(t('worker.action.rejectFailed')); } finally { setRejecting(false); }
-                    }}>
+                    <Button color="primary" variant="fill" size="xlarge" disabled={rejecting} onClick={handleChangeRequest}>
                       {rejecting ? t('worker.action.rejectProcessing') : t('worker.action.rejectSubmit')}
                     </Button>
                   </BottomSheet.CTA>
@@ -213,6 +226,34 @@ export default function WorkerContractDetailPage() {
               >
                 <div style={{ padding: '0 24px 24px' }}>
                   <TextField variant="box" label={t('worker.action.rejectReasonLabel')} placeholder={t('worker.action.rejectReasonPlaceholder')} value={rejectionReason} onChange={e => setRejectionReason(e.target.value)} />
+                </div>
+              </BottomSheet>
+
+              <ListRow
+                contents={<ListRow.Texts type="2RowTypeA" top={t('worker.action.rejectHardPrompt')} bottom={t('worker.action.rejectHardPromptSub')} />}
+                withArrow={true}
+                onClick={() => setIsHardRejectBottomSheetOpen(true)}
+              />
+              <BottomSheet
+                open={isHardRejectBottomSheetOpen}
+                onClose={() => setIsHardRejectBottomSheetOpen(false)}
+                header={<BottomSheet.Header>{t('worker.action.rejectHardTitle')}</BottomSheet.Header>}
+                headerDescription={<BottomSheet.HeaderDescription>{t('worker.action.rejectHardPromptSub')}</BottomSheet.HeaderDescription>}
+                cta={
+                  <BottomSheet.CTA>
+                    <Button color="danger" variant="fill" size="xlarge" disabled={rejectingHard} onClick={async () => {
+                      if (!confirm(t('worker.action.rejectHardConfirm'))) return;
+                      setRejectingHard(true);
+                      try { const updated = await rejectContract(id, rejectHardReason || '거절됨'); setContract(updated); setIsHardRejectBottomSheetOpen(false); }
+                      catch { alert(t('worker.action.rejectHardFailed')); } finally { setRejectingHard(false); }
+                    }}>
+                      {rejectingHard ? t('worker.action.rejectHardProcessing') : t('worker.action.rejectHardSubmit')}
+                    </Button>
+                  </BottomSheet.CTA>
+                }
+              >
+                <div style={{ padding: '0 24px 24px' }}>
+                  <TextField variant="box" label={t('worker.action.rejectHardReasonLabel')} placeholder={t('worker.action.rejectHardReasonPlaceholder')} value={rejectHardReason} onChange={e => setRejectHardReason(e.target.value)} />
                 </div>
               </BottomSheet>
             </>
