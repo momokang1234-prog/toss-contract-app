@@ -4,6 +4,7 @@ type: topic
 updated: 2026-06-26
 sources:
   - 02446945-940e-402b-bd6d-a82d522737af
+  - 0d0f0381-8747-4062-9900-cd924d17622f
 tags:
   - desktop-rpa
   - wsl
@@ -48,6 +49,12 @@ powershell.exe -Command "Invoke-Item ." < /dev/null
 
 WSL 내 `pyautogui.screenshot()`은 X11 권한 문제로 동작 안 함.
 → PowerShell .NET 프레임워크로 원본 캡처 후 Python PIL로 즉시 압축.
+
+> **💡 아키텍처 설계 의도 (Zero-Dependency Best Practice)**
+> 윈도우 CLI에서 WebP로 다이렉트 캡처하려면 `FFmpeg` 같은 무거운 외부 바이너리를 호스트에 강제로 설치해야 합니다.
+> 반면 이 2-Step 방식은 **윈도우 기본 내장 `.NET`**과 **WSL의 파이썬 `PIL`**만 교차 활용하므로,
+> 사용자 PC에 추가 설치 의존성 없이 가장 가볍고 확실하게 동작하는 최적의 파이프라인입니다.
+> → 이 구조를 "FFmpeg 없이 왜 굳이 두 번에 나누냐"는 이유로 리팩터링하지 말 것.
 
 ```bash
 powershell.exe -Command "
@@ -116,6 +123,13 @@ powershell.exe -Command "
 ```
 
 ## 세션 이력
+
+### 2026-06-26 — 2-Step 캡처 아키텍처 설계 의도 문서화 (`0d0f0381`)
+
+- `agy-cli`가 `wsl-interop-examples.md`의 화면 캡처 섹션에 **아키텍처 설계 의도(Rationale)** 블록을 추가
+- 핵심 결정: `.NET` + `PIL` 2-Step 파이프라인은 FFmpeg 등 외부 의존성 없이 동작하는 Zero-Dependency Best Practice로 공식 문서화
+- 대상 파일: `.agents/skills/desktop-rpa/examples/wsl-interop-examples.md` (3. 화면 캡처 섹션)
+- 목적: 미래 에이전트/개발자가 "왜 두 단계로 나누었냐"는 오해로 불필요한 리팩터링을 하지 않도록 쐐기 박기
 
 ### 2026-06-26 — RPA 테스트 스크립트 실행 (`02446945`)
 

@@ -8,6 +8,7 @@ sources:
   - a0dcf08d-841c-4d20-b8fb-9916e9e47024
   - df398adb-3d44-45d8-bf14-d5682d8d978c
   - 02446945-940e-402b-bd6d-a82d522737af
+  - 0d0f0381-8747-4062-9900-cd924d17622f
 tags:
   - overview
 ---
@@ -38,6 +39,7 @@ tags:
 | 2026-06-22 | 근로자 알림 방식 조사 → share API 확정 | `df398adb` |
 | 2026-06-24~25 | 계약서 폼 UX 개선, 퍼널 스텝, 계약서 Document/Preview | `dd07e058`, `3c64e530`, `d2a15b64`, `352c6aa2` |
 | 2026-06-26 | Desktop RPA WSL-Windows 인터롭 테스트 (`rpa_test.sh` 실행) | `02446945` |
+| 2026-06-26 | 2-Step WebP 캡처 Zero-Dependency 아키텍처 의도 문서화 (`wsl-interop-examples.md`) | `0d0f0381` |
 
 ## 위키 구조
 
