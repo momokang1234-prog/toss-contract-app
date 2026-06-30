@@ -11,8 +11,9 @@
 
 ## 2. Validation Engine Blocking
 **Findings from Research:**
-- The validation engine (e.g., in `src/domain/contract/validation.ts`) currently blocks form submission and prevents saving a contract if it triggers a validation warning (such as a minimum wage mismatch).
-- **Action Item:** This functionality implies the app is making a final legal decision. The logic must be updated to throw warnings that alert the user, but still **allow** them to bypass the warning and save the contract.
+- The validation engine strictly categorizes issues like minimum wage mismatches as errors (`src/domain/contract/validation.ts`, Lines 179-184).
+- The form wizard's state management hook (`src/pages/employer/contract-form/hooks/useContractForm.ts`, Lines 280-285) explicitly blocks progression if domain-level errors exist by forcing an error message on the `checklist_agreed` field.
+- **Action Item:** This functionality implies the app is making a final legal decision. We must allow the user to save despite these warnings. We should either downgrade the mismatch from an `error` to a `warning` in `validation.ts` or remove the block in `useContractForm.ts` so users can acknowledge the checklist and proceed.
 
 ## 3. Privacy, Signature Integrity & Anti-Forgery
 **Findings from Research:**
