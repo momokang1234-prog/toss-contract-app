@@ -128,6 +128,7 @@ VoI 판단 기준: "이 정보가 결론 도출에 결정적인가? 아직 출�
           neuro-visual-architect/SKILL.md # 타이포그래피 우선 로직
   _workspace/                           # 중간 결과물 저장
   gemini_domain2_sources.md            # Gemini 학습 데이터 소스 리포트 (2026-06-30)
+  gemini_domain3_infrastructure.md     # Gemini DB/인프라 리포트 (2026-06-30, 세션 4e1e67ff)
 ```
 
 ## 2025~2026 MAS 평가 트렌드 (리서치 산출물 요약)
@@ -178,6 +179,40 @@ VoI 판단 기준: "이 정보가 결론 도출에 결정적인가? 아직 출�
 /root/research-team/
   upgrade_final_report.md   # 3단계 업그레이드 로드맵 최종 리포트 (세션 33aaaa89 산출물)
 ```
+
+## Gemini DB/인프라 도메인 리서치 산출물 (2026-06-30)
+
+세션 `4e1e67ff` — agy-cli 도메인 매니저 역할로 `search_web` 4회 조사 후
+`/root/research-team/gemini_domain3_infrastructure.md` 생성. 부모 세션 `9b988031`에 `send_message`로 납품.
+
+### 조사 항목 및 핵심 내용
+
+#### 1. Gemini 모델 아키텍처 및 훈련 인프라
+- 기반: **Transformer 아키텍처** (멀티모달 네이티브 — 텍스트·이미지·오디오·비디오·코드 동시 처리)
+- 훈련 하드웨어: **TPU v4/v5e** 클러스터, 프레임워크 **JAX + Pathways**
+- 모델 패밀리: Nano(온디바이스) / Flash(처리량 최적화) / Pro·Ultra(복잡 추론)
+
+#### 2. Gemini 임베딩 & 벡터 데이터베이스
+- 모델: **Gemini Embedding 2** — 멀티모달 통합 벡터 공간(텍스트·이미지·비디오 → 단일 공간)
+- **MRL (Matryoshka Representation Learning)**: 출력 차원 수 조절 가능 (크기 vs 정밀도 트레이드오프)
+- Gemini는 임베딩 생성만, 저장·검색은 별도 벡터 DB 필요
+- 호환 벡터 DB: Pinecone, Qdrant, **pgvector**(PostgreSQL), Cloud SQL for MySQL
+- Google Cloud 내: **Vertex AI Vector Search** (ANN/KNN 인덱싱, 엔터프라이즈 스케일)
+
+#### 3. Colossus 분산 스토리지
+- Google 내부 분산 파일시스템 (GFS 후속), YouTube·Gmail·Google Cloud Storage 등 전사 공통
+- AI 워크로드용: **Rapid Bucket (Rapid Storage)** — Colossus 위에서 동작하는 고성능 AI 훈련 스토리지
+- 성능: 양방향 gRPC 기반, **15+ TiB/s 대역폭**, 서브 밀리초 레이턴시, 수백만 RPS
+- GPU/TPU "메모리 벽" 해소 목적: 칩에 데이터를 충분히 빠르게 공급
+
+#### 4. TPU 인프라 상세
+- 배포 단위: **TPU Pod** (수천 개 칩을 단일 고성능 시스템으로)
+- 연결: **ICI (Inter-Chip Interconnect)** + **OCS (Optical Circuit Switching)** (저레이턴시 동적 재구성)
+- 최신 세대 (2026):
+  - **TPU 8t** — 훈련 최적화
+  - **TPU 8i** — 추론/에이전틱 워크로드 최적화
+- 핵심 기능: **SparseCore** (임베딩 가속), 확장된 온칩 SRAM (대규모 KV 캐시 처리)
+- 소프트웨어: **AI Hypercomputer** 아키텍처, JAX/PyTorch/TensorFlow 지원
 
 ---
 
