@@ -9,6 +9,8 @@ sources:
   - eac871be-3429-4958-916d-0dddabf8fa2a
   - 0688defe-ad02-49c2-8f85-e1985c081066
   - 4e1e67ff-18b4-49b3-b437-df0ef921595c
+  - 0b7ddfd9-e32e-4434-877a-6db20499b91c
+  - 541c1dc6-480a-45b4-906d-7ca80467d5d0
 tags:
   - research-team
   - agy-cli
@@ -274,3 +276,95 @@ VoI 판단 기준: "이 정보가 결론 도출에 결정적인가? 아직 출�
       migration_plan.md               # 도메인3: 마이그레이션 플랜
       final_upgrade_report.md         # 최종 종합 리포트 (세션 0688defe 산출물)
 ```
+
+---
+
+## 초기 하네스 구축 계획 — plan.md (세션 0b7ddfd9 분석)
+
+세션 `0b7ddfd9` (2026-06-30)에서 agy-cli가 `/root/research-team/plan.md`를 분석했다.
+현재 4계층 피라미드 아키텍처의 **원형(原型)** 이 되는 초기 3에이전트 설계안.
+
+### 초기 3에이전트 구조
+
+```
+.agents/plugins/research-plugin/
+├── plugin.json
+├── agents/
+│   ├── researcher/
+│   │   └── agent.json        # 현재 deep_researcher와 대응
+│   └── analyst/
+│       └── agent.json        # 현재 도메인 매니저와 대응
+└── skills/
+    ├── research-orchestrator/
+    │   └── SKILL.md
+    ├── web-researcher/
+    │   └── SKILL.md
+    └── report-writer/
+        └── SKILL.md
+```
+
+| 에이전트 | 역할 | 적용 방법론 |
+|----------|------|-------------|
+| **Orchestrator** | 전체 파이프라인 조율 (계획→수집→분석→보고), Data Freshness 기반 캐시 판단 | Data Freshness 관리 |
+| **Researcher** (web-researcher 스킬) | 인터넷·문서에서 Raw 데이터 수집 및 1차 검증 | 크롤링/스크레이핑, 출처 다양화, 메타데이터 확인, 교차 검증 |
+| **Analyst** (report-writer 스킬) | 통계적 오류 교정 및 최종 분석 보고서 작성 | 데이터 마이닝, 데이터 정제, 이상치 제거, 표본 설계·통계적 유의성, A/B 테스트 |
+
+> 📌 초기 계획(3에이전트)은 이후 세션들을 거쳐 4계층 피라미드(오케스트레이터→도메인 매니저→리서처 Leaf→비주얼 아키텍트)로 확장됨.
+
+---
+
+## 11개 핵심 데이터 스킬 상세 계획 (skill_authoring_plan.md)
+
+`/root/research-team/skill_authoring_plan.md`에 정의된 각 SKILL.md `## 지침 (Instructions)` 섹션 작성 가이드라인.
+
+| # | 스킬 ID | 핵심 지침 요약 |
+|---|---------|----------------|
+| 1 | `data-mining` | EDA vs 예측 모델링 구분; Association Rules/Clustering/Classification 선택 기준; pandas·scikit-learn 기본 도구; 결과는 반드시 비즈니스 인사이트로 번역 |
+| 2 | `sampling-design` | SRS 외 층화(Stratified)·군집(Cluster) 추출 기준; 생존자/선택 편향 체크리스트; Confidence Level·Margin of Error 기반 샘플 사이즈 산정 |
+| 3 | `crawling-scraping` | robots.txt·법적 제약 선행 확인; 정적(requests+BeautifulSoup) vs 동적(Selenium/Playwright) 도구 선택 기준; Rate Limiting·User-Agent 윤리 수집 준수 |
+| 4 | `data-cleaning` | 결측치(MCAR/MAR/MNAR 분류)·중복·형식 불일치 처리 순서; 정제 전/후 레코드 수·결측률 로그 의무화 |
+| 5 | `statistical-significance` | 귀무가설·대립가설 명시; 표본 크기 충족 후 p-value 계산; p<0.05 이상 결론 도출 금지; 효과 크기(Cohen's d/r) 병기 |
+| 6 | `cross-validation` | 출처 2개 이상 독립적으로 수집; 이견 발생 시 제3 출처 추가; 수렴 출처 수 및 이견 내용 보고에 명시 |
+| 7 | `data-triangulation` | 정부 공공 데이터·학술지·민간 API 3종 최소화; 복수 방법론(설문+웹스크레이핑+공개 DB) 병행; Key값(국가코드·연도) 일치화 후 Join |
+| 8 | `outlier-detection` | IQR×1.5 또는 Z-Score≥3 통계 기준 + Isolation Forest ML 탐지 병행; 입력 오류는 제거/대체, 자연 발생 극단값(블랙스완)은 분리 분석 |
+| 9 | `metadata-analysis` | 수집 파일 생성일·작성자·수정 내역·라이선스 권한 파악; 사전 정의 데이터 스키마(Data Dictionary)와 타입·구조 일치 검증 |
+| 10 | `data-freshness` | 정적 데이터(연 단위) vs 동적 데이터(일/분 단위) TTL 구분; 마지막 갱신일 이후만 수집하는 증분(Delta Load) 처리 |
+| 11 | `ab-testing` | "A를 하면 B가 O% 상승" 형식의 귀무·대립가설 수립; 대조군/실험군 무작위 배정 후 A/A 테스트 1차 검증; MDE(최소 탐지 효과) 기반 필요 트래픽 계산 |
+
+---
+
+## research-team 디렉토리 파일 목록 확인 (세션 0b7ddfd9)
+
+2026-06-30 기준 `list_dir` 도구로 확인된 `/root/research-team/` 루트 파일 목록:
+
+```
+/root/research-team/
+  .agents/              # 서브디렉토리: hooks/, plugins/, skills/
+  .obsidian/            # Obsidian 에디터 아티팩트 (기술 부채)
+  build_agents.py       (4,788 bytes)
+  build_pyramid.py      (5,034 bytes)
+  build_visualizer.py   (4,362 bytes)
+  compliance_checklist.md  (5,192 bytes)  # 리서치 출력 샘플: AU/NZ 시장 진출 컴플라이언스
+  fact_check_raw.md     (4,750 bytes)     # 리서치 출력 샘플: 유럽 vs AU/NZ 규정 팩트체크
+  generate_skills.py    (5,302 bytes)     # 데드 코드 (update_skills.py가 즉시 덮어씀)
+  interactive_agent.py  (625 bytes)
+  plan.md               (3,805 bytes)     # 초기 3에이전트 하네스 구축 계획
+  reports/              # 서브디렉토리
+  skill_authoring_plan.md  (5,887 bytes) # 11개 핵심 데이터 스킬 상세 계획
+  update_skills.py      (11,201 bytes)
+```
+
+### 리서치 출력 샘플 파일 (compliance_checklist.md, fact_check_raw.md)
+
+상업용 식기세척기 AU/NZ 수출 컴플라이언스를 주제로 한 파이프라인 실제 리서치 출력물.
+
+**주요 내용 요약 (fact_check_raw.md 팩트체크 결과):**
+
+| 항목 | 결론 |
+|------|------|
+| 전기 안전: CB 스킴 + Delta 테스팅 | **TRUE** — 기존 IECEE CB Report 제출 가능, 국가 편차(Deviations)에 대해서만 Delta Testing 추가 |
+| 전원 플러그: AS/NZS 3112 (Type I) | **TRUE (실무)** — 상업용 환경 어댑터 사용 불가; WHS 법상 Testing & Tagging 검사 실패 |
+| EMC: RCM 마크 (ACMA) | **TRUE** — EU CE/UKCA 인증 데이터 직접 유용 불가, ISO 17025 인증 랩의 별도 테스팅 필수 |
+| 물·에너지 효율: WELS/MEPS | **TRUE** — EU 기준과 AU 기준(AS/NZS 2007.1:2021) 상이, 별도 인증 랩 테스팅 필수 |
+| 스마트 기기 보안 | **부분 TRUE** — ACMA가 아닌 호주 내무부(Home Affairs) 소관, 2026-03-04 발효; 3대 요건: ①기본 비밀번호 금지 ②취약점 보고 ③보안 업데이트 투명성 |
+| 현지 법적 대리인 | **TRUE** — EESS 외국 제조사 직접 등록 불가; ABN/NZ IRD 보유 현지 법인 또는 수입업자 지정 필수 |
