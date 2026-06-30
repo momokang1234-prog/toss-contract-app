@@ -1,7 +1,7 @@
 ---
 title: toss-contract-app Wiki 전체 현황
 type: overview
-updated: 2026-06-26
+updated: 2026-07-01
 sources:
   - 9d5fb614-0c8d-423d-9792-a3affc0c86b6
   - 6f153450-3fce-4e9a-a711-48185748d13b
@@ -9,6 +9,8 @@ sources:
   - df398adb-3d44-45d8-bf14-d5682d8d978c
   - 02446945-940e-402b-bd6d-a82d522737af
   - 0d0f0381-8747-4062-9900-cd924d17622f
+  - 9b988031-11a0-4515-b783-eda40dc57456
+  - 2cb2bc2e-14e2-4e79-beaf-9a4a3a959e94
 tags:
   - overview
 ---
@@ -22,9 +24,9 @@ tags:
 - **스택**: React + TypeScript + Vite / Supabase Edge Functions / Granite 미니앱 / `@toss/tds-mobile` v2.4.0
 - **개발 서버**: `http://localhost:5173`
 
-## 세션 현황 (2026-06-26 기준)
+## 세션 현황 (2026-07-01 기준)
 
-- 총 세션: **317개** / 총 턴: **15,151개**
+- 총 세션: **345개** / 총 턴: (갱신 필요)
 - 주요 에이전트: `claude-code`, `agy-cli` (antigravity-agent)
 - 활성 프로젝트: `toss-contract-app` (claude-code 세션), 다수의 UUID 프로젝트 (agy-cli 세션)
 
@@ -40,6 +42,7 @@ tags:
 | 2026-06-24~25 | 계약서 폼 UX 개선, 퍼널 스텝, 계약서 Document/Preview | `dd07e058`, `3c64e530`, `d2a15b64`, `352c6aa2` |
 | 2026-06-26 | Desktop RPA WSL-Windows 인터롭 테스트 (`rpa_test.sh` 실행) | `02446945` |
 | 2026-06-26 | 2-Step WebP 캡처 Zero-Dependency 아키텍처 의도 문서화 (`wsl-interop-examples.md`) | `0d0f0381` |
+| 2026-06-30 | research-team A2A 파이프라인 개선: seCall 절대경로 픽스, visual-architect 한국어 고정, VoI 기반 도메인 매니저 업그레이드, MAS 평가 트렌드 리서치 | `9b988031`, `2cb2bc2e` |
 
 ## 위키 구조
 
@@ -56,6 +59,7 @@ wiki/
     tds-mini-app.md             # TDS 컴포넌트, Granite 설정
     agent-setup.md              # .claude/ 에이전트/커맨드 설정
     desktop-rpa.md             # WSL-Windows 인터롭, PowerShell RPA
+    research-team-pipeline.md  # agy-cli 피라미드 A2A 리서치 파이프라인
   decisions/
     2026-06-17-migrate-omp-to-claude.md       # OMP → Claude 마이그레이션
     2026-06-22-worker-notification-share-api.md  # 근로자 알림 방식
