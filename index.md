@@ -7,6 +7,25 @@ updated_at: 2026-06-26
 
 ## Sessions
 
+- [[raw/.sessions/2026-06-30/agy-cli_eac871be-3429-4958-916d-0dddabf8fa2a_eac871be|<USER_REQUEST>
+/research-plugin:research-orchestra...]] — 71턴, agy-cli, 18:18
+- [[raw/.sessions/2026-06-30/agy-cli_e7a15f51-7feb-4227-8955-8352fbd7635f_e7a15f51|<USER_REQUEST>
+Research the best practices for fol...]] — 16턴, agy-cli, 18:16
+- [[raw/.sessions/2026-06-30/agy-cli_cd73883c-5ffc-49d8-a636-091a98510cff_cd73883c|<USER_REQUEST>
+Research the best practices for fol...]] — 16턴, agy-cli, 18:16
+- [[raw/.sessions/2026-06-30/agy-cli_a102cb5c-5559-4920-ad90-7e7359698a29_a102cb5c|Untitled Session]] — 17턴, agy-cli, 18:16
+- [[raw/.sessions/2026-06-30/agy-cli_49ecf9cb-74ed-478d-9ee4-b976e2417239_49ecf9cb|Untitled Session]] — 8턴, agy-cli, 18:16
+- [[raw/.sessions/2026-06-30/agy-cli_3a043387-da26-4e61-9828-4344fedafb4c_3a043387|Untitled Session]] — 6턴, agy-cli, 18:17
+- [[raw/.sessions/2026-06-30/agy-cli_26bb8f1c-2b2f-47d3-a371-7cf6bc08636a_26bb8f1c|Untitled Session]] — 6턴, agy-cli, 18:17
+- [[raw/.sessions/2026-06-30/agy-cli_0b7ddfd9-e32e-4434-877a-6db20499b91c_0b7ddfd9|<USER_REQUEST>
+Analyze the markdown files in /root...]] — 17턴, agy-cli, 18:16
+- [[raw/.sessions/2026-06-30/agy-cli_0688defe-ad02-49c2-8f85-e1985c081066_0688defe|Untitled Session]] — 9턴, agy-cli, 18:18
+- [[raw/.sessions/2026-06-30/claude-code_unknown_journal|Untitled Session]] — 0턴, claude-code, 18:18
+- [[raw/.sessions/2026-06-30/claude-code_unknown_journal|Untitled Session]] — 0턴, claude-code, 18:18
+- [[raw/.sessions/2026-06-30/claude-code_unknown_6726d6c8|Untitled Session]] — 0턴, claude-code, 18:18
+- [[raw/.sessions/2026-06-30/claude-code_unknown_a2532129|Untitled Session]] — 0턴, claude-code, 18:18
+- [[raw/.sessions/2026-06-30/claude-code_unknown_6ec95f0b|Untitled Session]] — 0턴, claude-code, 18:18
+- [[raw/.sessions/2026-06-30/claude-code_unknown_fd7c14c9|Untitled Session]] — 0턴, claude-code, 18:18
 - [[raw/.sessions/2026-06-30/agy-cli_fc026ab3-c106-4b64-a346-904eff8a71ea_fc026ab3|Untitled Session]] — 9턴, agy-cli, 17:26
 - [[raw/.sessions/2026-06-30/agy-cli_f3cb1b23-b0c3-47ad-a0f5-38b39ebeac3e_f3cb1b23|Untitled Session]] — 9턴, agy-cli, 18:02
 - [[raw/.sessions/2026-06-30/agy-cli_efeb9b9a-f02c-4dcb-8b7e-db7fde5a2b8b_efeb9b9a|Untitled Session]] — 6턴, agy-cli, 17:25
