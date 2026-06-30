@@ -7,6 +7,18 @@ updated_at: 2026-06-26
 
 ## Sessions
 
+- [[raw/.sessions/2026-06-30/agy-cli_c80ca46d-1a54-4426-a32d-77a6a5c3da65_c80ca46d|Untitled Session]] — 6턴, agy-cli, 18:41
+- [[raw/.sessions/2026-06-30/agy-cli_babe3aa9-78dd-49a3-9a27-def1df2e7360_babe3aa9|Untitled Session]] — 6턴, agy-cli, 18:39
+- [[raw/.sessions/2026-06-30/agy-cli_99f966cc-1ae4-4dbb-9488-9aabc14bade5_99f966cc|Untitled Session]] — 5턴, agy-cli, 18:39
+- [[raw/.sessions/2026-06-30/agy-cli_7e374ad3-94ce-4255-98df-1a16a355c2e0_7e374ad3|Untitled Session]] — 12턴, agy-cli, 18:43
+- [[raw/.sessions/2026-06-30/agy-cli_7a4a1c80-bcb6-4974-a97c-9c31727995e0_7a4a1c80|Untitled Session]] — 6턴, agy-cli, 18:40
+- [[raw/.sessions/2026-06-30/agy-cli_5db60656-555e-4e23-9b87-bf2ee066377a_5db60656|Untitled Session]] — 9턴, agy-cli, 18:38
+- [[raw/.sessions/2026-06-30/claude-code_unknown_journal|Untitled Session]] — 0턴, claude-code, 18:43
+- [[raw/.sessions/2026-06-30/claude-code_unknown_journal|Untitled Session]] — 0턴, claude-code, 18:43
+- [[raw/.sessions/2026-06-30/claude-code_unknown_6726d6c8|Untitled Session]] — 0턴, claude-code, 18:43
+- [[raw/.sessions/2026-06-30/claude-code_unknown_a2532129|Untitled Session]] — 0턴, claude-code, 18:43
+- [[raw/.sessions/2026-06-30/claude-code_unknown_6ec95f0b|Untitled Session]] — 0턴, claude-code, 18:43
+- [[raw/.sessions/2026-06-30/claude-code_unknown_fd7c14c9|Untitled Session]] — 0턴, claude-code, 18:43
 - [[raw/.sessions/2026-06-30/agy-cli_eac871be-3429-4958-916d-0dddabf8fa2a_eac871be|<USER_REQUEST>
 /research-plugin:research-orchestra...]] — 71턴, agy-cli, 18:18
 - [[raw/.sessions/2026-06-30/agy-cli_e7a15f51-7feb-4227-8955-8352fbd7635f_e7a15f51|<USER_REQUEST>
