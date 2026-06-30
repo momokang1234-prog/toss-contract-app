@@ -5,6 +5,7 @@ updated: 2026-07-01
 sources:
   - 9b988031-11a0-4515-b783-eda40dc57456
   - 2cb2bc2e-14e2-4e79-beaf-9a4a3a959e94
+  - 33aaaa89-6581-4baa-a5b8-ac27a63cb5d6
 tags:
   - research-team
   - agy-cli
@@ -140,3 +141,37 @@ VoI 판단 기준: "이 정보가 결론 도출에 결정적인가? 아직 출�
 
 1. **Red Team 에이전트** — 최종 리포트 전 LLM-as-a-Judge 비판적 검증. 통과 실패 시 도메인 매니저에게 반려(Reject) → 재조사 강제하는 Self-reflective Loop
 2. **OpenTelemetry(OTel) 옵저버빌리티** — A2A 통신을 터미널 로그 대신 DAG 시각 그래프로 추적
+
+## A2A 파이프라인 업그레이드 최종 로드맵 (2026-06-30 확정)
+
+세션 `33aaaa89` 에서 agy-cli 서브에이전트가 3개 도메인 리포트를 종합해
+`/root/research-team/upgrade_final_report.md` 를 생성했다. (완료 후 부모 에이전트 `9b988031`에게 `send_message`로 납품)
+
+위의 "업그레이드 후보 아이디어"가 아래 3단계 로드맵으로 구체화되었다.
+
+### Phase 1 — Architectural Foundation & Decentralization
+
+- **목표**: 모놀리식 오케스트레이터 구조 → **동적 DAG (Directed Acyclic Graph)** 기반 아키텍처로 전환
+- 각 도메인 매니저가 런타임에 서브트리를 독립적으로 확장/축소할 수 있는 구조 지향
+- OTel 기반 DAG 시각 추적 포함 (업그레이드 후보 아이디어 2번 구체화)
+
+### Phase 2 — Integration Standardization & Agentic RAG
+
+- **목표**: 도구 접근 표준화 및 자기 반성 루프 도입
+- **MCP(Model Context Protocol)** 를 에이전트 도구 레이어 표준으로 채택 (seCall MCP 연동과 연속성)
+- **Critique Node (비평 노드)** 삽입: 각 도메인 리포트 납품 전 LLM-as-a-Judge 자기 반성 단계
+- Self-reflective Loop: 비평 통과 실패 → 해당 도메인 매니저에게 반려 → 재조사 강제 (업그레이드 후보 아이디어 1번 구체화)
+
+### Phase 3 — Assured Autonomy & Security Guardrails
+
+- **목표**: 자율성 보장 + 보안 가드레일
+- **Proactive Guardrails**: 잘못된 방향의 리서치를 사전에 차단하는 가드레일 에이전트
+- **Zero-trust Auditing**: A2A 통신 메시지에 대한 신뢰 검증 레이어
+- **Automated Hallucination Checks**: A2A 파이프라인 내부에서 자동 환각 탐지 및 교차 검증
+
+### 관련 파일
+
+```
+/root/research-team/
+  upgrade_final_report.md   # 3단계 업그레이드 로드맵 최종 리포트 (세션 33aaaa89 산출물)
+```

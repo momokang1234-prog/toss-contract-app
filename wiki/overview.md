@@ -11,6 +11,7 @@ sources:
   - 0d0f0381-8747-4062-9900-cd924d17622f
   - 9b988031-11a0-4515-b783-eda40dc57456
   - 2cb2bc2e-14e2-4e79-beaf-9a4a3a959e94
+  - 33aaaa89-6581-4baa-a5b8-ac27a63cb5d6
 tags:
   - overview
 ---
@@ -43,6 +44,7 @@ tags:
 | 2026-06-26 | Desktop RPA WSL-Windows 인터롭 테스트 (`rpa_test.sh` 실행) | `02446945` |
 | 2026-06-26 | 2-Step WebP 캡처 Zero-Dependency 아키텍처 의도 문서화 (`wsl-interop-examples.md`) | `0d0f0381` |
 | 2026-06-30 | research-team A2A 파이프라인 개선: seCall 절대경로 픽스, visual-architect 한국어 고정, VoI 기반 도메인 매니저 업그레이드, MAS 평가 트렌드 리서치 | `9b988031`, `2cb2bc2e` |
+| 2026-06-30 | research-team 업그레이드 최종 리포트 합성: 3개 도메인 리포트 → `upgrade_final_report.md` (DAG 아키텍처·MCP·Guardrails 3단계 로드맵) | `33aaaa89` |
 
 ## 위키 구조
 
