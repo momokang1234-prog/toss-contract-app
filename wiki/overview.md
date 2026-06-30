@@ -51,6 +51,7 @@ tags:
 | 2026-06-22 | 근로자 알림 방식 조사 → share API 확정 | `df398adb` |
 | 2026-06-24~25 | 계약서 폼 UX 개선, 퍼널 스텝, 계약서 Document/Preview | `dd07e058`, `3c64e530`, `d2a15b64`, `352c6aa2` |
 | 2026-06-26 | 계약서 폼 UX 개선: 근로자 주소 제거(Step1), 임금지급방법·주휴요일 BottomSheet 전환(Step3/4), FunnelQuestion active/completed 시각 구분 | `6c3d999e` |
+| 2026-06-26 | **IS_MOCK 전체 스캔**: 미구현 Mock 기능 4가지 목록화 (인증·계약서DB·사업장DB·카카오공유), un-mocking 우선순위 정리 | `6ce267c1` |
 | 2026-06-26 | Desktop RPA WSL-Windows 인터롭 테스트 (`rpa_test.sh` 실행) | `02446945` |
 | 2026-06-26 | 2-Step WebP 캡처 Zero-Dependency 아키텍처 의도 문서화 (`wsl-interop-examples.md`) | `0d0f0381` |
 | 2026-06-30 | research-team A2A 파이프라인 개선: seCall 절대경로 픽스, visual-architect 한국어 고정, VoI 기반 도메인 매니저 업그레이드, MAS 평가 트렌드 리서치 | `9b988031`, `2cb2bc2e` |
@@ -80,6 +81,7 @@ wiki/
     research-team-pipeline.md  # agy-cli 피라미드 A2A 리서치 파이프라인
     agy-cli.md                 # agy CLI 설정 경로, hooks, 플래그, TUI 명령어
     secall.md                  # seCall 세션 검색엔진: ingest 파이프라인, LLM 백엔드, agy ingest 보류
+    mock-mode.md               # IS_MOCK 플래그 전체 스캔, 미구현 4가지 기능, un-mocking 로드맵
   decisions/
     2026-06-17-migrate-omp-to-claude.md       # OMP → Claude 마이그레이션
     2026-06-22-worker-notification-share-api.md  # 근로자 알림 방식
@@ -94,6 +96,10 @@ wiki/
 | OG 이미지 | `public/og-contract.png` | 파일 없음 |
 | dev 변형 TSC 에러 | `src/pages/dev/WorkerVariant*.tsx` | ListRow/Badge prop 불일치 |
 | per-day UI 실제 렌더 확인 | 개발 서버 | 시각 검증 미완료 |
+| **[Mock] 인증 실 연동** | `src/contexts/AuthContext.tsx` | IS_MOCK: sessionStorage 가짜 세션 → Supabase Auth 교체 필요 |
+| **[Mock] 계약서 DB 실 연동** | `src/hooks/useContracts.ts` | MockContractService → SupabaseContractService 전환 필요 |
+| **[Mock] 사업장 DB 실 연동** | `src/hooks/useBusiness.ts` | 로컬 배열 → Supabase `businesses` 테이블 CRUD 필요 |
+| **[Mock] 카카오 공유 실 연동** | `src/api/smart-messenger.ts` | alert() → 카카오 JS SDK / 알림톡 API 필요 |
 
 ## 빠른 참조
 
