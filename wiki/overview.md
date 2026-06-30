@@ -7,6 +7,7 @@ sources:
   - 6f153450-3fce-4e9a-a711-48185748d13b
   - a0dcf08d-841c-4d20-b8fb-9916e9e47024
   - df398adb-3d44-45d8-bf14-d5682d8d978c
+  - 02446945-940e-402b-bd6d-a82d522737af
 tags:
   - overview
 ---
@@ -36,6 +37,7 @@ tags:
 | 2026-06-18 | mTLS/알림 구현 이어서, Tossface 폰트 연동, CLAUDE.md 생성 | `6f153450` |
 | 2026-06-22 | 근로자 알림 방식 조사 → share API 확정 | `df398adb` |
 | 2026-06-24~25 | 계약서 폼 UX 개선, 퍼널 스텝, 계약서 Document/Preview | `dd07e058`, `3c64e530`, `d2a15b64`, `352c6aa2` |
+| 2026-06-26 | Desktop RPA WSL-Windows 인터롭 테스트 (`rpa_test.sh` 실행) | `02446945` |
 
 ## 위키 구조
 
@@ -51,6 +53,7 @@ wiki/
     contract-form.md            # 계약서 폼 퍼널, per-day 근무시간
     tds-mini-app.md             # TDS 컴포넌트, Granite 설정
     agent-setup.md              # .claude/ 에이전트/커맨드 설정
+    desktop-rpa.md             # WSL-Windows 인터롭, PowerShell RPA
   decisions/
     2026-06-17-migrate-omp-to-claude.md       # OMP → Claude 마이그레이션
     2026-06-22-worker-notification-share-api.md  # 근로자 알림 방식
