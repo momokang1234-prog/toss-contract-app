@@ -1,0 +1,67 @@
+
+> bossimclockedin@0.1.0 build
+> vite build
+
+vite v6.4.3 building for production...
+transforming...
+✓ 538 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                                         0.82 kB │ gzip:   0.42 kB
+dist/assets/DeeplinkHandler-DKFZ9BDE.css                0.09 kB │ gzip:   0.10 kB
+dist/assets/NotFoundPage-96r9I3Ec.css                   0.13 kB │ gzip:   0.13 kB
+dist/assets/ContractHistoryPage-DHqlQkIZ.css            0.18 kB │ gzip:   0.16 kB
+dist/assets/ContractSignPage-CEjyU_pV.css               0.44 kB │ gzip:   0.29 kB
+dist/assets/ContractTimelinePage-sQ_6BSBH.css           0.53 kB │ gzip:   0.29 kB
+dist/assets/LanguagePicker-BKZhKwU_.css                 0.66 kB │ gzip:   0.35 kB
+dist/assets/BusinessManagePage-C-tspCXM.css             0.70 kB │ gzip:   0.42 kB
+dist/assets/BusinessFormPage-sXMN6wrb.css               0.73 kB │ gzip:   0.39 kB
+dist/assets/ContractListPage-B7ePipug.css               0.88 kB │ gzip:   0.44 kB
+dist/assets/ContractFormProgress-BG4YRTLC.css           0.90 kB │ gzip:   0.44 kB
+dist/assets/DevGalleryPage-bRnV5pka.css                 0.98 kB │ gzip:   0.53 kB
+dist/assets/ContractDetailPage-ZqKWmpkJ.css             1.44 kB │ gzip:   0.65 kB
+dist/assets/ContractDetailPage-D1W0eRxW.css             1.49 kB │ gzip:   0.65 kB
+dist/assets/ContractFormPage-B5BPb8rE.css               1.56 kB │ gzip:   0.68 kB
+dist/assets/DashboardPage-CHEZk0Ix.css                  2.11 kB │ gzip:   0.82 kB
+dist/assets/index-BnEvwp9X.css                         15.78 kB │ gzip:   4.74 kB
+dist/assets/ContractDocumentView-DdJ7ibS3.js            0.42 kB │ gzip:   0.32 kB
+dist/assets/LanguageSettings-BmDA2cbv.js                0.43 kB │ gzip:   0.31 kB
+dist/assets/DevBypass-D_LYzvGm.js                       0.67 kB │ gzip:   0.45 kB
+dist/assets/NotFoundPage-DaOvYBrp.js                    0.76 kB │ gzip:   0.52 kB
+dist/assets/DeeplinkHandler-QWFJtYHT.js                 0.82 kB │ gzip:   0.50 kB
+dist/assets/LanguageOnboarding-CVWouuy6.js              1.06 kB │ gzip:   0.60 kB
+dist/assets/LanguagePicker-Bc9zDg7e.js                  1.12 kB │ gzip:   0.61 kB
+dist/assets/ContractHistoryPage-ComPeFLI.js             1.44 kB │ gzip:   0.80 kB
+dist/assets/DevGalleryPage-uP_pXCAP.js                  1.49 kB │ gzip:   0.80 kB
+dist/assets/businessValidator-DxMOXSNx.js               1.65 kB │ gzip:   0.95 kB
+dist/assets/WorkerInvitePage-BUA86pRR.js                1.71 kB │ gzip:   1.05 kB
+dist/assets/SignaturePad-CQ02LRDp.js                    1.95 kB │ gzip:   1.03 kB
+dist/assets/ContractTimelinePage-DF9tVBMX.js            2.14 kB │ gzip:   1.20 kB
+dist/assets/index-DaynxUA0.js                           2.33 kB │ gzip:   1.22 kB
+dist/assets/badgeUtils-D4lEfsvx.js                      2.55 kB │ gzip:   1.32 kB
+dist/assets/useBusiness-O7Y1wSWo.js                     2.79 kB │ gzip:   1.23 kB
+dist/assets/IconsCatalogPage-BD0_tjNF.js                2.91 kB │ gzip:   1.27 kB
+dist/assets/Suspense-DAHxXKxm.js                        3.61 kB │ gzip:   1.35 kB
+dist/assets/index-CAhWKj4O.js                           3.80 kB │ gzip:   1.63 kB
+dist/assets/ContractCompletionVariants-CIiddqD-.js      4.09 kB │ gzip:   1.29 kB
+dist/assets/BusinessFormPage-DXvfDvQq.js                4.19 kB │ gzip:   1.84 kB
+dist/assets/BusinessManagePage-Bv7ZskN1.js              4.40 kB │ gzip:   1.58 kB
+dist/assets/ContractListPage-CxHMakAL.js                4.42 kB │ gzip:   2.17 kB
+dist/assets/ContractListPage-BQqRnoZs.js                4.90 kB │ gzip:   2.06 kB
+dist/assets/useTranslation-BqWhTXqi.js                  5.20 kB │ gzip:   2.45 kB
+dist/assets/useContracts-DQ7MiCns.js                    5.42 kB │ gzip:   1.57 kB
+dist/assets/DashboardPage-fvjgdnun.js                   5.89 kB │ gzip:   2.23 kB
+dist/assets/ContractDetailPage-De6gM05Z.js              7.32 kB │ gzip:   2.87 kB
+dist/assets/FlowViewerPage-NwoQFi7w.js                  7.77 kB │ gzip:   2.93 kB
+dist/assets/ContractFormProgress-CNvLa_AI.js            7.77 kB │ gzip:   3.25 kB
+dist/assets/ContractDetailPage-CNw8MCUA.js             17.09 kB │ gzip:   6.07 kB
+dist/assets/purify.es-V6uLfjnH.js                      26.92 kB │ gzip:  10.17 kB
+dist/assets/UXTestPage-C4VHTKSG.js                     36.41 kB │ gzip:  10.18 kB
+dist/assets/ContractFormPage-DdX_plYw.js              102.41 kB │ gzip:  26.30 kB
+dist/assets/index.es-D9vfD59E.js                      159.59 kB │ gzip:  53.54 kB
+dist/assets/html2canvas.esm-CBrSDip1.js               202.30 kB │ gzip:  48.03 kB
+dist/assets/html2canvas-pro.esm-Nt-1fq2x.js           231.77 kB │ gzip:  57.76 kB
+dist/assets/ContractSignPage-BXdY_Px4.js              348.07 kB │ gzip:  91.29 kB
+dist/assets/jspdf.es.min-q65fR8Zj.js                  390.36 kB │ gzip: 128.72 kB
+dist/assets/index-BeBEH_zE.js                       1,556.59 kB │ gzip: 488.29 kB
+✓ built in 20.20s

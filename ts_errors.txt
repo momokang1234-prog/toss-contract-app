@@ -1,0 +1,2 @@
+src/pages/employer/ContractFormPage.tsx(236,22): error TS2339: Property 'Content' does not exist on type 'ExportedBottomSheet'.
+src/pages/employer/ContractFormPage.tsx(271,23): error TS2339: Property 'Content' does not exist on type 'ExportedBottomSheet'.
