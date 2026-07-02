@@ -279,7 +279,7 @@ export function useContractForm() {
         const contractData = buildDomainContractData(form);
         const vr = validateLaborContract(contractData);
         if (!vr.valid && vr.errors.length > 0) {
-          e.checklist_agreed = '법적 기준에 미달하는 항목이 있습니다. 위 안내된 항목을 수정해주세요.';
+          e.checklist_agreed = '작성되지 않은 필수 항목이나 기준에 미달하는 항목이 있습니다. 위 안내를 확인해주세요.';
         } else if (!form.checklist_agreed) {
           e.checklist_agreed = '체크리스트 확인에 동의해주세요';
         }
@@ -318,11 +318,8 @@ export function useContractForm() {
       let contract;
       const contractData = buildContractData(form, businesses[0].id);
 
-      if (id) {
-        contract = await updateContract(id, { ...contractData, status: 'template', template_name: templateName, rejection_reason: "" });
-      } else {
-        contract = await createContract({ ...contractData, status: 'template', template_name: templateName });
-      }
+      // Always create a new contract for template, don't update current one
+      contract = await createContract({ ...contractData, status: 'template', template_name: templateName });
       return contract;
     } catch (err) {
       console.error(err);

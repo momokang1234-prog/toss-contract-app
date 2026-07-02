@@ -15,20 +15,22 @@ interface Step3WorkScheduleProps {
   setScheduleMode: (mode: ContractFormData['schedule_mode']) => void;
 }
 
-function pillStyle(active: boolean): React.CSSProperties {
+function dayButtonStyle(active: boolean): React.CSSProperties {
   return {
-    padding: '12px 20px',
-    borderRadius: 24,
-    fontSize: 16,
+    width: '44px',
+    height: '44px',
+    borderRadius: '50%',
+    fontSize: '16px',
     fontWeight: 600,
-    color: active ? '#fff' : '#333D4B',
+    color: active ? '#fff' : '#4E5968',
     backgroundColor: active ? '#3182F6' : '#F2F4F6',
     border: 'none',
     cursor: 'pointer',
     transition: 'all 0.2s',
-    flex: '1 1 calc(33.333% - 8px)',
-    minWidth: '60px',
-    textAlign: 'center',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexShrink: 0,
   };
 }
 
@@ -122,23 +124,25 @@ export default function Step3WorkSchedule({
       {/* 1. 요일 선택 */}
       <CommentBoundary name="근무일정-요일선택">
         <FunnelQuestion
-          title={<>무슨 요일에<br />출근하시나요?</>}
+          title={<>근무하는 요일은<br />어떻게 되나요?</>}
           subtitle="출근하는 모든 요일을 선택해주세요"
           isActive={activeField === 'days'}
           onEnter={() => setActiveField('days')}
           summary={form.work_days.length > 0 ? `출근일: ${form.work_days.map((d) => DAY_LABELS[d]).join(', ')}` : undefined}
         >
-          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', gap: 4 }}>
             {DAYS.map((day) => (
-              <button key={day} onClick={() => toggleDay(day)} style={pillStyle(form.work_days.includes(day))}>
+              <button 
+                type="button" 
+                key={day} 
+                onClick={(e) => { e.preventDefault(); toggleDay(day); }} 
+                style={dayButtonStyle(form.work_days.includes(day))}
+              >
                 {DAY_LABELS[day]}
               </button>
             ))}
           </div>
           {errors.work_days && <div style={{ color: '#FF5252', fontSize: 13, marginTop: 8 }}>{errors.work_days}</div>}
-          {activeField === 'days' && form.work_days.length > 0 && (
-            <button style={nextBtnStyle()} onClick={() => setActiveField('mode')}>선택 완료</button>
-          )}
         </FunnelQuestion>
       </CommentBoundary>
 
@@ -153,8 +157,8 @@ export default function Step3WorkSchedule({
             summary={isSame ? '모든 요일 같게' : '요일마다 다르게'}
           >
             <div style={{ display: 'flex', gap: 8 }}>
-              <button style={pillStyle(isSame)} onClick={() => { setScheduleMode('same'); setActiveField('time'); }}>모든 요일 같게</button>
-              <button style={pillStyle(!isSame)} onClick={() => { setScheduleMode('perDay'); setActiveField('time'); }}>요일마다 다르게</button>
+              <button type="button" style={{ ...dayButtonStyle(isSame), width: 'auto', padding: '0 20px', borderRadius: 24, flex: 1 }} onClick={(e) => { e.preventDefault(); setScheduleMode('same'); setActiveField('time'); }}>모든 요일 같게</button>
+              <button type="button" style={{ ...dayButtonStyle(!isSame), width: 'auto', padding: '0 20px', borderRadius: 24, flex: 1 }} onClick={(e) => { e.preventDefault(); setScheduleMode('perDay'); setActiveField('time'); }}>요일마다 다르게</button>
             </div>
           </FunnelQuestion>
         </CommentBoundary>
@@ -191,9 +195,6 @@ export default function Step3WorkSchedule({
             </FunnelQuestion>
           )}
           {errors.workSchedule && <div style={{ color: '#FF5252', fontSize: 13, marginTop: 8 }}>{errors.workSchedule}</div>}
-          {activeField === 'time' && timeFilled && (
-            <button style={nextBtnStyle()} onClick={() => setActiveField('holiday')}>다음</button>
-          )}
         </CommentBoundary>
       )}
 
@@ -208,9 +209,10 @@ export default function Step3WorkSchedule({
             summary={form.weekly_holiday ? `주휴일: ${DAY_LABELS[form.weekly_holiday]}` : undefined}
           >
             <button
+              type="button"
               className="funnel-huge-input"
               style={{ textAlign: 'left', cursor: 'pointer', paddingBottom: '8px', color: form.weekly_holiday ? '#333D4B' : '#d1d6db' }}
-              onClick={() => setHolidaySheetOpen(true)}
+              onClick={(e) => { e.preventDefault(); setHolidaySheetOpen(true); }}
             >
               {form.weekly_holiday ? `${DAY_LABELS[form.weekly_holiday]}요일` : '선택해주세요'}
             </button>
@@ -224,9 +226,10 @@ export default function Step3WorkSchedule({
                   const isSelected = form.weekly_holiday === day;
                   return (
                     <button
+                      type="button"
                       key={day}
                       style={{ padding: '16px', background: isSelected ? '#F2F4F6' : 'transparent', border: 'none', borderRadius: '12px', textAlign: 'left', fontSize: '16px', fontWeight: 600, color: isSelected ? '#3182F6' : '#333D4B' }}
-                      onClick={() => { selectWeeklyHoliday(day); setHolidaySheetOpen(false); }}
+                      onClick={(e) => { e.preventDefault(); selectWeeklyHoliday(day); setHolidaySheetOpen(false); }}
                     >
                       {DAY_LABELS[day]}요일
                     </button>

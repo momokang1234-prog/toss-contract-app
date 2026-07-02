@@ -5,7 +5,13 @@ let initialStore = [...MOCK_CONTRACTS];
 if (typeof window !== 'undefined') {
   const saved = localStorage.getItem('MOCK_CONTRACTS_STORE');
   if (saved) {
-    try { initialStore = JSON.parse(saved); } catch (e) {}
+    try { 
+      const parsed = JSON.parse(saved) as Contract[]; 
+      // Merge templates if they are missing
+      const templates = MOCK_CONTRACTS.filter(c => c.status === 'template');
+      const missingTemplates = templates.filter(t => !parsed.some(p => p.id === t.id));
+      initialStore = [...missingTemplates, ...parsed];
+    } catch (e) {}
   } else {
     localStorage.setItem('MOCK_CONTRACTS_STORE', JSON.stringify(initialStore));
   }

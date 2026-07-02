@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { TextField, Spacing } from '@toss/tds-mobile';
 import type { ContractFormData } from '../types';
 import { CommentBoundary } from '../../../dev/CommentBoundary';
 import { FunnelQuestion } from '../../../../components/funnel/FunnelQuestion';
@@ -22,23 +23,24 @@ export default function Step1BasicInfo({ form, errors, handleChange }: Step1Basi
         onEnter={() => setActiveField('name')}
         summary={form.worker_name ? `이름: ${form.worker_name}` : undefined}
       >
-        <label className="funnel-label">근로자 이름</label>
-        <input
-          className="funnel-huge-input"
-          placeholder="예: 홍길동"
-          value={form.worker_name}
-          onChange={e => handleChange('worker_name', e.target.value)}
-          onKeyDown={e => {
-            if (e.key === 'Enter' && form.worker_name.trim().length > 0) {
-              setActiveField('phone');
-            }
-          }}
-        />
-        {errors.worker_name && (
-          <div style={{ color: '#f04452', fontSize: '13px', marginTop: '8px' }}>
-            {errors.worker_name}
-          </div>
-        )}
+        <div style={{ padding: '0 4px' }}>
+          <TextField
+            variant="line"
+            labelOption="sustain"
+            label="근로자 이름"
+            placeholder="예: 홍길동"
+            value={form.worker_name}
+            onChange={e => handleChange('worker_name', e.target.value)}
+            hasError={!!errors.worker_name}
+            help={errors.worker_name}
+            onKeyDown={e => {
+              if (e.key === 'Enter' && form.worker_name.trim().length > 0) {
+                setActiveField('phone');
+              }
+            }}
+          />
+        </div>
+        <Spacing size={24} />
       </FunnelQuestion>
       </CommentBoundary>
 
@@ -52,24 +54,24 @@ export default function Step1BasicInfo({ form, errors, handleChange }: Step1Basi
         onEnter={() => setActiveField('phone')}
         summary={form.worker_phone ? `전화번호: ${form.worker_phone}` : undefined}
       >
-        <label className="funnel-label">전화번호</label>
-        <input
-          className="funnel-huge-input"
-          type="tel"
-          placeholder="01012345678"
-          value={form.worker_phone}
-          onChange={e => handleChange('worker_phone', e.target.value.replace(/\D/g, '').slice(0, 11))}
-          onKeyDown={e => {
-            if (e.key === 'Enter' && form.worker_phone.length >= 10) {
-              setActiveField('address');
-            }
-          }}
-        />
-        {errors.worker_phone && (
-          <div style={{ color: '#f04452', fontSize: '13px', marginTop: '8px' }}>
-            {errors.worker_phone}
-          </div>
-        )}
+        <div style={{ padding: '0 4px' }}>
+          <TextField
+            variant="line"
+            labelOption="sustain"
+            label="전화번호"
+            placeholder="01012345678"
+            value={form.worker_phone}
+            onChange={e => handleChange('worker_phone', e.target.value.replace(/\D/g, '').slice(0, 11))}
+            hasError={!!errors.worker_phone}
+            help={errors.worker_phone}
+            onKeyDown={e => {
+              if (e.key === 'Enter' && form.worker_phone.length >= 10) {
+                setActiveField('address');
+              }
+            }}
+          />
+        </div>
+        <Spacing size={24} />
       </FunnelQuestion>
       </CommentBoundary>
       )}
@@ -84,24 +86,24 @@ export default function Step1BasicInfo({ form, errors, handleChange }: Step1Basi
         onEnter={() => setActiveField('address')}
         summary={form.worker_address ? `주소: ${form.worker_address}` : undefined}
       >
-        <label className="funnel-label">주소</label>
-        <input
-          className="funnel-huge-input"
-          type="text"
-          placeholder="예: 서울특별시 강남구 테헤란로 142"
-          value={form.worker_address || ''}
-          onChange={e => handleChange('worker_address', e.target.value)}
-          onKeyDown={e => {
-            if (e.key === 'Enter') {
-              e.currentTarget.blur();
-            }
-          }}
-        />
-        {errors.worker_address && (
-          <div style={{ color: '#f04452', fontSize: '13px', marginTop: '8px' }}>
-            {errors.worker_address}
-          </div>
-        )}
+        <div style={{ padding: '0 4px' }}>
+          <TextField
+            variant="line"
+            labelOption="sustain"
+            label="주소"
+            placeholder="예: 서울특별시 강남구 테헤란로 142"
+            value={form.worker_address || ''}
+            onChange={e => handleChange('worker_address', e.target.value)}
+            hasError={!!errors.worker_address}
+            help={errors.worker_address}
+            onKeyDown={e => {
+              if (e.key === 'Enter') {
+                e.currentTarget.blur();
+              }
+            }}
+          />
+        </div>
+        <Spacing size={24} />
       </FunnelQuestion>
       </CommentBoundary>
       )}
@@ -109,3 +111,4 @@ export default function Step1BasicInfo({ form, errors, handleChange }: Step1Basi
     </div>
   );
 }
+

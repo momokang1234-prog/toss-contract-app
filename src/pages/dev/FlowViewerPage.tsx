@@ -33,9 +33,16 @@ const styles = css`
 .preview-toolbar { padding: 8px 16px; background: #fff; border-bottom: 1px solid #e5e8eb; display: flex; align-items: center; justify-content: space-between; font-size: 12px; color: #8b95a1; flex-shrink: 0; }
 .preview-url { font-family: 'SF Mono', Menlo, monospace; background: #f2f4f6; padding: 4px 8px; border-radius: 4px; color: #4e5968; }
 .preview-canvas { flex: 1; display: flex; justify-content: center; align-items: center; padding: 20px; overflow: auto; }
-.preview-frame-wrapper { width: 375px; height: 812px; background: #fff; border-radius: 24px; box-shadow: 0 8px 24px rgba(0,0,0,0.1); border: 8px solid #191f28; overflow: hidden; position: relative; flex-shrink: 0; }
+.preview-frame-wrapper { background: #fff; border-radius: 24px; box-shadow: 0 8px 24px rgba(0,0,0,0.1); border: 8px solid #191f28; overflow: hidden; position: relative; flex-shrink: 0; transition: width 0.3s, height 0.3s; }
 .preview-frame { width: 100%; height: 100%; border: none; background: #fff; }
 `;
+
+const DEVICES = [
+  { id: 'iphone14', name: 'iPhone 14/15 Pro', width: 393, height: 852 },
+  { id: 'iphone13mini', name: 'iPhone 13/12 mini', width: 375, height: 812 },
+  { id: 'iphoneSE', name: 'iPhone SE', width: 375, height: 667 },
+  { id: 'galaxys23', name: 'Galaxy S23/S24', width: 360, height: 780 },
+];
 
 interface FlowNode {
   id: string;
@@ -73,6 +80,7 @@ export default function FlowViewerPage() {
   const currentFlow = currentFlowId === 'contract' ? CONTRACT_FLOW : SIGN_FLOW;
   
   // State toggles for testing triggers
+  const [device, setDevice] = useState(DEVICES[0]);
   const [isHourly, setIsHourly] = useState(true);
   const [hoursOver4, setHoursOver4] = useState(false);
   const [isMinor, setIsMinor] = useState(false);
@@ -165,15 +173,24 @@ export default function FlowViewerPage() {
                 <span>{activeNode?.role === 'employer' ? '🏪 사장님 뷰' : '✍️ 알바생 뷰'}</span>
                 <span className="preview-url">{activeNode?.route}</span>
               </div>
-              <button 
-                onClick={() => setVersion(Date.now())}
-                style={{ padding: '4px 12px', borderRadius: 4, border: '1px solid #e5e8eb', background: '#fff', cursor: 'pointer', fontSize: 12 }}
-              >
-                🔄 새로고침
-              </button>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <select 
+                  value={device.id} 
+                  onChange={e => setDevice(DEVICES.find(d => d.id === e.target.value) || DEVICES[0])}
+                  style={{ padding: '4px', borderRadius: 4, border: '1px solid #e5e8eb', fontSize: 12, background: '#fff', cursor: 'pointer' }}
+                >
+                  {DEVICES.map(d => <option key={d.id} value={d.id}>{d.name} ({d.width}x{d.height})</option>)}
+                </select>
+                <button 
+                  onClick={() => setVersion(Date.now())}
+                  style={{ padding: '4px 12px', borderRadius: 4, border: '1px solid #e5e8eb', background: '#fff', cursor: 'pointer', fontSize: 12 }}
+                >
+                  🔄 새로고침
+                </button>
+              </div>
             </div>
             <div className="preview-canvas">
-              <div className="preview-frame-wrapper">
+              <div className="preview-frame-wrapper" style={{ width: device.width, height: device.height }}>
                 {activeNode && (
                   <iframe 
                     className="preview-frame"

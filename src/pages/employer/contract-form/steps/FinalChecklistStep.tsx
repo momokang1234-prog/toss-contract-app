@@ -78,7 +78,16 @@ export function FinalChecklistStep({ form, onChange, toggleDay, onNavigate }: Fi
     }
   };
 
-  validationRes.errors.forEach(err => addGuide(err.code));
+  validationRes.errors.forEach(err => {
+    if (err.code.startsWith('ZOD_')) {
+      guideItems.push({
+        title: '필수 항목 누락 및 오류',
+        desc: `${err.message} (이전 단계로 돌아가 누락된 내용을 채워주세요)`,
+      });
+    } else {
+      addGuide(err.code);
+    }
+  });
   validationRes.warnings.forEach(warn => addGuide(warn.code));
 
   return (

@@ -15,9 +15,7 @@ import Step6Preview from './contract-form/steps/Step6Preview';
 import { ContractFormProgress } from './contract-form/ContractFormProgress';
 
 export default function ContractFormPage() {
-  const [isTemplateSheetOpen, setIsTemplateSheetOpen] = useState(false);
   const [isLoadTemplateSheetOpen, setIsLoadTemplateSheetOpen] = useState(false);
-  const [templateName, setTemplateName] = useState('');
   
   const { contracts } = useContracts();
   const templates = contracts.filter(c => c.status === 'template');
@@ -100,6 +98,11 @@ export default function ContractFormPage() {
   const onSubmit = async () => {
     const contract = await handleSubmit();
     if (!contract) return;
+    
+    // Auto-save template
+    const autoTemplateName = form.job_description ? `${form.job_description} 양식` : '자동 저장 양식';
+    saveAsTemplate(autoTemplateName).catch(console.error);
+
     navigate(`/employer/contracts/${contract.id}`, { state: { justCreated: true } });
   };
 
@@ -108,18 +111,12 @@ export default function ContractFormPage() {
       <div className={styles.content}>
         <div style={{ paddingTop: 20, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <Paragraph typography="st3" fontWeight="bold">근로계약서 작성</Paragraph>
-          <div style={{ display: 'flex', gap: 16 }}>
+          <div style={{ display: 'flex', gap: 8 }}>
             <div 
-              style={{ color: '#8b95a1', fontWeight: 600, fontSize: 15, cursor: 'pointer', padding: '8px 0' }}
               onClick={() => setIsLoadTemplateSheetOpen(true)}
+              style={{ color: '#8b95a1', fontSize: 14, fontWeight: 500, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4, padding: '8px' }}
             >
-              양식 불러오기
-            </div>
-            <div 
-              style={{ color: '#3182F6', fontWeight: 600, fontSize: 15, cursor: 'pointer', padding: '8px 0' }}
-              onClick={() => setIsTemplateSheetOpen(true)}
-            >
-              양식 저장
+              📄 양식 불러오기
             </div>
           </div>
         </div>
@@ -204,12 +201,14 @@ export default function ContractFormPage() {
               onClick={() => {
                 if (isValidationStep) {
                   onValidationRun();
+                } else if (searchParams.has('templateId') && currentStep === 'basicInfo') {
+                  if (validateStep('basicInfo')) funnel.history.push('finalChecklist');
                 } else {
                   goNext(effectiveSteps[currentIndex + 1]);
                 }
               }}
             >
-              {isValidationStep ? '검증 실행' : '다음'}
+              {isValidationStep ? '검증 실행' : (searchParams.has('templateId') && currentStep === 'basicInfo') ? '작성 완료 및 확인' : '다음'}
             </Button>
           </div>
         ) : (
@@ -229,47 +228,7 @@ export default function ContractFormPage() {
         </div>
       </div>
 
-      <BottomSheet
-        open={isTemplateSheetOpen}
-        onClose={() => setIsTemplateSheetOpen(false)}
-      >
-        <BottomSheet.Content>
-          <Paragraph typography="t4" fontWeight="bold">
-            어떤 이름으로 양식을 저장할까요?
-          </Paragraph>
-          <Spacing size={8} />
-          <Paragraph typography="t6" color="grey-600">
-            직무나 근무 시간표를 알아보기 쉬운 이름으로 저장해두면, 나중에 직원 이름만 바꿔서 다시 사용할 수 있어요.
-          </Paragraph>
-          <Spacing size={24} />
-          <TextField
-            variant="line"
-            labelOption="sustain"
-            label="양식 이름"
-            placeholder="예: 주말 홀 서빙 알바"
-            value={templateName}
-            onChange={(e) => setTemplateName(e.target.value)}
-          />
-          <Spacing size={40} />
-          <Button
-            size="large"
-            color="primary"
-            disabled={!templateName.trim() || submitting}
-            loading={submitting}
-            onClick={async () => {
-              const contract = await saveAsTemplate(templateName);
-              if (contract) {
-                setIsTemplateSheetOpen(false);
-                alert('양식이 저장되었습니다.');
-                navigate('/employer/dashboard');
-              }
-            }}
-            style={{ width: '100%' }}
-          >
-            양식 저장하기
-          </Button>
-        </BottomSheet.Content>
-      </BottomSheet>
+
 
       <BottomSheet
         open={isLoadTemplateSheetOpen}

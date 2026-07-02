@@ -358,18 +358,30 @@ function AccountStep({
     <>
       <FunnelQuestion isActive title={<>급여 받을 계좌번호를<br />입력해주세요</>} subtitle="본인 명의의 은행 계좌를 입력해주세요">
         <CommentBoundary name="계좌-입력-폼">
-          <div onClickCapture={(e) => { e.preventDefault(); e.stopPropagation(); setIsBankOpen(true); }}>
-            <TextField variant="box" labelOption="sustain" label="은행" value={bank} onChange={() => {}} readOnly placeholder="선택" />
+          <div style={{ display: 'flex', gap: 12 }}>
+            <div style={{ flex: 3 }} onClickCapture={(e) => { e.preventDefault(); e.stopPropagation(); setIsBankOpen(true); }}>
+              <TextField 
+                variant="line" 
+                labelOption="sustain" 
+                label="은행" 
+                value={bank} 
+                onChange={() => {}} 
+                readOnly 
+                placeholder="선택" 
+              />
+            </div>
+            <div style={{ flex: 7 }}>
+              <TextField
+                variant="line"
+                labelOption="sustain"
+                label="계좌번호"
+                type="tel"
+                placeholder="- 없이 입력"
+                value={account}
+                onChange={e => setAccount(e.target.value.replace(/[^0-9]/g, ''))}
+              />
+            </div>
           </div>
-          <Spacing size={12} />
-          <span className="funnel-label">계좌번호</span>
-          <input
-            className="funnel-huge-input"
-            type="tel"
-            placeholder="- 없이 입력"
-            value={account}
-            onChange={e => setAccount(e.target.value.replace(/[^0-9]/g, ''))}
-          />
         </CommentBoundary>
       </FunnelQuestion>
 
