@@ -101,22 +101,15 @@ export default function LoginPage() {
           open={open}
           onClose={() => setOpen(false)}
           header={<BottomSheet.Header>어떤 역할로 시작할까요?</BottomSheet.Header>}
-          role="dialog"
-          aria-modal="true"
-          aria-label="역할 선택"
         >
           <ListRow
             contents={<ListRow.Texts type="1RowTypeA" top="사장님으로 시작하기" />}
             onClick={() => handleRoleSelect("employer")}
-            role="button"
-            tabIndex={0}
             aria-label="사장님 역할로 시작"
           />
           <ListRow
             contents={<ListRow.Texts type="1RowTypeA" top="근로자로 시작하기" />}
             onClick={() => handleRoleSelect("worker")}
-            role="button"
-            tabIndex={0}
             aria-label="근로자 역할로 시작"
           />
         </BottomSheet>

@@ -53,7 +53,7 @@ export default function DashboardPage() {
               네트워크 연결을 확인하고 다시 시도해주세요
             </Paragraph>
             <Spacing size={24} />
-            <Button color="primary" variant="ghost" size="large" onClick={refetch}>
+            <Button color="primary" variant="weak" size="large" onClick={refetch}>
               다시 시도
             </Button>
           </div>

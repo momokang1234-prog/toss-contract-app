@@ -144,7 +144,7 @@ export default function ContractListPage() {
               네트워크 연결을 확인하고 다시 시도해주세요
             </Paragraph>
             <Spacing size={24} />
-            <TextButton color="primary" variant="ghost" size="large" onClick={refetch}>
+            <TextButton color="primary" variant="clear" size="large" onClick={refetch}>
               다시 시도
             </TextButton>
           </div>
