@@ -5,6 +5,7 @@ import type { ReactNode } from 'react';
 import { tdsEvent, getSchemeUri } from '@apps-in-toss/web-framework';
 import { AuthProvider } from './contexts/AuthContext';
 import { ErrorBoundary } from './components/ErrorBoundary';
+import { PageErrorBoundary } from './components/PageErrorBoundary';
 import { DevBridge } from './dev/DevBridge';
 import { XrayPicker } from './components/dev/XrayPicker';
 import { RequireAuth } from './components/auth/RequireAuth';
@@ -41,7 +42,13 @@ const ContractCompletionVariantD = lazy(() => import('./pages/dev/employer/Contr
 const ContractCompletionVariantE = lazy(() => import('./pages/dev/employer/ContractCompletionVariants').then(m => ({ default: m.ContractCompletionVariantE })));
 
 function Lazy({ children }: { children: ReactNode }) {
-  return <Suspense fallback={<div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', background: 'var(--toss-bg, #fff)' }}><div className="loading-spinner">로딩 중...</div></div>}>{children}</Suspense>;
+  return (
+    <PageErrorBoundary>
+      <Suspense fallback={<div className="loading-container"><div className="loading-spinner">로딩 중...</div></div>}>
+        {children}
+      </Suspense>
+    </PageErrorBoundary>
+  );
 }
 
 function OverlayClearer() {

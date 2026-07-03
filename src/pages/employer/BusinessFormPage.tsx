@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useBusiness } from '../../hooks/useBusiness';
+import { useSessionStorage } from '../../hooks/useSessionStorage';
 import { Top, Paragraph, Spacing, Button, TextField } from '@toss/tds-mobile';
 import styles from './BusinessFormPage.module.css';
 
@@ -21,9 +22,9 @@ const KEYPAD = [
 export default function BusinessFormPage() {
   const navigate = useNavigate();
   const { createBusiness } = useBusiness();
-  const [step, setStep] = useState<'number' | 'info'>('number');
-  const [businessNumber, setBusinessNumber] = useState('');
-  const [form, setForm] = useState({ business_name: '', representative: '', address: '', phone: '' });
+  const [step, setStep, clearStep] = useSessionStorage<'number' | 'info'>('biz_form_step', 'number');
+  const [businessNumber, setBusinessNumber, clearBusinessNumber] = useSessionStorage('biz_form_num', '');
+  const [form, setForm, clearForm] = useSessionStorage('biz_form_data', { business_name: '', representative: '', address: '', phone: '' });
   const [submitting, setSubmitting] = useState(false);
   
   const [isValidating, setIsValidating] = useState(false);
@@ -68,6 +69,9 @@ export default function BusinessFormPage() {
         address: form.address,
         phone: form.phone,
       });
+      clearStep();
+      clearBusinessNumber();
+      clearForm();
       navigate('/employer/dashboard', { replace: true });
     } catch (err: any) { 
       alert('등록 실패: ' + (err.message || JSON.stringify(err))); 

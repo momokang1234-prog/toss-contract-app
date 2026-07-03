@@ -1,12 +1,13 @@
 import { useEffect, useRef } from 'react';
 import type { Contract } from '../../hooks/useContracts';
 import { generatePrintableHTML } from '../../domain/contract/template';
+import { WidgetErrorBoundary } from '../WidgetErrorBoundary';
 
 interface Props {
   contract: Contract;
 }
 
-export function ContractDocumentView({ contract }: Props) {
+function ContractDocumentViewInner({ contract }: Props) {
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -30,5 +31,13 @@ export function ContractDocumentView({ contract }: Props) {
         boxShadow: '0 2px 8px rgba(0,0,0,0.04)'
       }} 
     />
+  );
+}
+
+export function ContractDocumentView(props: Props) {
+  return (
+    <WidgetErrorBoundary>
+      <ContractDocumentViewInner {...props} />
+    </WidgetErrorBoundary>
   );
 }

@@ -8,17 +8,24 @@ import { useContracts } from '../../hooks/useContracts';
 export function DeeplinkHandler() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { isAuthenticated, userRole } = useAuth();
+  const { isAuthenticated, userRole, isLoading } = useAuth();
   const { getContract } = useContracts();
 
   useEffect(() => {
+    if (isLoading) return; // 인증 상태가 로드될 때까지 리다이렉트 지연
+
     async function handle() {
       if (!id) { navigate('/login'); return; }
       if (!isAuthenticated) { navigate(`/login?redirect=/contract/${id}`, { replace: true }); return; }
 
       const contract = await getContract(id);
       
-      if (contract?.status === 'invited' && userRole === 'worker') {
+      if (!contract) {
+        navigate('/error?type=not-found', { replace: true });
+        return;
+      }
+
+      if (contract.status === 'invited' && userRole === 'worker') {
         navigate(`/worker/invite/${id}`, { replace: true });
         return;
       }

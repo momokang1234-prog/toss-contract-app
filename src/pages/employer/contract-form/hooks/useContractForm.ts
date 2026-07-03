@@ -3,6 +3,7 @@ import { josa } from 'es-hangul';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useContracts } from '../../../../hooks/useContracts';
 import { useBusiness } from '../../../../hooks/useBusiness';
+import { useSessionStorage } from '../../../../hooks/useSessionStorage';
 import { validateLaborContract, type ValidationWarning, calcWeeklyHoursFromSchedule } from '../../../../domain/contract/validation';
 import {
   type ContractFormData,
@@ -22,6 +23,9 @@ import {
 import { buildContractData as buildDomainContractData } from '../../../../domain/contract/buildContractData';
 
 function mapFieldPath(path: string): string {
+  if (path.startsWith('worker.')) {
+    return path.replace('.', '_');
+  }
   const parts = path.split('.');
   const last = parts[parts.length - 1];
   return last.replace(/[A-Z]/g, m => '_' + m.toLowerCase());
@@ -55,7 +59,7 @@ export function useContractForm() {
   const navigate = useNavigate();
   const { createContract } = useContracts();
   const { businesses } = useBusiness();
-  const [form, setForm] = useState<ContractFormData>(DEFAULT_FORM);
+  const [form, setForm, clearForm] = useSessionStorage<ContractFormData>('wiz_form', DEFAULT_FORM);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [warnings, setWarnings] = useState<ValidationWarning[]>([]);
   const [validationResult, setValidationResult] = useState<ValidationResultData | null>(null);
@@ -67,18 +71,15 @@ export function useContractForm() {
     if (businesses.length > 0 && !form.workplace) {
       setForm(prev => ({ ...prev, workplace: businesses[0].address }));
     }
-  }, [businesses, form.workplace]);
+  }, [businesses, form.workplace, setForm]);
 
   // Restore from session on mount, or load from DB if editing/template
   const { id } = useParams();
   const searchParams = new URLSearchParams(window.location.search);
   const templateId = searchParams.get('templateId');
   const { getContract, updateContract } = useContracts();
-  const mounted = useRef(false);
+  
   useEffect(() => {
-    if (mounted.current) return;
-    mounted.current = true;
-    
     if (id || templateId) {
       const loadId = id || templateId!;
       getContract(loadId).then(c => {
@@ -114,26 +115,15 @@ export function useContractForm() {
             employment_insurance: c.employment_insurance,
             accident_insurance: c.accident_insurance,
             severance_clause: c.severance_clause,
-            checklist_agreed: isTemplate ? false : false,
+            checklist_agreed: false,
             other_conditions: c.other_conditions || '',
             employer_signature_data: c.employer_signature_data,
           });
         }
       });
-    } else {
-      const savedForm = sessionStorage.getItem('wiz_form');
-      if (savedForm !== null) {
-        try { setForm(prev => ({ ...prev, ...JSON.parse(savedForm) })); } catch { /* ignore */ }
-      }
     }
-  }, [id, getContract]);
-
-  // Session storage persistence (only after initial load)
-  useEffect(() => { 
-    if (mounted.current) {
-      sessionStorage.setItem('wiz_form', JSON.stringify(form)); 
-    }
-  }, [form]);
+    // If not editing/template, useSessionStorage already loaded the state from sessionStorage
+  }, [id, templateId, getContract, navigate, setForm]);
 
   // Beforeunload warning
   useEffect(() => {
@@ -236,62 +226,72 @@ export function useContractForm() {
 
   const validateStep = (step: ContractFormStep): boolean => {
     const e: Record<string, string> = {};
-    switch (step) {
-      case 'basicInfo':
-        if (!form.worker_name.trim()) e.worker_name = `${josa('이름', '을/를')} 입력해주세요`;
-        if (!form.worker_phone || form.worker_phone.length < 10) e.worker_phone = '정확한 전화번호를 입력해주세요';
-        break;
-      case 'workConditions':
-        if (!form.contract_type) e.contract_type = '계약 유형을 선택해주세요';
-        if (!form.workplace.trim()) e.workplace = `${josa('근무 장소', '을/를')} 입력해주세요`;
-        if (!form.job_description.trim()) e.job_description = `${josa('직무 내용', '을/를')} 입력해주세요`;
-        if (!form.start_date) e.start_date = `${josa('시작일', '을/를')} 선택해주세요`;
-        break;
-      case 'workSchedule':
-        if (form.work_days.length === 0) e.work_days = `${josa('근무 요일', '을/를')} 선택해주세요`;
-        if (!form.weekly_holiday) e.weekly_holiday = '주휴일을 선택해주세요';
-        for (const d of form.work_days) {
-          const s = form.work_schedule[d];
-          if (!s || !s.start || !s.end) {
-            e.workSchedule = `${DAY_LABELS[d] ?? d}요일의 근무시간을 입력해주세요`;
-            break;
-          }
-          if (s.start >= s.end) {
-            e.workSchedule = `${DAY_LABELS[d] ?? d}요일 종료 시간은 시작 시간보다 늦어야 합니다`;
-            break;
-          }
-        }
-        break;
-      case 'wageInsurance':
-        if (!form.base_wage || Number(form.base_wage) <= 0) e.base_wage = `${josa('금액', '을/를')} 입력해주세요`;
-        if (!form.wage_payment_day) e.wage_payment_day = '지급일을 선택해주세요';
-        if (form.accident_insurance !== true) e.accident_insurance = '산재보험은 전 사업장 의무가입입니다';
-        break;
-      case 'otherConditions':
-        break;
-      case 'finalChecklist': {
-        if (!businesses || businesses.length === 0) {
-          alert('사업장 정보를 먼저 등록해주세요.');
-          navigate('/employer/business/new');
-          return false;
-        }
-        
-        const contractData = buildDomainContractData(form);
-        const vr = validateLaborContract(contractData);
-        if (!vr.valid && vr.errors.length > 0) {
-          e.checklist_agreed = '작성되지 않은 필수 항목이나 기준에 미달하는 항목이 있습니다. 위 안내를 확인해주세요.';
-        } else if (!form.checklist_agreed) {
-          e.checklist_agreed = '체크리스트 확인에 동의해주세요';
-        }
-        break;
+    const STEP_FIELD_MAP: Record<ContractFormStep, string[]> = {
+      basicInfo: ['worker.name', 'worker.phone', 'worker.address'],
+      workConditions: ['contract.contractType', 'contract.workplace', 'contract.jobDescription', 'contract.startDate', 'contract.endDate'],
+      workSchedule: ['contract.workDays', 'contract.weeklyHoliday', 'contract.startTime', 'contract.endTime', 'contract.breakStartTime', 'contract.breakEndTime'],
+      wageInsurance: ['contract.wageType', 'contract.baseWage', 'contract.wagePaymentDate', 'contract.wagePaymentMethod'],
+      otherConditions: ['contract.otherConditions'],
+      finalChecklist: [],
+      preview: [],
+    };
+
+    if (step === 'finalChecklist') {
+      if (!businesses || businesses.length === 0) {
+        alert('사업장 정보를 먼저 등록해주세요.');
+        navigate('/employer/business/new');
+        return false;
       }
     }
+
+    const contractData = buildDomainContractData(form);
+    const vr = validateLaborContract(contractData);
+    const allowedFields = STEP_FIELD_MAP[step] || [];
+
+    vr.errors.forEach(err => {
+      if (allowedFields.includes(err.field) || allowedFields.some(f => err.field.startsWith(f))) {
+        const localKey = mapFieldPath(err.field);
+        if (!e[localKey]) e[localKey] = err.message;
+      }
+    });
+
+    if (step === 'wageInsurance' && form.accident_insurance !== true) {
+      e.accident_insurance = '산재보험은 전 사업장 의무가입입니다';
+    }
+
+    if (step === 'finalChecklist') {
+      if (!vr.valid && vr.errors.length > 0) {
+        e.checklist_agreed = '작성되지 않은 필수 항목이나 기준에 미달하는 항목이 있습니다. 위 안내를 확인해주세요.';
+      } else if (!form.checklist_agreed) {
+        e.checklist_agreed = '체크리스트 확인에 동의해주세요';
+      }
+    }
+
+    // Schedule local validation for schedule structure if missing
+    if (step === 'workSchedule') {
+      for (const d of form.work_days) {
+        const s = form.work_schedule[d];
+        if (!s || !s.start || !s.end) {
+          e.workSchedule = `${DAY_LABELS[d] ?? d}요일의 근무시간을 입력해주세요`;
+          break;
+        }
+        if (s.start >= s.end) {
+          e.workSchedule = `${DAY_LABELS[d] ?? d}요일 종료 시간은 시작 시간보다 늦어야 합니다`;
+          break;
+        }
+      }
+    }
+
     setErrors(e);
     return Object.keys(e).length === 0;
   };
 
+  const isSubmittingRef = useRef(false);
+
   const handleSubmit = async () => {
     if (businesses.length === 0) { alert('먼저 사업장을 등록해주세요.'); return null; }
+    if (isSubmittingRef.current) return null;
+    isSubmittingRef.current = true;
     setSubmitting(true);
     try {
       let contract;
@@ -308,11 +308,14 @@ export function useContractForm() {
       alert('계약서 저장에 실패했습니다.');
       return null;
     } finally {
+      isSubmittingRef.current = false;
       setSubmitting(false);
     }
   };
   const saveAsTemplate = async (templateName: string) => {
     if (businesses.length === 0) { alert('먼저 사업장을 등록해주세요.'); return null; }
+    if (isSubmittingRef.current) return null;
+    isSubmittingRef.current = true;
     setSubmitting(true);
     try {
       let contract;
@@ -326,6 +329,7 @@ export function useContractForm() {
       alert('템플릿 저장에 실패했습니다.');
       return null;
     } finally {
+      isSubmittingRef.current = false;
       setSubmitting(false);
     }
   };
@@ -352,5 +356,6 @@ export function useContractForm() {
     formatWagePaymentDate,
     wagePaymentDayLabel,
     navigate,
+    clearForm,
   };
 }

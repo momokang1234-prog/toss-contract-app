@@ -37,12 +37,15 @@ export default function ContractFormPage() {
     computeBreakMinutes,
     formatWagePaymentDate,
     navigate,
+    clearForm,
   } = useContractForm();
 
   const isDevMock = sessionStorage.getItem('mock_role') !== null || sessionStorage.getItem('force_mock') === 'true';
   const searchParams = new URLSearchParams(window.location.search);
   const requestedStep = searchParams.get('contract-form-wizard') as ContractFormStep | null;
-  const initialStep = (isDevMock && requestedStep && STEP_ORDER.includes(requestedStep)) 
+  
+  // 운영 환경에서도 step 복구 허용하여 모바일 환경 탭 전환 및 새로고침 시 데이터 유실/초기화 방어
+  const initialStep = (requestedStep && STEP_ORDER.includes(requestedStep)) 
     ? requestedStep 
     : 'basicInfo';
 
@@ -80,9 +83,15 @@ export default function ContractFormPage() {
     }
   }, [isDevMock, handleChange]);
 
+  // 더블 클릭 및 다중 탭 방어를 위한 상태
+  const [isPushing, setIsPushing] = useState(false);
+
   const goNext = (nextStep: ContractFormStep) => {
+    if (isPushing) return;
     if (!validateStep(currentStep)) return;
+    setIsPushing(true);
     funnel.history.push(nextStep as 'basicInfo');
+    setTimeout(() => setIsPushing(false), 400);
   };
 
   const goBack = () => {
@@ -90,9 +99,12 @@ export default function ContractFormPage() {
   };
 
   const onValidationRun = () => {
+    if (isPushing) return;
     const passed = validateStep('finalChecklist');
     if (passed) {
+      setIsPushing(true);
       funnel.history.push('preview');
+      setTimeout(() => setIsPushing(false), 400);
     }
   };
   const onSubmit = async () => {
@@ -103,7 +115,16 @@ export default function ContractFormPage() {
     const autoTemplateName = form.job_description ? `${form.job_description} 양식` : '자동 저장 양식';
     saveAsTemplate(autoTemplateName).catch(console.error);
 
+    clearForm(); // Clear storage on success
+
     navigate(`/employer/contracts/${contract.id}`, { state: { justCreated: true } });
+  };
+
+  const onExit = () => {
+    if (window.confirm('작성 중인 내용을 취소하고 나가시겠습니까?')) {
+      clearForm();
+      navigate('/employer/dashboard', { replace: true });
+    }
   };
 
   return (
@@ -114,9 +135,15 @@ export default function ContractFormPage() {
           <div style={{ display: 'flex', gap: 8 }}>
             <div 
               onClick={() => setIsLoadTemplateSheetOpen(true)}
-              style={{ color: '#8b95a1', fontSize: 14, fontWeight: 500, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4, padding: '8px' }}
+              style={{ color: 'var(--tds-color-grey600)', fontSize: 14, fontWeight: 500, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4, padding: '8px' }}
             >
-              📄 양식 불러오기
+              📄 양식
+            </div>
+            <div 
+              onClick={onExit}
+              style={{ color: 'var(--tds-color-red500)', fontSize: 14, fontWeight: 500, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4, padding: '8px' }}
+            >
+              ✕ 닫기
             </div>
           </div>
         </div>
@@ -260,8 +287,9 @@ export default function ContractFormPage() {
                   style={{ width: '100%', marginBottom: 12, justifyContent: 'flex-start', paddingLeft: 20 }}
                   onClick={() => {
                     setIsLoadTemplateSheetOpen(false);
-                    // Just navigate with templateId, this triggers useContractForm to reload the data!
-                    window.location.href = `/employer/contracts/new?templateId=${t.id}`;
+                    // 풀 리로드(window.location.href) 대신 SPA 라우팅 사용
+                    navigate(`/employer/contracts/new?templateId=${t.id}`, { replace: true });
+                    funnel.history.push('basicInfo');
                   }}
                 >
                   <span style={{ fontSize: 20, marginRight: 12 }}>📄</span> {t.template_name || '이름 없는 양식'}

@@ -57,7 +57,7 @@ export default function LoginPage() {
   return (
     <div className={styles.page}>
       <CommentBoundary name="로그인-헤드">
-        <div style={{ paddingTop: 60 }}>
+        <div className={styles.headerContainer}>
           <Paragraph typography="t2" fontWeight="bold">근로계약서 작성을<br />더 쉽게</Paragraph>
           <Spacing size={8} />
           <Paragraph typography="t5" color="grey-500">3단계로 끝내는 간편 계약서</Paragraph>
@@ -65,12 +65,12 @@ export default function LoginPage() {
       </CommentBoundary>
 
       <CommentBoundary name="로그인-기능리스트">
-        <div style={{ marginTop: 32 }}>
+        <div className={styles.listContainer}>
           <List>
             {FEATURES.map((f, i) => (
               <ListRow
                 key={i}
-                left={<span style={{ fontSize: 28 }}>{f.icon}</span>}
+                left={<span className={styles.iconContainer}>{f.icon}</span>}
                 contents={<ListRow.Texts type="2RowTypeA" top={f.title} bottom={f.desc} />}
               />
             ))}

@@ -1,5 +1,6 @@
 import { useRef, useEffect, useState } from 'react';
 import { Button, Spacing } from '@toss/tds-mobile';
+import { WidgetErrorBoundary } from './WidgetErrorBoundary';
 
 interface SignaturePadProps {
   /** 서명이 바뀔 때마다(한 획 끝/지우기) dataURL 또는 null을 알려줘요. */
@@ -10,7 +11,7 @@ interface SignaturePadProps {
  * 서명 캔버스 + "다시 쓰기" 버튼만 렌더해요.
  * 타이틀/서브타이틄은 위자드 다른 단계와 동일하게 `FunnelQuestion`이 제공해요.
  */
-export default function SignaturePad({ onChange }: SignaturePadProps) {
+function SignaturePadInner({ onChange }: SignaturePadProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const hasDrawnRef = useRef(false);
   const [isDrawing, setIsDrawing] = useState(false);
@@ -149,5 +150,13 @@ export default function SignaturePad({ onChange }: SignaturePadProps) {
         다시 쓰기
       </Button>
     </>
+  );
+}
+
+export default function SignaturePad(props: SignaturePadProps) {
+  return (
+    <WidgetErrorBoundary>
+      <SignaturePadInner {...props} />
+    </WidgetErrorBoundary>
   );
 }

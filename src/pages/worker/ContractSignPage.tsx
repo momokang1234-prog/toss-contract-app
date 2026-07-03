@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { CommentBoundary } from '../dev/CommentBoundary';
 import SignaturePad from '../../components/SignaturePad';
 import { FunnelQuestion } from '../../components/funnel/FunnelQuestion';
@@ -130,8 +130,10 @@ export default function ContractSignPage() {
     funnel.step === 'Sign' ? !!sigData && !signing :
     true;
 
+  const isSigningRef = useRef(false);
   const handleSign = async () => {
-    if (!id || !sigData) return;
+    if (!id || !sigData || isSigningRef.current) return;
+    isSigningRef.current = true;
     setSigning(true);
     try {
       const hashBuffer = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(sigData));
@@ -170,6 +172,7 @@ export default function ContractSignPage() {
     } catch (err) {
       alert(handleApiError(err, 'ContractSign:sign'));
     } finally {
+      isSigningRef.current = false;
       setSigning(false);
     }
   };
