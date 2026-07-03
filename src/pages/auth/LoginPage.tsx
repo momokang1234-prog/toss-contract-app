@@ -58,6 +58,7 @@ export default function LoginPage() {
     <div className={styles.page}>
       <CommentBoundary name="로그인-헤드">
         <div className={styles.headerContainer}>
+          <h1 className="visually-hidden">근로계약서 작성 서비스</h1>
           <Paragraph typography="t2" fontWeight="bold">근로계약서 작성을<br />더 쉽게</Paragraph>
           <Spacing size={8} />
           <Paragraph typography="t5" color="grey-500">3단계로 끝내는 간편 계약서</Paragraph>
@@ -65,13 +66,14 @@ export default function LoginPage() {
       </CommentBoundary>
 
       <CommentBoundary name="로그인-기능리스트">
-        <div className={styles.listContainer}>
+        <div className={styles.listContainer} role="list" aria-label="서비스 기능">
           <List>
             {FEATURES.map((f, i) => (
               <ListRow
                 key={i}
-                left={<span className={styles.iconContainer}>{f.icon}</span>}
+                left={<span className={styles.iconContainer} aria-hidden="true">{f.icon}</span>}
                 contents={<ListRow.Texts type="2RowTypeA" top={f.title} bottom={f.desc} />}
+                role="listitem"
               />
             ))}
           </List>
@@ -87,6 +89,7 @@ export default function LoginPage() {
             size="xlarge"
             onClick={handleStart}
             disabled={isLoading}
+            aria-label={isLoading ? "로그인 처리 중..." : (IS_MOCK ? "시작하기 (Mock)" : "시작하기")}
           >
             {IS_MOCK ? "시작하기 (Mock)" : "시작하기"}
           </Button>
@@ -94,9 +97,28 @@ export default function LoginPage() {
       </CommentBoundary>
 
       <CommentBoundary name="로그인-역할선택">
-        <BottomSheet open={open} onClose={() => setOpen(false)} header={<BottomSheet.Header>어떤 역할로 시작할까요?</BottomSheet.Header>}>
-          <ListRow contents={<ListRow.Texts type="1RowTypeA" top="사장님으로 시작하기" />} onClick={() => handleRoleSelect("employer")} />
-          <ListRow contents={<ListRow.Texts type="1RowTypeA" top="근로자로 시작하기" />} onClick={() => handleRoleSelect("worker")} />
+        <BottomSheet
+          open={open}
+          onClose={() => setOpen(false)}
+          header={<BottomSheet.Header>어떤 역할로 시작할까요?</BottomSheet.Header>}
+          role="dialog"
+          aria-modal="true"
+          aria-label="역할 선택"
+        >
+          <ListRow
+            contents={<ListRow.Texts type="1RowTypeA" top="사장님으로 시작하기" />}
+            onClick={() => handleRoleSelect("employer")}
+            role="button"
+            tabIndex={0}
+            aria-label="사장님 역할로 시작"
+          />
+          <ListRow
+            contents={<ListRow.Texts type="1RowTypeA" top="근로자로 시작하기" />}
+            onClick={() => handleRoleSelect("worker")}
+            role="button"
+            tabIndex={0}
+            aria-label="근로자 역할로 시작"
+          />
         </BottomSheet>
       </CommentBoundary>
     </div>

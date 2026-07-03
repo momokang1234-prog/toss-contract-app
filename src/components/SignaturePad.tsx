@@ -101,6 +101,8 @@ function SignaturePadInner({ onChange }: SignaturePadProps) {
   return (
     <>
       <div
+        role="application"
+        aria-label="서명 입력 영역"
         style={{
           border: '1px solid #E5E8EB',
           borderRadius: 16,
@@ -120,6 +122,8 @@ function SignaturePadInner({ onChange }: SignaturePadProps) {
           onTouchStart={startDrawing}
           onTouchMove={draw}
           onTouchEnd={stopDrawing}
+          aria-label="서명 캔버스. 손가락으로 서명하세요."
+          role="img"
         />
         {!hasSignature && (
           <div
@@ -132,6 +136,7 @@ function SignaturePadInner({ onChange }: SignaturePadProps) {
               pointerEvents: 'none',
               fontSize: 16,
             }}
+            aria-hidden="true"
           >
             여기에 서명해 주세요
           </div>
@@ -146,6 +151,7 @@ function SignaturePadInner({ onChange }: SignaturePadProps) {
         display="block"
         disabled={!hasSignature}
         onClick={handleClear}
+        aria-label="서명 지우고 다시 작성"
       >
         다시 쓰기
       </Button>
