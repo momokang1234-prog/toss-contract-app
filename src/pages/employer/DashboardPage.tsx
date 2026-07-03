@@ -6,6 +6,7 @@ import { useContracts } from '../../hooks/useContracts';
 import { useBusiness } from '../../hooks/useBusiness';
 import { Top, Paragraph, Spacing, Button, Text, BottomSheet } from '@toss/tds-mobile';
 import styles from './DashboardPage.module.css';
+import { LoadingState } from '../../components/shared/LoadingState';
 
 export default function DashboardPage() {
   const navigate = useNavigate();
@@ -30,7 +31,7 @@ export default function DashboardPage() {
 
   // 로딩 중이거나, 등록된 사업장이 없어서 리다이렉트 될 예정이라면 화면을 그리지 않음 (깜빡임 방지)
   if (loading || businesses.length === 0) {
-    return null;
+    return <LoadingState message="사업장 정보를 불러오는 중..." />;
   }
 
   // 비즈니스 데이터 로드 실패 시 에러 표시

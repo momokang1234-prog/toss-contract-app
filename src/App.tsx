@@ -7,6 +7,7 @@ import { AuthProvider } from './contexts/AuthContext';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { PageErrorBoundary } from './components/PageErrorBoundary';
 import { DevBridge } from './dev/DevBridge';
+import { LoadingState } from './components/shared/LoadingState';
 import { XrayPicker } from './components/dev/XrayPicker';
 import { RequireAuth } from './components/auth/RequireAuth';
 
@@ -44,7 +45,7 @@ const ContractCompletionVariantE = lazy(() => import('./pages/dev/employer/Contr
 function Lazy({ children }: { children: ReactNode }) {
   return (
     <PageErrorBoundary>
-      <Suspense fallback={<div className="loading-container"><div className="loading-spinner">로딩 중...</div></div>}>
+      <Suspense fallback={<LoadingState message="페이지를 불러오는 중..." />}>
         {children}
       </Suspense>
     </PageErrorBoundary>

@@ -1,0 +1,110 @@
+.loadingFull {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: var(--tds-color-background);
+}
+
+.loadingInline {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 16px;
+}
+
+.loadingSmall {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--tds-color-grey200);
+  border-top-color: var(--tds-color-grey600);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+.loadingSmall .spinner {
+  width: 16px;
+  height: 16px;
+  border-width: 2px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.message {
+  color: var(--tds-color-grey600);
+  font-size: 14px;
+  text-align: center;
+}
+
+/* Skeleton styles */
+.skeleton {
+  padding: 20px;
+  background: var(--tds-color-background);
+}
+
+.skeletonHeader {
+  height: 24px;
+  width: 40%;
+  background: linear-gradient(90deg, var(--tds-color-grey100) 25%, var(--tds-color-grey200) 50%, var(--tds-color-grey100) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 4px;
+  margin-bottom: 20px;
+}
+
+.skeletonItem {
+  height: 80px;
+  background: linear-gradient(90deg, var(--tds-color-grey100) 25%, var(--tds-color-grey200) 50%, var(--tds-color-grey100) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 8px;
+  margin-bottom: 12px;
+}
+
+.skeletonForm {
+  height: 48px;
+  background: linear-gradient(90deg, var(--tds-color-grey100) 25%, var(--tds-color-grey200) 50%, var(--tds-color-grey100) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 8px;
+  margin-bottom: 16px;
+}
+
+.skeletonDetail {
+  height: 100px;
+  background: linear-gradient(90deg, var(--tds-color-grey100) 25%, var(--tds-color-grey200) 50%, var(--tds-color-grey100) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 8px;
+  margin-bottom: 16px;
+}
+
+.skeletonButton {
+  height: 48px;
+  width: 100%;
+  background: linear-gradient(90deg, var(--tds-color-grey100) 25%, var(--tds-color-grey200) 50%, var(--tds-color-grey100) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 8px;
+  margin-top: 20px;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}

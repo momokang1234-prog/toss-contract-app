@@ -11,6 +11,7 @@ import styles from './ContractListPage.module.css';
 import { InviteWorkerSheet } from '../../components/delivery/InviteWorkerSheet';
 import { useState } from 'react';
 import { TextButton } from '@toss/tds-mobile';
+import { PageSkeleton } from '../../components/shared/LoadingState';
 
 function ContractListContent({ contracts, navigate, onNewContract }: {
   contracts: any[];
@@ -165,15 +166,10 @@ export default function ContractListPage() {
       <Suspense
         clientOnly
         fallback={
-          <Delay ms={200}>
+          <Delay ms={150}>
             {({ isDelayed }) => isDelayed && (
-              <div style={{ opacity: isDelayed ? 1 : 0 }}>
-                {[1,2,3].map(i => (
-                  <div key={i} style={{
-                    height: 72, margin: '8px 0', borderRadius: 12,
-                    background: '#F5F6F8', animation: 'pulse 1.5s infinite'
-                  }} />
-                ))}
+              <div style={{ opacity: isDelayed ? 1 : 0, transition: 'opacity 0.2s' }}>
+                <PageSkeleton type="list" />
               </div>
             )}
           </Delay>
