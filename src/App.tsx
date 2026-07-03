@@ -133,7 +133,7 @@ export default function App() {
             <SchemeRouteHandler />
             <XrayPicker />
             <Routes>
-              <Route path="/login" element={<LoginPage />} />
+              <Route path="/login" element={<PageErrorBoundary><LoginPage /></PageErrorBoundary>} />
               <Route path="/contract/:id" element={<Lazy><DeeplinkHandler /></Lazy>} />
               <Route path="/language" element={<Lazy><LanguageOnboarding /></Lazy>} />
               <Route path="/settings/language" element={<Lazy><LanguageSettings /></Lazy>} />
