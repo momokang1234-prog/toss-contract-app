@@ -53,6 +53,41 @@ export default defineConfig(({ command, mode }) => {
       },
     },
     build: {
+      rollupOptions: {
+        output: {
+          manualChunks: (id) => {
+            // React core
+            if (id.includes('react') || id.includes('react-dom') || id.includes('react-router')) {
+              return 'react-vendor';
+            }
+            // TDS UI framework
+            if (id.includes('@toss/tds') || id.includes('@apps-in-toss')) {
+              return 'toss-vendor';
+            }
+            // Emotion styling
+            if (id.includes('@emotion')) {
+              return 'emotion-vendor';
+            }
+            // PDF generation libraries - heavy!
+            if (id.includes('jspdf') || id.includes('html2canvas')) {
+              return 'pdf-vendor';
+            }
+            // Lottie animations
+            if (id.includes('lottie')) {
+              return 'lottie-vendor';
+            }
+            // Supabase
+            if (id.includes('@supabase')) {
+              return 'supabase-vendor';
+            }
+            // Other utilities
+            if (id.includes('node_modules')) {
+              return 'utils-vendor';
+            }
+          },
+        },
+      },
+      chunkSizeWarningLimit: 800,
     },
   };
 });
