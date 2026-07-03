@@ -10,6 +10,7 @@ import styles from './ContractListPage.module.css';
 
 import { InviteWorkerSheet } from '../../components/delivery/InviteWorkerSheet';
 import { useState } from 'react';
+import { TextButton } from '@toss/tds-mobile';
 
 function ContractListContent({ contracts, navigate, onNewContract }: {
   contracts: any[];
@@ -112,11 +113,45 @@ function ContractListContent({ contracts, navigate, onNewContract }: {
 }
 export default function ContractListPage() {
   const navigate = useNavigate();
-  const { contracts } = useContracts();
+  const { contracts, loading, error, refetch } = useContracts();
   const [isInviteSheetOpen, setIsInviteSheetOpen] = useState(false);
 
   // Filter out templates from the general list
   const activeContracts = contracts.filter(c => c.status !== 'template');
+
+  // Error state
+  if (error && !loading) {
+    return (
+      <div className={styles.page}>
+        <Top title="">
+          <Button color="primary" variant="weak" size="small"
+            onClick={() => setIsInviteSheetOpen(true)}>
+            + 새 계약서
+          </Button>
+        </Top>
+        <div className={styles.content}>
+          <div className={styles.empty}>
+            <img src="https://static.toss.im/2d-emojis/png/4x/u1F514.png" alt=""
+              style={{ width: 72, height: 72 }}
+            />
+            <Spacing size={16} />
+            <Paragraph typography="t5" color="grey-600" fontWeight="bold">
+              계약서를 불러오지 못했어요
+            </Paragraph>
+            <Spacing size={8} />
+            <Paragraph typography="t7" color="grey-500">
+              네트워크 연결을 확인하고 다시 시도해주세요
+            </Paragraph>
+            <Spacing size={24} />
+            <TextButton color="primary" variant="ghost" size="large" onClick={refetch}>
+              다시 시도
+            </TextButton>
+          </div>
+        </div>
+        <InviteWorkerSheet open={isInviteSheetOpen} onClose={() => setIsInviteSheetOpen(false)} />
+      </div>
+    );
+  }
 
   return (
     <div className={styles.page}>

@@ -21,15 +21,18 @@ export function useContracts() {
   const { userProfile, userRole } = useAuth();
   const [contracts, setContracts] = useState<Contract[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
 
   const fetchContracts = useCallback(async () => {
     if (!userProfile || !userRole) return;
     setLoading(true);
+    setError(null);
     try {
       const data = await contractService.fetchContracts(userProfile.userKey, userRole, userProfile.phone);
       setContracts(data);
     } catch (err) {
       console.error(err);
+      setError(err instanceof Error ? err : new Error('Failed to fetch contracts'));
     } finally {
       setLoading(false);
     }
@@ -160,6 +163,7 @@ export function useContracts() {
   return {
     contracts,
     loading,
+    error,
     getContract,
     createContract,
     inviteWorker,
