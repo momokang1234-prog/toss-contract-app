@@ -10,7 +10,7 @@ import styles from './DashboardPage.module.css';
 export default function DashboardPage() {
   const navigate = useNavigate();
   const { contracts } = useContracts();
-  const { businesses, loading } = useBusiness();
+  const { businesses, loading, error: businessError, refetch } = useBusiness();
   const { setRole } = useAuth();
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [selectedBusinessId, setSelectedBusinessId] = useState<string | null>(null);
@@ -31,6 +31,34 @@ export default function DashboardPage() {
   // 로딩 중이거나, 등록된 사업장이 없어서 리다이렉트 될 예정이라면 화면을 그리지 않음 (깜빡임 방지)
   if (loading || businesses.length === 0) {
     return null;
+  }
+
+  // 비즈니스 데이터 로드 실패 시 에러 표시
+  if (businessError) {
+    return (
+      <div className={styles.page}>
+        <Top title="대시보드" />
+        <div className={styles.content}>
+          <div className={styles.empty}>
+            <img src="https://static.toss.im/2d-emojis/png/4x/u1F514.png" alt=""
+              style={{ width: 72, height: 72 }}
+            />
+            <Spacing size={16} />
+            <Paragraph typography="t5" color="grey-600" fontWeight="bold">
+              사업장 정보를 불러오지 못했어요
+            </Paragraph>
+            <Spacing size={8} />
+            <Paragraph typography="t7" color="grey-500">
+              네트워크 연결을 확인하고 다시 시도해주세요
+            </Paragraph>
+            <Spacing size={24} />
+            <Button color="primary" variant="ghost" size="large" onClick={refetch}>
+              다시 시도
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   const selectedBusiness = businesses.find(b => b.id === selectedBusinessId) || businesses[0];

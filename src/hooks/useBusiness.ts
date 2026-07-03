@@ -85,30 +85,41 @@ export function useBusiness() {
   const { userProfile, userRole } = useAuth();
   const [businesses, setBusinesses] = useState<Business[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
 
   const fetchBusinesses = useCallback(async () => {
     if (!userProfile) return;
     setLoading(true);
+    setError(null);
 
-    if (IS_MOCK) {
-      await new Promise(r => setTimeout(r, 300));
-      setBusinesses(
-        userRole === 'employer'
-          ? mockBusinessStore.filter(b => b.owner_user_key === userProfile.userKey)
-          : mockBusinessStore
-      );
+    try {
+      if (IS_MOCK) {
+        await new Promise(r => setTimeout(r, 300));
+        setBusinesses(
+          userRole === 'employer'
+            ? mockBusinessStore.filter(b => b.owner_user_key === userProfile.userKey)
+            : mockBusinessStore
+        );
+        setLoading(false);
+        return;
+      }
+
+      const { data, error } = await supabase
+        .from('businesses')
+        .select('*')
+        .eq('owner_user_key', userProfile.userKey)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setBusinesses(data ?? []);
+    } catch (err) {
+      console.error('Failed to fetch businesses:', err);
+      setError(err instanceof Error ? err : new Error('Failed to fetch businesses'));
+      setBusinesses([]);
+    } finally {
       setLoading(false);
-      return;
     }
-
-    const { data } = await supabase
-      .from('businesses')
-      .select('*')
-      .eq('owner_user_key', userProfile.userKey)
-      .order('created_at', { ascending: false });
-    setBusinesses(data ?? []);
-    setLoading(false);
-  }, [userProfile]);
+  }, [userProfile, userRole]);
 
   useEffect(() => { fetchBusinesses(); }, [fetchBusinesses]);
 
@@ -157,5 +168,5 @@ export function useBusiness() {
     return data;
   };
 
-  return { businesses, loading, createBusiness, updateBusiness, refetch: fetchBusinesses };
+  return { businesses, loading, error, createBusiness, updateBusiness, refetch: fetchBusinesses };
 }
