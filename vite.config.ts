@@ -5,6 +5,12 @@ export default defineConfig(({ command, mode }) => {
   const isDev = mode === "development" || command === "serve";
 
   return {
+    css: {
+      modules: {
+        localsConvention: 'camelCase',
+        generateScopedName: isDev ? '[local]_[hash:base64:5]' : '[hash:base64:8]',
+      },
+    },
     plugins: [
       react({
         jsxImportSource: "@emotion/react",
@@ -39,8 +45,18 @@ export default defineConfig(({ command, mode }) => {
         'X-XSS-Protection': '1; mode=block',
         'Referrer-Policy': 'strict-origin-when-cross-origin',
         'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
-        // CSP (Content Security Policy)
-        'Content-Security-Policy': "frame-ancestors 'self' https://cert.toss.im; default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self' https://*.supabase.co https://cert.toss.im wss://*.supabase.co; frame-src 'none'; object-src 'none';",
+        // CSP (Content Security Policy) - Updated to allow external fonts/dev tools
+        'Content-Security-Policy': [
+          "frame-ancestors 'self' https://cert.toss.im",
+          "default-src 'self'",
+          "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://unpkg.com",
+          "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com",
+          "font-src 'self' data: https://fonts.gstatic.com https://cdn.jsdelivr.net",
+          "img-src 'self' data: https:",
+          "connect-src 'self' https://*.supabase.co https://cert.toss.im wss://*.supabase.co",
+          "frame-src 'none'",
+          "object-src 'none'",
+        ].join('; '),
         // Cache control for development
         'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0',
       },
@@ -54,9 +70,23 @@ export default defineConfig(({ command, mode }) => {
           rewrite: (path) => path.replace(/^\/api\/ux-test/, "/ux-test"),
         },
         "/api": {
-          target: "https://cert.toss.im",
+          target: process.env.VITE_API_TARGET || "https://cert.toss.im",
           changeOrigin: true,
+          secure: false, // For development
           rewrite: (path) => path.replace(/^\/api/, "/api/v2"),
+          configure: (proxy, options) => {
+            proxy.on('error', (err, req, res) => {
+              console.warn('API proxy error (using mock fallback):', err.message);
+              // In development, return mock response to prevent app crashes
+              if (isDev) {
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ mock: true, message: 'Development mode - API unavailable' }));
+              }
+            });
+            proxy.on('proxyReq', (proxyReq, req, res) => {
+              console.log('Proxying:', req.method, req.url, '→', options.target);
+            });
+          },
         },
       },
     },

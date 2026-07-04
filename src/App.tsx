@@ -70,6 +70,7 @@ function SchemeRouteHandler() {
     setInitialized(true);
 
     try {
+      // getSchemeUri might throw in browser dev environment
       const schemeUri = getSchemeUri();
       if (schemeUri) {
         // schemeUri 예: intoss://bossimclockedin/contract/123
@@ -89,7 +90,9 @@ function SchemeRouteHandler() {
         }
       }
     } catch (error) {
-      logError('deepLinkHandler', error, { schemeUri: 'scheme_parsing_failed' });
+      // Silently ignore scheme errors in dev environment
+      // They're expected when running outside Toss app
+      console.debug('[SchemeRouteHandler] Scheme parsing failed (expected in dev):', error);
     }
   }, [navigate, initialized]);
 

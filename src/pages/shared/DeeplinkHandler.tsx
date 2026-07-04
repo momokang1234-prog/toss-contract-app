@@ -15,31 +15,37 @@ export function DeeplinkHandler() {
     if (isLoading) return; // 인증 상태가 로드될 때까지 리다이렉트 지연
 
     async function handle() {
-      if (!id) { navigate('/login'); return; }
-      if (!isAuthenticated) { navigate(`/login?redirect=/contract/${id}`, { replace: true }); return; }
+      try {
+        if (!id) { navigate('/login'); return; }
+        if (!isAuthenticated) { navigate(`/login?redirect=/contract/${id}`, { replace: true }); return; }
 
-      const contract = await getContract(id);
-      
-      if (!contract) {
-        navigate('/error?type=not-found', { replace: true });
-        return;
-      }
+        const contract = await getContract(id);
 
-      if (contract.status === 'invited' && userRole === 'worker') {
-        navigate(`/worker/invite/${id}`, { replace: true });
-        return;
-      }
+        if (!contract) {
+          navigate('/error?type=not-found', { replace: true });
+          return;
+        }
 
-      if (userRole === 'worker') {
-        navigate(`/worker/contracts/${id}`, { replace: true });
-      } else if (userRole === 'employer') {
-        navigate(`/employer/contracts/${id}`, { replace: true });
-      } else {
-        navigate(`/worker/contracts/${id}`, { replace: true });
+        if (contract.status === 'invited' && userRole === 'worker') {
+          navigate(`/worker/invite/${id}`, { replace: true });
+          return;
+        }
+
+        if (userRole === 'worker') {
+          navigate(`/worker/contracts/${id}`, { replace: true });
+        } else if (userRole === 'employer') {
+          navigate(`/employer/contracts/${id}`, { replace: true });
+        } else {
+          navigate(`/worker/contracts/${id}`, { replace: true });
+        }
+      } catch (error) {
+        console.error('[deepLinkHandler] Error:', error);
+        // On error, redirect to error page or login
+        navigate(isAuthenticated ? '/error?type=api-error' : '/login', { replace: true });
       }
     }
     handle();
-  }, [id, isAuthenticated, userRole, navigate, getContract]);
+  }, [id, isAuthenticated, userRole, navigate, getContract, isLoading]);
 
   return (
     <div className={styles.container}>
