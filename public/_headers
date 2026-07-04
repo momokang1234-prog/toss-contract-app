@@ -1,0 +1,51 @@
+# Security Headers for Production Deployment
+# Based on research from nextjs-security-audit.md and load-balancing-scalability.md
+
+# Apply security headers to all routes
+/*
+  X-Frame-Options: SAMEORIGIN
+  X-Content-Type-Options: nosniff
+  X-XSS-Protection: 1; mode=block
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=()
+
+# Content Security Policy for production
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'sha256-xyz' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self' https://*.supabase.co wss://*.supabase.co; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests
+
+# ========================================
+# Cache Control for Static Assets
+# ========================================
+
+# Static assets - cache for 1 year (immutable)
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Fonts - cache for 1 year (immutable)
+/fonts/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Images - cache for 30 days
+/images/*
+  Cache-Control: public, max-age=2592000
+
+# ========================================
+# Cache Control for Dynamic Content
+# ========================================
+
+# HTML files - no caching (for SPA routing)
+/*.html
+  Cache-Control: no-cache, no-store, must-revalidate
+
+# Index file - no caching
+/index.html
+  Cache-Control: no-cache, no-store, must-revalidate
+
+# ========================================
+# CORS for External Resources
+# ========================================
+
+# Allow Supabase API calls
+/supabase/*
+  Access-Control-Allow-Origin: *
+  Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS
+  Access-Control-Allow-Headers: Content-Type, Authorization, apikey

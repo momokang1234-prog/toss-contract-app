@@ -2,6 +2,7 @@
 import { createContext, useContext, useState, useCallback, type ReactNode } from 'react';
 import { IS_MOCK, supabase } from '../api/supabase';
 import { tossLogin } from '../api/toss-auth';
+import { logAuthError } from '../utils/errorConsolidation';
 const MOCK_AUTH_DELAY_MS = 500;
 
 export type UserRole = 'employer' | 'worker' | null;
@@ -14,7 +15,7 @@ export interface UserProfile {
   birthday?: string;
 }
 
-interface AuthState {
+export interface AuthState {
   isAuthenticated: boolean;
   userRole: UserRole;
   isLoading: boolean;
@@ -26,7 +27,7 @@ interface AuthState {
   setRole: (role: 'employer' | 'worker') => Promise<void>;
 }
 
-const AuthContext = createContext<AuthState | null>(null);
+export const AuthContext = createContext<AuthState | null>(null);
 
 const MOCK_PROFILES: Record<string, UserProfile & { role: UserRole }> = {
   employer: {
@@ -126,7 +127,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       sessionStorage.setItem('temp_user_info', JSON.stringify(user));
       return { isNewUser: true };
     } catch (err) {
-      console.error('[Auth] login failed', err);
+      logAuthError('login', err, { authMethod: IS_MOCK ? 'mock' : 'toss' });
       throw err;
     } finally {
       setIsLoading(false);

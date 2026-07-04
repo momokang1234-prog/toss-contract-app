@@ -33,7 +33,15 @@ export default defineConfig(({ command, mode }) => {
       cors: true,
       allowedHosts: true,
       headers: {
-        'Content-Security-Policy': "frame-ancestors *;",
+        // Security Headers (based on nextjs-security-audit.md research)
+        'X-Frame-Options': 'SAMEORIGIN',
+        'X-Content-Type-Options': 'nosniff',
+        'X-XSS-Protection': '1; mode=block',
+        'Referrer-Policy': 'strict-origin-when-cross-origin',
+        'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
+        // CSP (Content Security Policy)
+        'Content-Security-Policy': "frame-ancestors 'self' https://cert.toss.im; default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self' https://*.supabase.co https://cert.toss.im wss://*.supabase.co; frame-src 'none'; object-src 'none';",
+        // Cache control for development
         'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0',
       },
       watch: {
@@ -55,35 +63,12 @@ export default defineConfig(({ command, mode }) => {
     build: {
       rollupOptions: {
         output: {
-          manualChunks: (id) => {
-            // React core
-            if (id.includes('react') || id.includes('react-dom') || id.includes('react-router')) {
-              return 'react-vendor';
-            }
-            // TDS UI framework
-            if (id.includes('@toss/tds') || id.includes('@apps-in-toss')) {
-              return 'toss-vendor';
-            }
-            // Emotion styling
-            if (id.includes('@emotion')) {
-              return 'emotion-vendor';
-            }
-            // PDF generation libraries - heavy!
-            if (id.includes('jspdf') || id.includes('html2canvas')) {
-              return 'pdf-vendor';
-            }
-            // Lottie animations
-            if (id.includes('lottie')) {
-              return 'lottie-vendor';
-            }
-            // Supabase
-            if (id.includes('@supabase')) {
-              return 'supabase-vendor';
-            }
-            // Other utilities
-            if (id.includes('node_modules')) {
-              return 'utils-vendor';
-            }
+          manualChunks: {
+            // Core frameworks - separate to prevent circular dependencies
+            'react-core': ['react', 'react-dom', 'react-router-dom'],
+            'toss-ui': ['@toss/tds-mobile', '@apps-in-toss/web-framework'],
+            'emotion-core': ['@emotion/react', '@emotion/babel-plugin'],
+            'supabase-core': ['@supabase/supabase-js'],
           },
         },
       },
