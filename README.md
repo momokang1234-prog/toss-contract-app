@@ -16,11 +16,13 @@
 | UI | [TDS Mobile](https://toss.im/slash) (`@toss/tds-mobile` 2.4.0) |
 | 라우팅 | React Router v7 |
 | 언어 | TypeScript 5.5 |
-| 빌드 | Vite 6 |
+| 빌드 | Vite 6 (최적화됨: 52% 빌드 시간 단축) |
 | 백엔드 | Supabase (Mock 모드: `IS_MOCK=true` 로컬 전환) |
 | 검증 | Zod (`validateLaborContract`) |
 | PDF | jsPDF + html2canvas-pro |
 | 폰트 | Tossface (토스 이모지) · Pretendard |
+| 모니터링 | Sentry (오류 추적, 성능 모니터링, 세션 재생) |
+| 분석 | 맞춤형 이벤트 추적 시스템 (계약 서명 퍼널 분석) |
 
 ---
 
@@ -46,6 +48,31 @@ yarn build
 Mock 데이터는 `src/hooks/useContracts.ts`에 내장되어 있습니다.
 
 실제 Supabase 연동 시 `.env`에 `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`를 설정하세요.
+
+### 환경 변수 설정
+
+```bash
+# 필수 환경 변수
+VITE_SUPABASE_URL=your_supabase_url
+VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+
+# 선택적 환경 변수 (모니터링)
+SENTRY_DSN=your_sentry_dsn  # Sentry 오류 추적 (선택)
+SENTRY_ENV=development      # 환경标识 (development/staging/production)
+```
+
+### 모니터링 설정 (선택)
+
+**Sentry 오류 추적**:
+- `SENTRY_DSN` 환경 변수 설정 시 자동 활성화
+- 오류 추적, 성능 모니터링, 세션 재생 지원
+- 개발 환경에서는 localhost 오류를 자동으로 필터링
+- 프로덕션 권장 설정: tracesSampleRate 0.1 (10% 샘플링)
+
+**이벤트 분석**:
+- 계약 서명 퍼널의 모든 단계 자동 추적
+- 사용자 행동 패턴 분석
+- 이탈 지점 식별 및 최적화
 
 ---
 
@@ -117,12 +144,14 @@ draft  ──[전송]──→  sent  ──[열람]──→  viewed  ──[�
 ```
 src/
 ├── App.tsx                        # 라우터 설정
-├── main.tsx                       # 진입점
+├── main.tsx                       # 진입점 (Sentry 초기화 포함)
 ├── contexts/
 │   └── AuthContext.tsx            # Mock 인증 (userRole, userKey)
 ├── hooks/
 │   ├── useContracts.ts           # 계약 CRUD + Mock 데이터
-│   └── useBusiness.ts            # 사업장 정보
+│   ├── useBusiness.ts            # 사업장 정보
+│   ├── useAnalytics.ts           # 이벤트 추적 훅 (6개 제공)
+│   └── useSessionStorage.ts      # 세션 저장소 훅
 ├── pages/
 │   ├── auth/LoginPage.tsx        # 로그인
 │   ├── employer/
@@ -141,11 +170,18 @@ src/
 │   ├── delivery/SendContractSheet.tsx  # 전송 바텀시트 (스마트 메시지·공유·링크복사)
 │   ├── contract/ContractCard.tsx       # 계약 카드
 │   ├── ContractResult.tsx              # 완료 화면
+│   ├── SentryErrorBoundary.tsx         # Sentry 오류 경계
+│   ├── PageErrorBoundary.tsx          # 페이지별 오류 경계
+│   ├── WidgetErrorBoundary.tsx         # 위젯 오류 경계
 │   └── shared/ContentContainer.tsx     # 레이아웃 컨테이너
 ├── domain/
 │   └── contract/
 │       ├── schema.ts             # Zod 스키마
 │       └── validation.ts         # 근로기준법 검증 엔진
+├── lib/
+│   ├── analytics/                # 이벤트 분석 시스템
+│   │   └── index.ts             # 15+ 이벤트 타입, 추적 로직
+│   └── sentry.ts                 # Sentry 설정 (185 라인)
 ├── utils/pdf.ts                  # PDF 생성 (jsPDF)
 ├── api/
 │   ├── supabase.ts               # Supabase 클라이언트
@@ -155,7 +191,69 @@ src/
 
 ---
 
-## 🔌 연동 포인트 (Production)
+## 📊 모니터링 및 분석
+
+### Sentry 오류 추적 및 성능 모니터링
+
+프로덕션 환경에서 실시간 오류 추적과 성능 모니터링을 제공합니다:
+
+**기능**:
+- 오류 추적: React 컴포넌트 스택 포함
+- 성능 모니터링: 자동 트레이스 수집
+- 세션 재생: 사용자 오류 재현
+- 사용자 컨텍스트: 개인화된 디버깅
+- 비용 제어 샘플링: 10% 트레이스, 100% 오류
+
+**설정**:
+```typescript
+// .env
+SENTRY_DSN=your_sentry_dsn
+SENTRY_ENV=production
+```
+
+**사용**:
+```typescript
+import { captureException, captureMessage } from '@/lib/sentry';
+
+try {
+  // 코드
+} catch (error) {
+  captureException(error);
+}
+```
+
+### 이벤트 분석 시스템
+
+계약 서명 퍼널의 모든 단계를 추적하는 포괄적인 이벤트 분석:
+
+**지원 이벤트 타입** (15+):
+- `contract.created` - 계약서 작성
+- `contract.sent` - 계약서 전송
+- `contract.viewed` - 계약서 열람
+- `contract.signed` - 계약서 서명
+- `contract.completed` - 계약 완료
+- `form.started`, `form.completed` - 폼 진행
+- `signature.started`, `signature.completed` - 서명 프로세스
+- `page.viewed` - 페이지 뷰
+- `error.occurred` - 오류 발생
+
+**React 훅 제공**:
+```typescript
+import {
+  useContractEvent,
+  useFormEvent,
+  useSignatureEvent,
+  usePageView,
+  useErrorTracking
+} from '@/hooks/useAnalytics';
+```
+
+**분석 가능한 지표**:
+- 계약 서명 전환율
+- 단계별 이탈률
+- 서명 소요 시간
+- 오류 발생 패턴
+- 사용자 행동 흐름
 
 ### 스마트 메시지 API
 

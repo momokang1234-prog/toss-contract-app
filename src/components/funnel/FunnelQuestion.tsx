@@ -1,13 +1,13 @@
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef, type ReactNode } from 'react';
 import { BoardRow, Spacing } from '@toss/tds-mobile';
 import styles from './FunnelQuestion.module.css';
 
 interface FunnelQuestionProps {
-  title: React.ReactNode;
-  subtitle?: React.ReactNode;
+  title: ReactNode;
+  subtitle?: ReactNode;
   isActive: boolean;
   onEnter?: () => void;
-  summary?: React.ReactNode;
+  summary?: ReactNode;
   children: React.ReactNode;
 }
 

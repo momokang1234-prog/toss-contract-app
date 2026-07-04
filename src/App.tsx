@@ -10,6 +10,7 @@ import { DevBridge } from './dev/DevBridge';
 import { LoadingState } from './components/shared/LoadingState';
 import { XrayPicker } from './components/dev/XrayPicker';
 import { RequireAuth } from './components/auth/RequireAuth';
+import { logError } from './utils/errorConsolidation';
 
 import LoginPage from './pages/auth/LoginPage';
 
@@ -88,7 +89,7 @@ function SchemeRouteHandler() {
         }
       }
     } catch (error) {
-      console.error('Failed to handle deep link scheme:', error);
+      logError('deepLinkHandler', error, { schemeUri: 'scheme_parsing_failed' });
     }
   }, [navigate, initialized]);
 

@@ -1,8 +1,9 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { Global, css } from '@emotion/react';
 import type { StateSnapshot, LogEntry, LogKind, AgentIssue, FixProposal, SessionEvent } from '../../dev/UXTestTypes';
 import * as api from '../../dev/UXTestAPI';
 import type { GuardrailResult } from '../../dev/UXTestAPI';
+import { logError } from '../../utils/errorConsolidation';
 
 // ─── Styles ───
 const styles = css`
@@ -266,7 +267,7 @@ export default function UXTestPage() {
         setSelectedFilename(list[0].filename);
       }
     } catch (err) {
-      console.error('Failed to load designs list', err);
+      logError('loadDesignsList', err, { api: 'UXTestAPI' });
     } finally {
       setLoadingDesigns(false);
     }
@@ -283,7 +284,7 @@ export default function UXTestPage() {
     if (selectedFilename) {
       api.fetchDesignContent(selectedFilename)
         .then(content => setSelectedDesignContent(content))
-        .catch(err => console.error('Failed to load design content', err));
+        .catch(err => logError('loadDesignContent', err, { filename: selectedFilename }));
     } else {
       setSelectedDesignContent(null);
     }

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, ReactNode, useContext, createContext } from 'react';
+import { useState, useEffect, useRef, useContext, createContext, type ReactNode } from 'react';
 
 // ── Context: 계층 경로 자동 추적 ──────────────────────────────────
 const BoundaryContext = createContext<string[]>([]);

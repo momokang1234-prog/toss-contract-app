@@ -9,6 +9,13 @@ import "./i18n";
 import "./index.css";
 import "./styles/tossface.css";
 
+// Sentry Error and Performance Monitoring
+import { initSentry } from "./lib/sentry";
+import { SentryErrorBoundary } from "./components/SentryErrorBoundary";
+
+// Initialize Sentry (conditional - won't error if DSN missing)
+initSentry();
+
 const globalStyles = css({
   ":root": {
     ...makeFixedTypographyVariables(),
@@ -21,8 +28,10 @@ const globalStyles = css({
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <ThemeProvider>
     <Global styles={globalStyles} />
-    <OverlayProvider>
-      <App />
-    </OverlayProvider>
+    <SentryErrorBoundary>
+      <OverlayProvider>
+        <App />
+      </OverlayProvider>
+    </SentryErrorBoundary>
   </ThemeProvider>
 );

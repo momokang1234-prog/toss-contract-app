@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, type CSSProperties } from 'react';
 import { Spacing, BottomSheet } from '@toss/tds-mobile';
 import type { ContractFormData, DaySchedule } from '../types';
 import { DAYS, DAY_LABELS, DEFAULT_DAY_SCHEDULE } from '../types';
@@ -15,7 +15,7 @@ interface Step3WorkScheduleProps {
   setScheduleMode: (mode: ContractFormData['schedule_mode']) => void;
 }
 
-function dayButtonStyle(active: boolean): React.CSSProperties {
+function dayButtonStyle(active: boolean): CSSProperties {
   return {
     width: '44px',
     height: '44px',
@@ -34,7 +34,7 @@ function dayButtonStyle(active: boolean): React.CSSProperties {
   };
 }
 
-function nextBtnStyle(): React.CSSProperties {
+function nextBtnStyle(): CSSProperties {
   return {
     width: '100%', padding: 16, borderRadius: 16, backgroundColor: '#333D4B',
     color: 'white', marginTop: 24, fontSize: 16, fontWeight: 'bold', border: 'none',

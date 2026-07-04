@@ -73,9 +73,15 @@ export default function BusinessFormPage() {
       clearBusinessNumber();
       clearForm();
       navigate('/employer/dashboard', { replace: true });
-    } catch (err: any) { 
-      alert('등록 실패: ' + (err.message || JSON.stringify(err))); 
-      console.error(err);
+    } catch (err: any) {
+      alert('등록 실패: ' + (err.message || JSON.stringify(err)));
+      // Analytics tracking for business registration errors
+      if (typeof window !== 'undefined' && (window as any).analytics) {
+        (window as any).analytics.track('business_registration_error', {
+          error_message: err.message || 'Unknown error',
+          error_type: err.name || 'Error'
+        });
+      }
     }
     finally { setSubmitting(false); }
   };

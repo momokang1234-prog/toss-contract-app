@@ -21,6 +21,8 @@ import {
   wagePaymentDayLabel,
 } from '../buildContractData';
 import { buildContractData as buildDomainContractData } from '../../../../domain/contract/buildContractData';
+import { handleApiError } from '../../../../utils/errorHandler';
+import { trackError, trackFormProgress } from '../../../../lib/analytics';
 
 function mapFieldPath(path: string): string {
   if (path.startsWith('worker.')) {
@@ -304,8 +306,9 @@ export function useContractForm() {
       }
       return contract;
     } catch (err) {
-      console.error(err);
-      alert('계약서 저장에 실패했습니다.');
+      const errorMessage = handleApiError(err, 'contract_save');
+      alert(errorMessage);
+      trackError('contract_save_failed', 'useContractForm', { error: String(err) });
       return null;
     } finally {
       isSubmittingRef.current = false;
@@ -325,8 +328,10 @@ export function useContractForm() {
       contract = await createContract({ ...contractData, status: 'template', template_name: templateName });
       return contract;
     } catch (err) {
-      console.error(err);
-      alert('템플릿 저장에 실패했습니다.');
+      const errorMessage = handleApiError(err, 'template_save');
+      alert(errorMessage);
+      trackError('template_save_failed', 'useContractForm', { error: String(err) });
+      return null;
       return null;
     } finally {
       isSubmittingRef.current = false;

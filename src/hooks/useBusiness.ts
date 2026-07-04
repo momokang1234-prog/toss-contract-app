@@ -113,9 +113,15 @@ export function useBusiness() {
       if (error) throw error;
       setBusinesses(data ?? []);
     } catch (err) {
-      console.error('Failed to fetch businesses:', err);
       setError(err instanceof Error ? err : new Error('Failed to fetch businesses'));
       setBusinesses([]);
+      // Analytics tracking for business fetch errors
+      if (typeof window !== 'undefined' && (window as any).analytics) {
+        (window as any).analytics.track('business_fetch_error', {
+          error_message: err instanceof Error ? err.message : 'Unknown error',
+          user_role: userRole
+        });
+      }
     } finally {
       setLoading(false);
     }

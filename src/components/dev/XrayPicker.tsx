@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 
 /**
  * XrayPicker — 엘리먼트 피커 + 래핑 스캔 자동 엑스레이 오버레이

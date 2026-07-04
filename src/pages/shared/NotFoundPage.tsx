@@ -5,7 +5,13 @@ import styles from './NotFoundPage.module.css';
 export default function NotFoundPage() {
   const navigate = useNavigate();
   const location = window.location;
-  console.log('NotFoundPage hit for:', location.pathname, location.search);
+  // Analytics tracking for 404 errors
+  if (typeof window !== 'undefined' && (window as any).analytics) {
+    (window as any).analytics.track('404_page_view', {
+      path: location.pathname,
+      search: location.search
+    });
+  }
 
   return (
     <div className={styles.page}>

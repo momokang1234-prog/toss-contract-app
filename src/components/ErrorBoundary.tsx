@@ -1,5 +1,6 @@
 import { Component, type ReactNode } from 'react';
 import { GlobalErrorFallback } from './shared/ErrorFallback';
+import { logComponentError } from '../utils/errorConsolidation';
 
 interface Props { children: ReactNode; }
 interface State { error: Error | null; hasError: boolean; }
@@ -11,8 +12,11 @@ export class ErrorBoundary extends Component<Props, State> {
     return { error, hasError: true };
   }
 
-  componentDidCatch(error: Error) {
-    console.error('[ErrorBoundary]', error);
+  componentDidCatch(error: Error, errorInfo: any) {
+    logComponentError('ErrorBoundary', error, {
+      componentStack: errorInfo.componentStack,
+      errorBoundaryLevel: 'global'
+    });
   }
 
   resetErrorBoundary = () => {

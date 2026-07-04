@@ -7,6 +7,7 @@ import { useBusiness } from '../../hooks/useBusiness';
 import { Top, Paragraph, Spacing, Button, Text, BottomSheet } from '@toss/tds-mobile';
 import styles from './DashboardPage.module.css';
 import { LoadingState } from '../../components/shared/LoadingState';
+import { NetworkErrorFallback } from '../../components/shared/NetworkErrorFallback';
 
 export default function DashboardPage() {
   const navigate = useNavigate();
@@ -40,23 +41,10 @@ export default function DashboardPage() {
       <div className={styles.page}>
         <Top title="대시보드" />
         <div className={styles.content}>
-          <div className={styles.empty}>
-            <img src="https://static.toss.im/2d-emojis/png/4x/u1F514.png" alt=""
-              style={{ width: 72, height: 72 }}
-            />
-            <Spacing size={16} />
-            <Paragraph typography="t5" color="grey-600" fontWeight="bold">
-              사업장 정보를 불러오지 못했어요
-            </Paragraph>
-            <Spacing size={8} />
-            <Paragraph typography="t7" color="grey-500">
-              네트워크 연결을 확인하고 다시 시도해주세요
-            </Paragraph>
-            <Spacing size={24} />
-            <Button color="primary" variant="weak" size="large" onClick={refetch}>
-              다시 시도
-            </Button>
-          </div>
+          <NetworkErrorFallback
+            message="사업장 정보를 불러오지 못했어요"
+            onRetry={refetch}
+          />
         </div>
       </div>
     );

@@ -1,17 +1,15 @@
 import { useNavigate } from 'react-router-dom';
 import { useContracts } from '../../hooks/useContracts';
-import { Fragment } from 'react';
-import { Top, Paragraph, Spacing, Button, List, ListRow, Badge } from '@toss/tds-mobile';
+import { Fragment, useState } from 'react';
+import { Top, Paragraph, Spacing, Button, List, ListRow, Badge, TextButton } from '@toss/tds-mobile';
 import { Suspense, Delay } from '@suspensive/react';
 import { CONTRACT_TYPE_LABEL } from '../../utils/labels';
 import { CommentBoundary } from '../dev/CommentBoundary';
 import { getContractBadge } from '../../utils/badgeUtils';
 import styles from './ContractListPage.module.css';
-
 import { InviteWorkerSheet } from '../../components/delivery/InviteWorkerSheet';
-import { useState } from 'react';
-import { TextButton } from '@toss/tds-mobile';
 import { PageSkeleton } from '../../components/shared/LoadingState';
+import { NetworkErrorFallback } from '../../components/shared/NetworkErrorFallback';
 
 function ContractListContent({ contracts, navigate, onNewContract }: {
   contracts: any[];
@@ -131,23 +129,11 @@ export default function ContractListPage() {
           </Button>
         </Top>
         <div className={styles.content}>
-          <div className={styles.empty}>
-            <img src="https://static.toss.im/2d-emojis/png/4x/u1F514.png" alt=""
-              style={{ width: 72, height: 72 }}
-            />
-            <Spacing size={16} />
-            <Paragraph typography="t5" color="grey-600" fontWeight="bold">
-              계약서를 불러오지 못했어요
-            </Paragraph>
-            <Spacing size={8} />
-            <Paragraph typography="t7" color="grey-500">
-              네트워크 연결을 확인하고 다시 시도해주세요
-            </Paragraph>
-            <Spacing size={24} />
-            <TextButton color="primary" variant="clear" size="large" onClick={refetch}>
-              다시 시도
-            </TextButton>
-          </div>
+          <NetworkErrorFallback
+            message="계약서를 불러오지 못했어요"
+            onRetry={refetch}
+            retryText="다시 시도"
+          />
         </div>
         <InviteWorkerSheet open={isInviteSheetOpen} onClose={() => setIsInviteSheetOpen(false)} />
       </div>

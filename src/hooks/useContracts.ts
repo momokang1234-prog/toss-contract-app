@@ -31,8 +31,14 @@ export function useContracts() {
       const data = await contractService.fetchContracts(userProfile.userKey, userRole, userProfile.phone);
       setContracts(data);
     } catch (err) {
-      console.error(err);
       setError(err instanceof Error ? err : new Error('Failed to fetch contracts'));
+      // Analytics tracking for contract fetch errors
+      if (typeof window !== 'undefined' && (window as any).analytics) {
+        (window as any).analytics.track('contracts_fetch_error', {
+          error_message: err instanceof Error ? err.message : 'Unknown error',
+          user_role: userRole
+        });
+      }
     } finally {
       setLoading(false);
     }

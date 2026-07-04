@@ -1,5 +1,6 @@
 import { Component, type ReactNode } from 'react';
 import { PageErrorFallback } from './shared/ErrorFallback';
+import { logComponentError } from '../utils/errorConsolidation';
 
 interface Props { children: ReactNode; }
 interface State { error: Error | null; hasError: boolean; }
@@ -11,8 +12,11 @@ export class PageErrorBoundary extends Component<Props, State> {
     return { error, hasError: true };
   }
 
-  componentDidCatch(error: Error) {
-    console.error('[PageErrorBoundary]', error);
+  componentDidCatch(error: Error, errorInfo: any) {
+    logComponentError('PageErrorBoundary', error, {
+      componentStack: errorInfo.componentStack,
+      errorBoundaryLevel: 'page'
+    });
   }
 
   resetErrorBoundary = () => {

@@ -113,7 +113,15 @@ export default function ContractFormPage() {
     
     // Auto-save template
     const autoTemplateName = form.job_description ? `${form.job_description} 양식` : '자동 저장 양식';
-    saveAsTemplate(autoTemplateName).catch(console.error);
+    saveAsTemplate(autoTemplateName).catch((err: Error) => {
+      // Analytics tracking for template save errors (non-blocking)
+      if (typeof window !== 'undefined' && (window as any).analytics) {
+        (window as any).analytics.track('template_save_error', {
+          template_name: autoTemplateName,
+          error_message: err.message
+        });
+      }
+    });
 
     clearForm(); // Clear storage on success
 

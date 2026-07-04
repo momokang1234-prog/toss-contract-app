@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { BottomSheet, Button, TextField, TextButton, Switch, Paragraph } from '@toss/tds-mobile';
 import { ContractFormData, type DaySchedule } from '../types';
 import { validateLaborContract } from '../../../../domain/contract/validation';

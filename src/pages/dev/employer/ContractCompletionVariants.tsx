@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { List, ListRow, Button, BottomSheet, Spacing, Paragraph } from '@toss/tds-mobile';
 
 // Base mock component to simulate the Contract Detail Page
-function MockContractDetail({ children }: { children: React.ReactNode }) {
+function MockContractDetail({ children }: { children: ReactNode }) {
   return (
     <div style={{ padding: '0 24px' }}>
       <Spacing size={24} />

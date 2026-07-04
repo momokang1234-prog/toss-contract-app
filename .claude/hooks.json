@@ -1,0 +1,12 @@
+{
+  "preInvocation": [
+    {
+      "description": "Check autonomous loop timer status",
+      "execute": "node",
+      "args": [
+        "-e",
+        "const targetTime = new Date().setHours(7, 0, 0, 0); const now = Date.now(); const remaining = Math.max(0, targetTime - now); const hours = Math.floor(remaining / 3600000); const mins = Math.floor((remaining % 3600000) / 60000); console.log('\\n🕐 TIMER CHECK: Target 07:00 | Remaining: ' + hours + 'h ' + mins + 'm | Status: ' + (remaining > 0 ? '🟢 RUNNING' : '🔴 COMPLETE')); if (remaining <= 0) { console.log('⚠️  TARGET TIME REACHED! Loop complete at 07:00 KST'); }"
+      ]
+    }
+  ]
+}

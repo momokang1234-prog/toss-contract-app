@@ -13,6 +13,7 @@ import { ContractDocumentView } from '../../components/contract/ContractDocument
 import { DocumentReceiptTracker } from '../../components/contract/DocumentReceiptTracker';
 import SignaturePad from '../../components/SignaturePad';
 import styles from './ContractDetailPage.module.css';
+import { logError } from '../../utils/errorConsolidation';
 
 export default function ContractDetailPage() {
   const { id } = useParams();
@@ -41,7 +42,7 @@ export default function ContractDetailPage() {
       setIsTemplateSheetOpen(false);
       alert('양식이 성공적으로 저장되었습니다!');
     } catch (e) {
-      console.error(e);
+      logError('saveAsTemplate', e, { contractId: contract?.id, templateName });
       alert('양식 저장에 실패했습니다.');
     } finally {
       setSavingTemplate(false);
@@ -161,7 +162,7 @@ export default function ContractDetailPage() {
       const u = await completeContract(id, undefined, pdfUrl || undefined, employerSignature);
       setContract(u);
     } catch (err) {
-      console.error(err);
+      logError('completeContract', err, { contractId: id, step: 'pdf_generation' });
       alert('확정 처리에 실패했습니다. (PDF 생성 또는 DB 통신 에러)');
     } finally {
       setCompleting(false);

@@ -18,6 +18,8 @@
     "@emotion/babel-plugin": "^11.13.5",
     "@emotion/react": "^11.14.0",
     "@lottiefiles/react-lottie-player": "^3.6.0",
+    "@sentry/react": "^10.63.0",
+    "@sentry/tracing": "^7.120.4",
     "@supabase/supabase-js": "^2.107.0",
     "@suspensive/react": "^3.21.2",
     "@toss/tds-mobile": "2.4.0",

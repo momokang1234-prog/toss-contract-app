@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Button, Paragraph, Spacing, Top } from '@toss/tds-mobile';
 import type { Contract } from '../../hooks/useContracts';
 import { ContractDocumentView } from './ContractDocumentView';
+import { logError } from '../../utils/errorConsolidation';
 
 interface ContractPreviewProps {
   contract: Contract;
@@ -16,7 +17,7 @@ export function ContractPreview({ contract }: ContractPreviewProps) {
       const { downloadContractPDF } = await import('../../utils/pdf');
       await downloadContractPDF(contract);
     } catch (err) {
-      console.error(err);
+      logError('downloadPDF', err, { contractId: contract.id });
       alert('PDF 다운로드에 실패했어요.');
     } finally {
       setDownloading(false);

@@ -1,6 +1,7 @@
 import { Component, type ReactNode } from 'react';
 import { Button, Paragraph, Spacing } from '@toss/tds-mobile';
 import { css } from '@emotion/react';
+import { logComponentError } from '../utils/errorConsolidation';
 
 const widgetStyle = css`
   display: flex;
@@ -34,8 +35,11 @@ export class WidgetErrorBoundary extends Component<Props, State> {
     return { error, hasError: true };
   }
 
-  componentDidCatch(error: Error) {
-    console.error('[WidgetErrorBoundary]', error);
+  componentDidCatch(error: Error, errorInfo: any) {
+    logComponentError('WidgetErrorBoundary', error, {
+      componentStack: errorInfo.componentStack,
+      errorBoundaryLevel: 'widget'
+    });
   }
 
   resetErrorBoundary = () => {
